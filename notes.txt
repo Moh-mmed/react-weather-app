@@ -1,0 +1,6 @@
+main color: #00afef
+darkBlue: #29364C
+First dark Gray: #6a6a6a
+Second dark Gray: #464646
+
+light green:#CCE16A
