@@ -7,4 +7,3 @@ light gray: #ebebeb
 light gray: #dfdfdf
 
 light green:#CCE16A
-changes
