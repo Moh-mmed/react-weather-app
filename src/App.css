@@ -5,12 +5,9 @@
 }
 body {
   font-family: "Montserrat", sans-serif;
-<<<<<<< HEAD
-=======
   /* overflow-y: hidden; */
   height: 3000px;
   color: #29364c;
->>>>>>> 43d0e9c (finishing main design)
 }
 .App {
   display: flex;

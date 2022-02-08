@@ -11,12 +11,8 @@ import {
   StyledStats,
   StyledLevel,
   StyledLevelSpan,
-<<<<<<< HEAD
-  StyledLevelBar,
-=======
   StyledProgressBarContainer,
   StyledProgressBar,
->>>>>>> 43d0e9c (finishing main design)
 } from "./StyledAirQualityComponents";
 
 const AirQuality = () => {
@@ -24,11 +20,7 @@ const AirQuality = () => {
     <StyledAirQualityContainer>
       <StyledHeading>
         <StyledImgContainer>
-<<<<<<< HEAD
-          <StyledImg src={img} alt="wind img"/>
-=======
           <StyledImg src={img} alt="wind img" />
->>>>>>> 43d0e9c (finishing main design)
         </StyledImgContainer>
         <StyledDesc>
           <span>air quality</span>
@@ -48,13 +40,9 @@ const AirQuality = () => {
           <StyledLevelSpan variant={true}>standard</StyledLevelSpan>
           <StyledLevelSpan variant={false}>hazardous</StyledLevelSpan>
         </StyledLevel>
-<<<<<<< HEAD
-        <StyledLevelBar/>
-=======
         <StyledProgressBarContainer>
           <StyledProgressBar variant="45.8"/>
         </StyledProgressBarContainer>
->>>>>>> 43d0e9c (finishing main design)
       </StyledStats>
     </StyledAirQualityContainer>
   );

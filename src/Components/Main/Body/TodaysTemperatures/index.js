@@ -1,12 +1,4 @@
 import React from 'react';
-<<<<<<< HEAD
-import { StyledTodaysWeather } from "./StyledTodaysWeatherComponents";
-
-const TodaysTemperatures = () => {
-  return (<StyledTodaysWeather>
-    Todays temperatures
-  </StyledTodaysWeather>);
-=======
 import {
   StyledTemperatures,
   StyledTempHeading,
@@ -93,7 +85,6 @@ const TodaysTemperatures = () => {
       </StyledTemperatures>
     </StyledTodaysWeather>
   );
->>>>>>> 43d0e9c (finishing main design)
 };
 
 export default TodaysTemperatures;
