@@ -37,11 +37,19 @@ position: relative;
 `;
 export const StyledSearchImgContainer = styled.div`
   position: absolute;
+<<<<<<< HEAD
   top: 5px;
   right: 5px;
 `;
 export const StyledImg = styled.img`
   width: 40px
+=======
+  top: 13px;
+  right: 5px;
+`;
+export const StyledImg = styled.img`
+  width: 25px
+>>>>>>> 43d0e9c (finishing main design)
 `;
 
 

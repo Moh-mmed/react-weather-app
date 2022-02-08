@@ -3,7 +3,11 @@ import styled from "styled-components";
 export const StyledSideBar = styled.div`
   display: flex;
   flex-direction: column;
+<<<<<<< HEAD
   height: 500px;
+=======
+  min-height: 100%;
+>>>>>>> 43d0e9c (finishing main design)
   background-color: #fbf9f9;
 `;
 

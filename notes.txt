@@ -1,6 +1,15 @@
 main color: #00afef
+<<<<<<< HEAD
 darkBlue: #29364C
 First dark Gray: #6a6a6a
 Second dark Gray: #464646
+=======
+FontDarkBlue: #29364C
+FontBlack: #13150a
+First dark Gray: #6a6a6a
+Second dark Gray: #464646
+light gray: #ebebeb
+light gray: #dfdfdf
+>>>>>>> 43d0e9c (finishing main design)
 
 light green:#CCE16A

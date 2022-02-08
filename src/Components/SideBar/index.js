@@ -7,7 +7,10 @@ import {
 } from "./StyledSideBar";
 const SideBar = () => {
   return (
+<<<<<<< HEAD
     <div>
+=======
+>>>>>>> 43d0e9c (finishing main design)
       <StyledSideBar>
           <StyledTodaysInfo>
             <StyledDate>
@@ -19,7 +22,10 @@ const SideBar = () => {
             </StyledTemp>
         </StyledTodaysInfo>
       </StyledSideBar>
+<<<<<<< HEAD
     </div>
+=======
+>>>>>>> 43d0e9c (finishing main design)
   );
 };
 

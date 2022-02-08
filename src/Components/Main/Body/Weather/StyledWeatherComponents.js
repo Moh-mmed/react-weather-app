@@ -4,12 +4,21 @@ export const StyledWeatherContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+<<<<<<< HEAD
   color: #6a6a6a;
+=======
+>>>>>>> 43d0e9c (finishing main design)
   text-transform: capitalize;
   background: url(${img});
   background-size: cover;
   border-radius: 20px;
+<<<<<<< HEAD
   min-height: 280px;
+=======
+  box-shadow: 4px 4px 8px 5px rgb(41 54 76 / 13%);
+  min-height: 280px;
+  min-width: 390px;
+>>>>>>> 43d0e9c (finishing main design)
   padding: 20px 30px;
 `;
 export const StyledHeading = styled.div`
@@ -50,7 +59,10 @@ export const StyledDesc = styled.div`
 export const StyledDegree = styled.div`
   display: flex;
   align-items: center;
+<<<<<<< HEAD
   color: #29364c;
+=======
+>>>>>>> 43d0e9c (finishing main design)
   & > span:nth-child(1) {
     font-size: 2.1rem;
     font-weight: 700;
@@ -66,8 +78,14 @@ export const StyledDegree = styled.div`
   }
 `;
 export const StyledCondition = styled.div`
+<<<<<<< HEAD
   font-weight: 500;
   font-size: 0.75rem;
+=======
+  font-weight: 600;
+  font-size: 0.75rem;
+  color: #13150a;
+>>>>>>> 43d0e9c (finishing main design)
 `;
 
 export const StyledStats = styled.div`
@@ -98,9 +116,17 @@ export const StyledStats = styled.div`
   }
   & > div:nth-child(2) {
     background-color: #cce16a;
+<<<<<<< HEAD
+=======
+    color: #13150a;
+>>>>>>> 43d0e9c (finishing main design)
   }
   & > div:nth-child(3) {
     background-color: #fff;
     border-radius: 20px;
+<<<<<<< HEAD
+=======
+    color: #13150a;
+>>>>>>> 43d0e9c (finishing main design)
   }
 `;
