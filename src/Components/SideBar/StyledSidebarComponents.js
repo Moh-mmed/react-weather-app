@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import img from "../../imgs/sunny-icon.png";
+import img from "../../imgs/sun.png";
 
 const degreeCalc = (deg) => {
   if(deg <= 3 || deg >= 97) return deg*1.8
@@ -56,7 +56,7 @@ export const StyledTemp = styled.div`
 
 
 export const StyledSunContainer = styled.div`
-  min-height: 70%;
+  height: 196px;
   margin-top: 16px;
   position: relative;
 `;
@@ -96,7 +96,7 @@ export const StyledSunIcon = styled.div`
   &::after {
     content: "";
     position: absolute;
-    left: 25px;
+    left: 0;
     top: -10px;
     width: 25px;
     height: 25px;
@@ -109,7 +109,7 @@ export const StyledStartNode = styled.span`
   display: inline-block;
   position: absolute;
   top: 134px;
-  left: 48px;
+  left: 21px;
   width: 10px;
   height: 10px;
   border-radius: 50%;
@@ -117,17 +117,16 @@ export const StyledStartNode = styled.span`
 `;
 export const StyledMovingNode = styled(StyledStartNode)`
   display: ${(props) => (props.day ? "inline-block" : "none")};
-  left: ${(props)=>`${48 + props.variant * 2.35}px`};
+  left: ${(props)=>`${21 + props.variant * 2.35}px`};
   background-color: #00afef
 `;
 export const StyledEndNode = styled(StyledStartNode)`
-  left: 283px;
+  left: 256px;
 `;
 export const StyledSunInfo = styled.div`
   margin-top: 1rem;
   display: flex;
   justify-content: space-between;
-  padding: 0 1.2rem;
   & > div {
     display: flex;
     flex-direction: column;
@@ -144,6 +143,53 @@ export const StyledSunInfo = styled.div`
       font-size: 0.9rem;
       font-weight: 400;
       letter-spacing: 1px;
+    }
+  }
+`;
+
+export const StyledUIrays = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+  height: 70px;
+  width: 100%;
+  padding: 20px;
+  background-color: #29364c;
+  color: #fff;
+  border-radius: 15px;
+  & > div:nth-child(1) {
+    width: 35px;
+    height: 35px;
+    background: url(${img});
+    background-size: cover;
+  }
+  & > div:nth-child(2) {
+    width: 75%;
+    text-transform: capitalize;
+    & > div:nth-child(1) {
+      display: flex;
+      align-items: center;
+      & > span:nth-child(1) {
+        text-transform: uppercase;
+        font-size: 1.3rem;
+        font-weight: 500;
+        margin-right: 20px;
+        letter-spacing: 1px;
+      }
+      & > span:nth-child(2) {
+        display: inline-block;
+        font-size: 0.5rem;
+        padding: 3px;
+        background-color: #cce16a;
+        border-radius: 15px;
+        color: #13150a;
+      }
+    }
+    & > div:nth-child(2) {
+      font-size: 0.7rem;
+      font-weight: 400;
+      margin-top: 5px;
     }
   }
 `;

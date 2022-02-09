@@ -13,6 +13,7 @@ import {
   StyledMovingNode,
   StyledSunInfo,
   StyledPathColoring,
+  StyledUIrays,
 } from "./StyledSidebarComponents";
 const SideBar = () => {
   return (
@@ -29,13 +30,13 @@ const SideBar = () => {
       <StyledSunContainer>
         <StyledSunPath>
           <StyledPath day={true}>
-            <StyledPathColoring variant={90} day={true} />
+            <StyledPathColoring variant={40} day={true} />
             {/* between 0 and 100*/}
           </StyledPath>
-          <StyledSunIcon variant={90} />
+          <StyledSunIcon variant={40} />
         </StyledSunPath>
         <StyledStartNode variant={true} />
-        <StyledMovingNode day={true} variant={90} />
+        <StyledMovingNode day={true} variant={40} />
         <StyledEndNode variant={false} />
         <StyledSunInfo>
           <div>
@@ -48,6 +49,16 @@ const SideBar = () => {
           </div>
         </StyledSunInfo>
       </StyledSunContainer>
+      <StyledUIrays>
+        <div></div>
+        <div>
+          <div>
+            <span>20 uvi</span>
+            <span>moderate</span>
+          </div>
+          <div>moderate risk from UV rays</div>
+        </div>
+      </StyledUIrays>
     </StyledSideBar>
   );
 };
