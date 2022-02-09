@@ -12,7 +12,7 @@ export const StyledSideBar = styled.div`
   display: flex;
   flex-direction: column;
   min-height: 100%;
-  background-color: #fbf9f9;
+  background-color: #EBEFF0;
   padding: 0 2em;
 `;
 
@@ -132,17 +132,18 @@ export const StyledSunInfo = styled.div`
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    min-height: 40px;
+    min-height: 30px;
     text-transform: capitalize;
 
     & > span:nth-child(1) {
-      font-size: 0.8rem;
+      font-size: 0.62rem;
       font-weight: 700;
     }
     & > span:nth-child(2) {
-      font-size: 0.9rem;
+      font-size: 0.75rem;
       font-weight: 400;
       letter-spacing: 1px;
+      color: #6a6a6a;
     }
   }
 `;
@@ -151,19 +152,13 @@ export const StyledUIrays = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 15px;
-  height: 70px;
+  margin-top: 10px;
+  height: 75px;
   width: 100%;
   padding: 20px;
   background-color: #29364c;
   color: #fff;
   border-radius: 15px;
-  & > div:nth-child(1) {
-    width: 35px;
-    height: 35px;
-    background: url(${img});
-    background-size: cover;
-  }
   & > div:nth-child(2) {
     width: 75%;
     text-transform: capitalize;
@@ -192,4 +187,83 @@ export const StyledUIrays = styled.div`
       margin-top: 5px;
     }
   }
+`;
+
+export const StyledPredictionHeading = styled.div`
+  line-height: 30px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  margin-top: 20px;
+`;
+export const StyledFollowingDays = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+`;
+export const PredictionDay = styled.div`
+  background-color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+  padding: 16px 20px;
+  border-radius: 15px;
+  & > div:nth-child(2) {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 75%;
+    height: 40px;
+    text-transform: capitalize;
+    & > div:nth-child(1) {
+      font-size: 0.7rem;
+      font-weight: 400;
+      color: #6a6a6a;
+    }
+    & > div:nth-child(2) {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #13150a;
+      text-transform: capitalize;
+      font-size: 0.9rem;
+      font-weight: 700;
+      & > div {
+        display: flex;
+        justify-content: space-between;
+        width: 65px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #00afef;
+      }
+    }
+  }
+`;
+export const StyledSunImg = styled.img`
+  width: 35px;
+`;
+export const StyledFollowingFiveDays = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  height:60px;
+  padding: 15px 0 0;
+  & > div {
+    background-color: #00afef;
+    display: flex;
+    align-items: center;
+    border-radius: 15px;
+    padding: 10px 15px;
+    color: #fff;
+    cursor: pointer;
+    & > span {
+      font-size: 0.7rem;
+      font-weight: 400;
+      margin-left: 10px;
+      text-transform: capitalize;
+    }
+  }
+`;
+export const StyledCalendarIcon = styled.img`
+  width: 15px;
 `;

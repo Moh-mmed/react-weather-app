@@ -1,4 +1,6 @@
 import React from 'react';
+import calendar from '../../imgs/calendar.png'
+import sun from "../../imgs/sun.png";
 import {
   StyledSideBar,
   StyledTodaysInfo,
@@ -14,6 +16,12 @@ import {
   StyledSunInfo,
   StyledPathColoring,
   StyledUIrays,
+  StyledPredictionHeading,
+  StyledFollowingDays,
+  PredictionDay,
+  StyledSunImg,
+  StyledFollowingFiveDays,
+  StyledCalendarIcon,
 } from "./StyledSidebarComponents";
 const SideBar = () => {
   return (
@@ -50,7 +58,7 @@ const SideBar = () => {
         </StyledSunInfo>
       </StyledSunContainer>
       <StyledUIrays>
-        <div></div>
+        <StyledSunImg src={sun} />
         <div>
           <div>
             <span>20 uvi</span>
@@ -59,6 +67,43 @@ const SideBar = () => {
           <div>moderate risk from UV rays</div>
         </div>
       </StyledUIrays>
+      <StyledPredictionHeading>weather prediction</StyledPredictionHeading>
+      <StyledFollowingDays>
+        <PredictionDay>
+          <StyledSunImg src={sun} />
+          <div>
+            <div>november 10</div>
+            <div>
+              <span>cloudy</span>
+              <div>
+                <span>26°</span>
+                <span>/</span>
+                <span>19°</span>
+              </div>
+            </div>
+          </div>
+        </PredictionDay>
+        <PredictionDay>
+          <StyledSunImg src={sun} />
+          <div>
+            <div>november 11</div>
+            <div>
+              <span>bright</span>
+              <div>
+                <span>26°</span>
+                <span>/</span>
+                <span>20°</span>
+              </div>
+            </div>
+          </div>
+        </PredictionDay>
+      </StyledFollowingDays>
+      <StyledFollowingFiveDays>
+        <div>
+          <StyledCalendarIcon src={calendar} />
+          <span>next 5 days</span>
+        </div>
+      </StyledFollowingFiveDays>
     </StyledSideBar>
   );
 };

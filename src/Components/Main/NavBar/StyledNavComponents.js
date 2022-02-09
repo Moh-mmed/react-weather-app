@@ -21,10 +21,10 @@ export const StyledSearchbar = styled.div`
   width: 50%;
 `;
 export const StyledInput = styled.input`
-position: relative;
+  position: relative;
   min-width: 300px;
   padding: 1em 0.9em;
-  background-color: #f5f5f5;
+  background-color: #ebeff0;
   border-radius: 10px;
   font-size: 0.95em;
   font-weight: 500;
@@ -37,11 +37,11 @@ position: relative;
 `;
 export const StyledSearchImgContainer = styled.div`
   position: absolute;
-  top: 13px;
-  right: 5px;
+  top: 15px;
+  right: 10px;
 `;
 export const StyledImg = styled.img`
-  width: 25px
+  width: 21px
 `;
 
 
