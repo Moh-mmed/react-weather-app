@@ -1,5 +1,13 @@
 import styled from "styled-components";
 import img from "../../imgs/sunny-icon.png";
+
+const degreeCalc = (deg) => {
+  if(deg <= 3 || deg >= 97) return deg*1.8
+  deg = deg * 1.8;
+  let diff = 26 - (deg * 0.28)
+  return deg+diff
+}
+
 export const StyledSideBar = styled.div`
   display: flex;
   flex-direction: column;
@@ -50,6 +58,7 @@ export const StyledTemp = styled.div`
 export const StyledSunContainer = styled.div`
   min-height: 70%;
   margin-top: 16px;
+  position: relative;
 `;
 export const StyledSunPath = styled.div`
   height: 140px;
@@ -65,23 +74,30 @@ export const StyledPath = styled.div`
   width: 240px;
   height: 240px;
   border-radius: 50%;
-  border: dashed 2px #00afef;
+  border: dashed 2px ${(props) => (props.day ? "#00afef" : "#29364c")};
   text-align: center;
+  overflow: hidden;
+`;
+export const StyledPathColoring = styled.div`
+  background-color: ${(props) =>
+    props.day ? "rgb(0 187 255 / 7%)" : "none"};
+  width: ${(props) => `${props.variant}%`};
+  height: 100%;
+  top: 0;
+  border: none;
 `;
 export const StyledSunIcon = styled.div`
-  background-color: bisque;
   width: 50%;
   box-sizing: border-box;
-  top: 50%;
-  left: 0%;
+  bottom: -8px;
   position: absolute;
   transform-origin: right;
-  transform: rotate(90deg);
+  transform: ${(props) => `rotate(${degreeCalc(props.variant)}deg)`};
   &::after {
     content: "";
     position: absolute;
-    left: -35px;
-    top: -8px;
+    left: 25px;
+    top: -10px;
     width: 25px;
     height: 25px;
     background: url(${img});
@@ -89,15 +105,23 @@ export const StyledSunIcon = styled.div`
   }
 `;
 
-export const StyledNodePoint = styled.span`
-  width: 7px;
-  height: 7px;
-  color: #29364c;
+export const StyledStartNode = styled.span`
+  display: inline-block;
+  position: absolute;
+  top: 134px;
+  left: 48px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: ${(props) => (props.variant ? "#00afef" : "#29364c")};
 `;
-export const StyledMovingNode = styled.div`
-  width: 7px;
-  height: 7px;
-  color: #00afef;
+export const StyledMovingNode = styled(StyledStartNode)`
+  display: ${(props) => (props.day ? "inline-block" : "none")};
+  left: ${(props)=>`${48 + props.variant * 2.35}px`};
+  background-color: #00afef
+`;
+export const StyledEndNode = styled(StyledStartNode)`
+  left: 283px;
 `;
 export const StyledSunInfo = styled.div`
   margin-top: 1rem;

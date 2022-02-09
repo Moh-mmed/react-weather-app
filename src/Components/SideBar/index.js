@@ -8,9 +8,11 @@ import {
   StyledSunPath,
   StyledSunIcon,
   StyledPath,
-  StyledNodePoint,
+  StyledStartNode,
+  StyledEndNode,
   StyledMovingNode,
   StyledSunInfo,
+  StyledPathColoring,
 } from "./StyledSidebarComponents";
 const SideBar = () => {
   return (
@@ -26,13 +28,15 @@ const SideBar = () => {
       </StyledTodaysInfo>
       <StyledSunContainer>
         <StyledSunPath>
-          <StyledPath>
-            <StyledSunIcon />
+          <StyledPath day={true}>
+            <StyledPathColoring variant={90} day={true} />
+            {/* between 0 and 100*/}
           </StyledPath>
-          <StyledNodePoint />
-          <StyledMovingNode />
-          <StyledNodePoint />
+          <StyledSunIcon variant={90} />
         </StyledSunPath>
+        <StyledStartNode variant={true} />
+        <StyledMovingNode day={true} variant={90} />
+        <StyledEndNode variant={false} />
         <StyledSunInfo>
           <div>
             <span>sunrise</span>

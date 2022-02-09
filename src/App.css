@@ -12,6 +12,8 @@ body {
 .App {
   display: flex;
   min-height: 100vh;
+  margin: auto;
+  width: 1349px;
 }
 .Main {
   width: 70%;
