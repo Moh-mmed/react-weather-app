@@ -1,6 +1,8 @@
-import React from 'react';
+import React,{useState, useEffect} from 'react';
+import { NavLink} from "react-router-dom";
 import calendar from '../../imgs/calendar.png'
 import sun from "../../imgs/sun.png";
+import cloudy from "../../imgs/all-cloudy.png";
 import {
   StyledSideBar,
   StyledTodaysInfo,
@@ -22,8 +24,16 @@ import {
   StyledSunImg,
   StyledFollowingFiveDays,
   StyledCalendarIcon,
+  StyledNextFiveDaysLink,
 } from "./StyledSidebarComponents";
 const SideBar = () => {
+ const [activeLink, setActiveLink] = useState(false)
+  const [currLink, setCurrLink] = useState(window.history)
+  useEffect(() => {
+    console.log(currLink);
+  }, [activeLink]);
+  
+
   return (
     <StyledSideBar>
       <StyledTodaysInfo>
@@ -70,7 +80,7 @@ const SideBar = () => {
       <StyledPredictionHeading>weather prediction</StyledPredictionHeading>
       <StyledFollowingDays>
         <PredictionDay>
-          <StyledSunImg src={sun} />
+          <StyledSunImg src={cloudy} />
           <div>
             <div>november 10</div>
             <div>
@@ -99,10 +109,27 @@ const SideBar = () => {
         </PredictionDay>
       </StyledFollowingDays>
       <StyledFollowingFiveDays>
-        <div>
-          <StyledCalendarIcon src={calendar} />
-          <span>next 5 days</span>
-        </div>
+        {activeLink ? (
+          <NavLink to="todays-temperatures">
+            <StyledNextFiveDaysLink
+              onClick={() => setActiveLink(!activeLink)}
+              variant={activeLink}
+            >
+              <StyledCalendarIcon src={calendar} />
+              <span>today's temperatures</span>
+            </StyledNextFiveDaysLink>
+          </NavLink>
+        ) : (
+          <NavLink to="next-five-days">
+            <StyledNextFiveDaysLink
+              onClick={() => setActiveLink(!activeLink)}
+              variant={activeLink}
+            >
+              <StyledCalendarIcon src={calendar} />
+              <span>next 5 days</span>
+            </StyledNextFiveDaysLink>
+          </NavLink>
+        )}
       </StyledFollowingFiveDays>
     </StyledSideBar>
   );

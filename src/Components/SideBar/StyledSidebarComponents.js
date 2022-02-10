@@ -12,6 +12,7 @@ export const StyledSideBar = styled.div`
   display: flex;
   flex-direction: column;
   min-height: 100%;
+  min-width: 350px;
   background-color: #EBEFF0;
   padding: 0 2em;
 `;
@@ -246,22 +247,26 @@ export const StyledSunImg = styled.img`
 export const StyledFollowingFiveDays = styled.div`
   display: flex;
   justify-content: flex-end;
-  height:60px;
+  height: 60px;
   padding: 15px 0 0;
-  & > div {
-    background-color: #00afef;
-    display: flex;
-    align-items: center;
-    border-radius: 15px;
-    padding: 10px 15px;
-    color: #fff;
-    cursor: pointer;
-    & > span {
-      font-size: 0.7rem;
-      font-weight: 400;
-      margin-left: 10px;
-      text-transform: capitalize;
-    }
+  & > a {
+    text-decoration: none;
+    
+  }
+`;
+export const StyledNextFiveDaysLink = styled.div`
+  background-color: ${(props) => (props.variant ? "#29364C" : "#00afef")};
+  display: flex;
+  align-items: center;
+  border-radius: 15px;
+  padding: 14px 18px;
+  color: #fff;
+  cursor: pointer;
+  & > span {
+    font-size: 0.7rem;
+    font-weight: 400;
+    margin-left: 10px;
+    text-transform: capitalize;
   }
 `;
 export const StyledCalendarIcon = styled.img`

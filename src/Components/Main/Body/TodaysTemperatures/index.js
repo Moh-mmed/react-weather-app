@@ -13,10 +13,10 @@ import {
   StyledDailyDegree,
 } from "./StyledTodaysWeatherComponents";
 import cloudy from "../../../../imgs/all-cloudy.png"
-import partlyCloudy from "../../../../imgs/partly-cloudy-icon.png"
-import snowy from "../../../../imgs/heavy-snow-icon.png"
-import lightSnow from "../../../../imgs/light-snow-icon.png"
-import sunny from "../../../../imgs/sunny-icon.png"
+import partlyCloudy from "../../../../imgs/partly-cloudy.png"
+import snowy from "../../../../imgs/heavy-snow.png"
+import lightSnow from "../../../../imgs/light-snow.png"
+import sunny from "../../../../imgs/sun.png"
 const TodaysTemperatures = () => {
   return (
     <StyledTodaysWeather>

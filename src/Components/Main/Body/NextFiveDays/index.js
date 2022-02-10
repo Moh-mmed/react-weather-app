@@ -12,18 +12,18 @@ import {
   StyledBullet,
   StyledDailyDegree,
 } from "./StyledNextFiveDaysComponents";
-import cloudy from "../../../../imgs/all-cloudy.png"
-import partlyCloudy from "../../../../imgs/partly-cloudy-icon.png"
-import snowy from "../../../../imgs/heavy-snow-icon.png"
-import lightSnow from "../../../../imgs/light-snow-icon.png"
-import sunny from "../../../../imgs/sunny-icon.png"
+import cloudy from "../../../../imgs/all-cloudy.png";
+import partlyCloudy from "../../../../imgs/partly-cloudy.png";
+import snowy from "../../../../imgs/heavy-snow.png";
+import lightSnow from "../../../../imgs/light-snow.png";
+import sunny from "../../../../imgs/sun.png";
 const NextFiveDays = () => {
   return (
     <StyledTodaysWeather>
       <StyledTempHeading>
         <StyledHeading>
-          How's the <br />
-          temperature today?
+          Next Five <br />
+          days' temperature
         </StyledHeading>
       </StyledTempHeading>
       <StyledTempTomorrow>

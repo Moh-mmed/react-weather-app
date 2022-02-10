@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import img from "../../../../imgs/day-partly-cloudy.jpg";
+import img from "../../../../imgs/day-sunny.jpg";
 export const StyledWeatherContainer = styled.div`
   display: flex;
   flex-direction: column;

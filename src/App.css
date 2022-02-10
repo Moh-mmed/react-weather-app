@@ -6,12 +6,11 @@
 body {
   font-family: "Montserrat", sans-serif;
   /* overflow-y: hidden; */
-  height: 3000px;
   color: #29364c;
+  height: 3000px;
 }
 .App {
   display: flex;
-  min-height: 100vh;
   margin: auto;
   width: 1349px;
 }
