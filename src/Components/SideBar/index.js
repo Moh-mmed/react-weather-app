@@ -28,10 +28,10 @@ import {
 } from "./StyledSidebarComponents";
 const SideBar = () => {
  const [activeLink, setActiveLink] = useState(false)
-  const [currLink, setCurrLink] = useState(window.history)
-  useEffect(() => {
-    console.log(currLink);
-  }, [activeLink]);
+  // const [currLink, setCurrLink] = useState(window.history)
+  // useEffect(() => {
+  //   console.log(currLink);
+  // }, [activeLink]);
   
 
   return (

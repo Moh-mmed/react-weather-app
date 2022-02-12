@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import logo from '../../../imgs/weatherme.png'
 import search from '../../../imgs/search.png'
 import {
@@ -10,24 +10,36 @@ import {
   StyledSearchImgContainer,
   StyledImg,
 } from "./StyledNavComponents";
+import NavBarForm from './NavBarForm';
 
 
-const Nav = () => {
+const Nav = (props) => {
+  const [enteredCity, setEnteredCity] = useState("")
+  const handleFormSubmit = (e) => {
+    e.preventDefault()
+    if (enteredCity !== "") {
+      props.handleSearchCity(enteredCity);
+   }
+  }
   return (
     <NavContainer>
       <StyledLogo>
         <StyledImage src={logo} alt="Weather logo" />
       </StyledLogo>
-      <StyledSearchbar>
-        <StyledInput
-          type="text"
-          placeholder="Search anything"
-          className="search-bar"
-        />
+      {/* <StyledSearchbar>
+        <form onSubmit={handleFormSubmit}>
+          <StyledInput
+            type="text"
+            placeholder="Search anything"
+            className="search-bar"
+            onChange={(e)=>setEnteredCity(e.target.value)}
+          />
+        </form>
         <StyledSearchImgContainer>
           <StyledImg src={search} alt="search img" />
         </StyledSearchImgContainer>
-      </StyledSearchbar>
+      </StyledSearchbar> */}
+      <NavBarForm handleSearchCity={props.handleSearchCity}/>
     </NavContainer>
   );
 };
