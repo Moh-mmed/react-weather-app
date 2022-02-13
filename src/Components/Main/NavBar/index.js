@@ -14,13 +14,13 @@ import NavBarForm from './NavBarForm';
 
 
 const Nav = (props) => {
-  const [enteredCity, setEnteredCity] = useState("")
-  const handleFormSubmit = (e) => {
-    e.preventDefault()
-    if (enteredCity !== "") {
-      props.handleSearchCity(enteredCity);
-   }
-  }
+  // const [enteredCity, setEnteredCity] = useState("")
+  // const handleFormSubmit = (e) => {
+  //   e.preventDefault()
+  //   if (enteredCity !== "") {
+  //     props.handleSearchCity(enteredCity);
+  //  }
+  // }
   return (
     <NavContainer>
       <StyledLogo>
