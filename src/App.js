@@ -12,6 +12,7 @@ import ErrorPage from './Components/ErrorPage'
 
 function App() {
   const [searchCity, setSearchCity] = useState(null)
+  const [currCity, setCurrCity] = useState(null)
   const [coords, setCoords] = useState(null)
   const [data, setData] = useState(null)
   const KEY = "99eb51721a50689c8175af2560a2b07c";
@@ -21,29 +22,51 @@ function App() {
     setSearchCity(e);
   }
 
-  //Find coordinates using location
-  const getLocation = async () => {
-    let coordinates;
-    let opts = {
-      enableHightAccuracy: true,
-      timeout: 1000 * 10,
-      maximumAge: 1000 * 60 * 5
-    }
-    let fail = (err) => console.log(err);
-    let success = (position) => {
-      coordinates = {
-        lat: Number(position.coords.latitude.toFixed(2)),
-        lon: Number(position.coords.longitude.toFixed(2)),
-      }; 
-      setCoords(coordinates);
-      // localStorage.setItem("coordinates", JSON.stringify(coordinates));
-    };
-    await navigator.geolocation.getCurrentPosition(success, fail, opts);
-  }
-  
 
+  //Find coordinates using location
+  // first we check if localStorage has saved coordinates, if not we get coordinates using Location API
+  // If user turn on location, the user should ask for detecting coordinates using location
   useEffect(() => {
- 
+    let coordinates = JSON.parse(localStorage.getItem("coordinates"));
+    if (coordinates !== null) {
+      setCoords(coordinates);
+    }else {
+     const getLocation = async () => {
+       let cityCoords;
+       let getCoordinatesWithLocation = new Promise((resolve, reject) => {
+         let opts = {
+           enableHightAccuracy: true,
+           timeout: 1000 * 10,
+           maximumAge: 1000 * 60 * 5,
+         };
+         const success = (position) => {
+           cityCoords = {
+             lat: Number(position.coords.latitude.toFixed(2)),
+             lon: Number(position.coords.longitude.toFixed(2)),
+           };
+           localStorage.setItem("coordinates", JSON.stringify(cityCoords));
+           setCoords(cityCoords);
+           resolve(cityCoords);
+         };
+         const fail = (err) => {
+           // Istanbul coordinates as default
+           cityCoords = { lat: 41.01, lon: 28.66 };
+           localStorage.setItem("coordinates", JSON.stringify(cityCoords));
+           setCoords(cityCoords);
+           reject("Location is INACTIVE");
+         };
+         navigator.geolocation.getCurrentPosition(success, fail, opts);
+       });
+       await getCoordinatesWithLocation;
+     };
+     getLocation(); 
+    }
+  },[])
+
+
+/*
+// Find coordinates for entered city
+  useEffect(() => {
   const findCoordinates = async () => {
       let coordinatesURL = `http://api.openweathermap.org/geo/1.0/direct?q=${searchCity}&limit=5&appid=${KEY}`;
       await axios
@@ -56,7 +79,6 @@ function App() {
               lat: Number(response.data[0].lat.toFixed(2)),
               lon: Number(response.data[0].lon.toFixed(2)),
             });
-            setSearchCity(response.data[0].name);
           } else {
              console.log("You entered a wrong city");
           }
@@ -69,11 +91,10 @@ function App() {
   //  let coordinates = JSON.parse(localStorage.getItem('coordinates')) || getLocation();
    getLocation()
   //  console.log(coords)
-    if (searchCity !== null) {
+    if (searchCity !== null ) {
      findCoordinates();
      console.log("Search city is running")
     }
-    
   }, [searchCity]);
 
   useEffect(() => {
@@ -99,7 +120,7 @@ function App() {
            headers: { Accept: "application/json" },
          })
          .then((response) => {
-           setSearchCity(response.data[0].name)
+           setCurrCity(response.data[0].name)
            console.log(response.data);
          })
          .catch((err) => {
@@ -108,11 +129,10 @@ function App() {
     };
     if (coords !== null) {
       findWeather()
-      findCityName();
     }
  }, [coords]);
 
-
+*/
   return (
     <div className="App">
       <div className="Main">
