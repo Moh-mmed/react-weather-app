@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, createContext } from "react";
 import { Route, Routes } from "react-router-dom"
+import WeatherContext from "./WeatherContext"
 import './App.css';
 import axios from "axios"
 import Body from "./Components/Main/Body";
@@ -14,22 +15,19 @@ function App() {
   const [searchCity, setSearchCity] = useState(null)
   const [currCity, setCurrCity] = useState(null)
   const [coords, setCoords] = useState(null)
-  const [data, setData] = useState(null)
+  const [weather, setWeather] = useState(null)
+  const [airQuality, setAirQuality] = useState(null);
   const [isLoading, setIsLoading] = useState(false)
+
+
   const KEY = "99eb51721a50689c8175af2560a2b07c";
   
-  
-  const handleSearchCity = (e) => {
-    setSearchCity(e);
-  }
-
 
   //Find coordinates using location
   // first we check if localStorage has saved coordinates, if not we get coordinates using Location API
   // If user turn on location, the user should ask for detecting coordinates using location
   useEffect(() => {
     let coordinates = JSON.parse(localStorage.getItem("coordinates"));
-
     // Find city name
     const findCityName = async (cor) => {
       const reverseURL = `https://api.openweathermap.org/geo/1.0/reverse?lat=${cor.lat}&lon=${cor.lon}&limit=5&appid=${KEY}`;
@@ -71,7 +69,7 @@ function App() {
             cityCoords = { lat: 41.01, lon: 28.66 };
             localStorage.setItem("coordinates", JSON.stringify(cityCoords));
             setCoords(cityCoords);
-             findCityName(cityCoords);
+            findCityName(cityCoords);
             reject("Location is INACTIVE");
           };
           navigator.geolocation.getCurrentPosition(success, fail, opts);
@@ -114,7 +112,7 @@ function App() {
   }, [searchCity]);
 
 
-
+// Find Weather data
   useEffect(() => {
     setIsLoading(true)
     if (coords !== null) {
@@ -125,11 +123,11 @@ function App() {
           headers: { Accept: "application/json" },
         })
         .then((response) => {
-          setData(response.data);
+          setWeather(response.data);
           setIsLoading(false)
         })
         .catch((err) => {
-          setData(console.log(err));
+          setWeather(console.log(err));
           setIsLoading(false);
         });
     };
@@ -137,32 +135,58 @@ function App() {
   }
  }, [coords]);
 
+
+// Find Air Quality
+  useEffect(() => {
+    setIsLoading(true);
+    if (coords !== null) {
+      const findAirQuality = async () => {
+        const airQualityURL = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${coords.lat}&lon=${coords.lon}&appid=${KEY}`;
+        await axios
+          .get(airQualityURL, {
+            headers: { Accept: "application/json" },
+          })
+          .then((response) => {
+            setAirQuality(response.data);
+            setIsLoading(false);
+          })
+          .catch((err) => {
+            setAirQuality(console.log(err));
+            setIsLoading(false);
+          });
+      };
+      findAirQuality();
+    }
+  }, [coords]); 
+
   return (
-    <div className="App">
-      {isLoading ? (
-        <div>Loading</div>
-      ) : (
-        <>
-          <div className="Main">
-            <Nav city={searchCity} handleSearchCity={handleSearchCity} />
-            <Routes>
-              <Route path="/" element={<Body />}>
-                <Route index element={<TodaysTemperatures />} />
-                <Route
-                  path="/todays-temperatures"
-                  element={<TodaysTemperatures />}
-                />
-                <Route path="/next-five-days" element={<NextFiveDays />} />
-              </Route>
-              <Route path="*" element={<ErrorPage />} />
-            </Routes>
-          </div>
-          <div className="Side-Bar">
-            <SideBar />
-          </div>
-        </>
-      )}
-    </div>
+    <WeatherContext.Provider value={{ weather, airQuality, currCity, isLoading }}>
+      <div className="App">
+        {isLoading ? (
+          <div>Loading</div>
+        ) : (
+          <>
+            <div className="Main">
+              <Nav city={searchCity} handleSearchCity={setSearchCity} />
+              <Routes>
+                <Route path="/" element={<Body />}>
+                  <Route index element={<TodaysTemperatures />} />
+                  <Route
+                    path="/todays-temperatures"
+                    element={<TodaysTemperatures />}
+                  />
+                  <Route path="/next-five-days" element={<NextFiveDays />} />
+                </Route>
+                <Route path="*" element={<ErrorPage />} />
+              </Routes>
+            </div>
+            <div className="Side-Bar">
+              <SideBar />
+            </div>
+          </>
+        )}
+      </div>
+    </WeatherContext.Provider>
   );
 }
 

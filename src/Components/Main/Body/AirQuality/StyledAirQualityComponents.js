@@ -1,6 +1,17 @@
 import styled from "styled-components";
 import img from "../../../../imgs/clean-air.jpg";
 
+const getProgressWidth = (index) => {
+  switch (index) {
+    case 1: return 4;
+    case 2: return 22;
+    case 3: return 45;
+    case 4: return 69;
+    case 5: return 95;
+    default: return 50
+  }
+} 
+
 export const StyledAirQualityContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -78,10 +89,10 @@ display: flex;
 flex-direction: column;
 justify-content: space-between;
 background-color: #fff;
-  border-radius: 20px;
-  width: 100%;
-  height: 70px;
-  padding: 14px 20px
+border-radius: 20px;
+width: 100%;
+height: 70px;
+padding: 14px 20px
 `;
 
 export const StyledLevel = styled.div`
@@ -113,7 +124,8 @@ export const StyledLevelSpan = styled.span`
 `;
 
 export const StyledProgressBarContainer = styled.div`
-  width: 100%;
+  margin: 0 auto;
+  width: 90%;
   height: 6px;
   background-color: #ebebeb;
   border-radius: 20px;
@@ -132,6 +144,6 @@ export const StyledProgressBar = styled.div`
     -webkit-linear-gradient(left, #00afef, #00afef);
 
   background-size: 20px 10px, 100% 100%, 100% 100%;
-  width: ${(props) => `${props.variant}%`};
+  width: ${(props) => `${getProgressWidth(props.variant)}%`};
   height: 100%;
 `;
