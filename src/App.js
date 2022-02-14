@@ -14,7 +14,7 @@ import ErrorPage from './Components/ErrorPage'
 function App() {
   const [searchCity, setSearchCity] = useState(null)
   const [currCity, setCurrCity] = useState(null)
-  const [coords, setCoords] = useState(null)
+  const [coords, setCoords] = useState(null);
   const [weather, setWeather] = useState(null)
   const [airQuality, setAirQuality] = useState(null);
   const [isLoading, setIsLoading] = useState(false)
@@ -22,6 +22,9 @@ function App() {
 
   const KEY = "99eb51721a50689c8175af2560a2b07c";
   
+  // const handleSearchCity = async (e) => {
+  //   await setSearchCity(e)
+  // };
 
   //Find coordinates using location
   // first we check if localStorage has saved coordinates, if not we get coordinates using Location API
@@ -37,9 +40,10 @@ function App() {
         })
         .then((response) => {
           setCurrCity(response.data[0].name);
+          setSearchCity(response.data[0].name)
         })
         .catch((err) => {
-          setCurrCity("Unknown");
+          console.log(err);
         });
     };
     if (coordinates !== null) {
@@ -55,9 +59,9 @@ function App() {
             maximumAge: 1000 * 60 * 5,
           };
           const success = (position) => {
-            cityCoords = {
-              lat: Number(position.coords.latitude.toFixed(2)),
-              lon: Number(position.coords.longitude.toFixed(2)),
+           cityCoords = {
+              lat: Number(position.coords.latitude),
+              lon: Number(position.coords.longitude)
             };
             localStorage.setItem("coordinates", JSON.stringify(cityCoords));
             setCoords(cityCoords);
@@ -67,7 +71,7 @@ function App() {
           const fail = (err) => {
             // Istanbul coordinates as default
             cityCoords = { lat: 41.01, lon: 28.66 };
-            localStorage.setItem("coordinates", JSON.stringify(cityCoords));
+            localStorage.setItem("coordinates", JSON.stringify(coords));
             setCoords(cityCoords);
             findCityName(cityCoords);
             reject("Location is INACTIVE");
@@ -80,7 +84,6 @@ function App() {
     }
   },[])
 
-
   // Find coordinates for entered city 
   useEffect(() => {
   const findCoordinates = async () => {
@@ -92,8 +95,8 @@ function App() {
         .then((response) => {
           if (response.data.length > 0) {
             let cityCoords = {
-              lat: Number(response.data[0].lat.toFixed(2)),
-              lon: Number(response.data[0].lon.toFixed(2)),
+              lat: Number(response.data[0].lat),
+              lon: Number(response.data[0].lon),
             };
             setCoords(cityCoords);
             setCurrCity(response.data[0].name)
@@ -105,16 +108,15 @@ function App() {
         .catch((err) => {
           console.log(err);
         });
-    };
-    if (searchCity !== null ) {
+  };
+    if (searchCity !== null) {
      findCoordinates();
-    }
+  }
   }, [searchCity]);
 
 
 // Find Weather data
   useEffect(() => {
-    setIsLoading(true)
     if (coords !== null) {
     const findWeather = async () => {
       const weatherURL = `https://api.openweathermap.org/data/2.5/onecall?lat=${coords.lat}&lon=${coords.lon}&units=metric&appid=${KEY}`;
@@ -124,11 +126,9 @@ function App() {
         })
         .then((response) => {
           setWeather(response.data);
-          setIsLoading(false)
         })
         .catch((err) => {
-          setWeather(console.log(err));
-          setIsLoading(false);
+          console.log(err);
         });
     };
     findWeather();
@@ -138,7 +138,6 @@ function App() {
 
 // Find Air Quality
   useEffect(() => {
-    setIsLoading(true);
     if (coords !== null) {
       const findAirQuality = async () => {
         const airQualityURL = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${coords.lat}&lon=${coords.lon}&appid=${KEY}`;
@@ -148,11 +147,9 @@ function App() {
           })
           .then((response) => {
             setAirQuality(response.data);
-            setIsLoading(false);
           })
           .catch((err) => {
-            setAirQuality(console.log(err));
-            setIsLoading(false);
+            console.log(err);
           });
       };
       findAirQuality();
@@ -160,9 +157,9 @@ function App() {
   }, [coords]); 
 
   return (
-    <WeatherContext.Provider value={{ weather, airQuality, currCity, isLoading }}>
+    <WeatherContext.Provider value={{ weather, airQuality, currCity }}>
       <div className="App">
-        {isLoading ? (
+        {(weather === null || airQuality === null) ? (
           <div>Loading</div>
         ) : (
           <>
