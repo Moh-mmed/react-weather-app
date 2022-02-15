@@ -1,11 +1,10 @@
 import styled from "styled-components";
-import img from "../../../../imgs/day-sunny.jpg";
 export const StyledWeatherContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   text-transform: capitalize;
-  background: url(${img});
+  background: ${(props) => `url(${props.img})`};
   background-size: cover;
   border-radius: 20px;
   box-shadow: 4px 4px 8px 5px rgb(41 54 76 / 13%);
@@ -25,11 +24,10 @@ export const StyledImgContainer = styled.div`
   background-color: #fff;
   margin-right: 15px;
   border-radius: 50%;
-  padding: 8px;
 `;
 
 export const StyledImg = styled.img`
-  width: 25px;
+  width: 50px;
 `;
 
 

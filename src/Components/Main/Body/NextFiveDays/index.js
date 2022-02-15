@@ -13,9 +13,8 @@ import {
   StyledDailyDegree,
 } from "./StyledNextFiveDaysComponents";
 import cloudy from "../../../../imgs/all-cloudy.png";
-import partlyCloudy from "../../../../imgs/partly-cloudy.png";
-import snowy from "../../../../imgs/heavy-snow.png";
-import lightSnow from "../../../../imgs/light-snow.png";
+import partlyCloudy from "../../../../imgs/partly_cloudy_tomorrow.jpg";
+import snowy from "../../../../imgs/snowy_tomorrow.jpg";
 import sunny from "../../../../imgs/sun.png";
 const NextFiveDays = () => {
   return (

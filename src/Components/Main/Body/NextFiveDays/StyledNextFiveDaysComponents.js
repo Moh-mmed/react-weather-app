@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import img from "../../../../imgs/tomorrow-rainy.jpg"
+import img from "../../../../imgs/rainy_tomorrow.jpg";
 const season = {
   winter: 'winter',
   spring: 'spring',

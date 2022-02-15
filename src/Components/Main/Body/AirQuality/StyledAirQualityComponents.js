@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import img from "../../../../imgs/clean-air.jpg";
+
 
 const getProgressWidth = (index) => {
   switch (index) {
@@ -17,7 +17,7 @@ export const StyledAirQualityContainer = styled.div`
   flex-direction: column;
   justify-content: space-between;
   text-transform: capitalize;
-  background: url(${img});
+  background: ${(props)=>`url(${props.img})`};
   background-size: cover;
   border-radius: 20px;
   box-shadow: 4px 4px 8px 5px rgb(41 54 76 / 13%);
@@ -42,7 +42,7 @@ export const StyledImgContainer = styled.div`
 `;
 
 export const StyledImg = styled.img`
-  width: 25px;
+  width: 34px;
 `;
 
 export const StyledDesc = styled.div`

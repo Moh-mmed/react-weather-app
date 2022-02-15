@@ -1,6 +1,7 @@
 import React from "react";
 import WeatherContext from "../../../../WeatherContext";
-import img from "../../../../imgs/wind.png"
+import icon from "../../../../imgs/air_quality.png"
+import backImg from "../../../../imgs/clear_air.jpg";
 import {
   StyledAirQualityContainer,
   StyledHeading,
@@ -28,7 +29,7 @@ const getWindDirection = (deg) => {
   if (deg >= 146 && deg < 168) return "South Southeast";
   if (deg >= 168 && deg < 191) return "South";
   if(deg >= 191 && deg < 213 ) return "Southeast Southwest";
-  if(deg >= 2135 && deg < 236 ) return "Southwest";
+  if(deg >= 213 && deg < 236 ) return "Southwest";
   if(deg >= 236&& deg < 258 ) return "West Southwest";
   if(deg >= 258 && deg < 281 ) return "West"
   if(deg >= 281 && deg < 303 ) return "West Northwest"
@@ -41,6 +42,7 @@ const AirQuality = () => {
     <WeatherContext.Consumer>
       {({ airQuality, weatherData }) => {
         if (airQuality !== null && weatherData !== null) {
+          console.log(airQuality)
           const {wind_deg} = weatherData.current
           const { components, main } = airQuality.list[0];
           let pm = Math.ceil(components.pm2_5);
@@ -51,10 +53,10 @@ const AirQuality = () => {
             }
           }
             return (
-              <StyledAirQualityContainer>
+              <StyledAirQualityContainer img={backImg}>
                 <StyledHeading>
                   <StyledImgContainer>
-                    <StyledImg src={img} alt="wind img" />
+                    <StyledImg src={icon} alt="wind img" />
                   </StyledImgContainer>
                   <StyledDesc>
                     <span>air quality</span>
@@ -66,7 +68,9 @@ const AirQuality = () => {
                     <span>{aqi}</span>
                     <span>aqi</span>
                   </StyledDegree>
-                  <StyledCondition>{ getWindDirection(wind_deg)}</StyledCondition>
+                  <StyledCondition>
+                    {getWindDirection(wind_deg)}
+                  </StyledCondition>
                 </div>
                 <StyledStats>
                   <StyledLevel>

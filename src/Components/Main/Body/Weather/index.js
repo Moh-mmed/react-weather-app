@@ -1,6 +1,13 @@
 import React from 'react';
 import WeatherContext from "../../../../WeatherContext";
-import img from "../../../../imgs/cloudy-day.png";
+import sunny_day from "../../../../imgs/sunny_day.jpg";
+import partly_cloudy_day from "../../../../imgs/partly_cloudy_day.jpg";
+import cloudy_day from "../../../../imgs/cloudy_day.jpg";
+import snowy_day from "../../../../imgs/snowy_day.jpg";
+import rainy_day from "../../../../imgs/rainy_day.jpg";
+import shower_day from "../../../../imgs/shower_day.jpg";
+import thunderstorm_day from "../../../../imgs/thunderstorm_day.jpg";
+import foggy_day from "../../../../imgs/foggy_day.jpg";
 import {
   StyledWeatherContainer,
   StyledHeading,
@@ -12,13 +19,34 @@ import {
   StyledStats,
 } from "./StyledWeatherComponents";
 
+const setBackgroundImg = (forecast, id) => {
+  forecast = forecast.toLowerCase();
+  switch (forecast) {
+    case "rain":
+      if(id >=500 && id<=504) return rainy_day;
+      return shower_day;
+    case "drizzle":
+      return sunny_day;
+    case "snow":
+      return snowy_day;
+    case "clear":
+      return sunny_day;
+    case "clouds":
+      if(id ===801) return partly_cloudy_day;
+      return cloudy_day;
+    case "thunderstorm":
+      return thunderstorm_day;
+    default:
+      return foggy_day;
+  }
+} 
+
 const Weather = () => {
   return (
     <WeatherContext.Consumer>
       {({ airQuality, weatherData }) => {
         if (airQuality !== null && weatherData !== null) {
          let {
-          clouds,
           feels_like,
           humidity,
           pressure,
@@ -26,14 +54,17 @@ const Weather = () => {
           visibility,
           weather,
           } = weatherData.current;
-          console.log(weatherData.current);
+          const { description, icon, id, main } = weather[0]
+          const backImg = setBackgroundImg(main, id)
+          const imgSrc = `http://openweathermap.org/img/wn/${icon}@2x.png`;
+          console.log(weatherData);
           feels_like = Math.round(feels_like); 
           temp = Math.round(temp); 
           return (
-            <StyledWeatherContainer>
+            <StyledWeatherContainer img={backImg}>
               <StyledHeading>
                 <StyledImgContainer>
-                  <StyledImg src={img} alt="wind img" />
+                  <StyledImg src={imgSrc} alt="wind img" />
                 </StyledImgContainer>
                 <StyledDesc>
                   <span>Weather</span>
@@ -45,7 +76,7 @@ const Weather = () => {
                   <span>{feels_like}°C</span>
                   <span>{temp}°C</span>
                 </StyledDegree>
-                <StyledCondition>Partly Cloudy</StyledCondition>
+                <StyledCondition>{description}</StyledCondition>
               </div>
               <StyledStats>
                 <div>
@@ -54,7 +85,7 @@ const Weather = () => {
                 </div>
                 <div>
                   <span>visibility</span>
-                  <span>4.3 km</span>
+                  <span>{Number(visibility / 1000).toFixed(1)} km</span>
                 </div>
                 <div>
                   <span>humidity</span>
