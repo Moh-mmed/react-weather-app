@@ -15,7 +15,7 @@ function App() {
   const [searchCity, setSearchCity] = useState(null)
   const [currCity, setCurrCity] = useState(null)
   const [coords, setCoords] = useState(null);
-  const [weather, setWeather] = useState(null)
+  const [weatherData, setWeatherData] = useState(null);
   const [airQuality, setAirQuality] = useState(null);
   const [isLoading, setIsLoading] = useState(false)
 
@@ -125,7 +125,7 @@ function App() {
           headers: { Accept: "application/json" },
         })
         .then((response) => {
-          setWeather(response.data);
+          setWeatherData(response.data);
         })
         .catch((err) => {
           console.log(err);
@@ -157,9 +157,9 @@ function App() {
   }, [coords]); 
 
   return (
-    <WeatherContext.Provider value={{ weather, airQuality, currCity }}>
+    <WeatherContext.Provider value={{ weatherData, airQuality, currCity }}>
       <div className="App">
-        {(weather === null || airQuality === null) ? (
+        {weatherData === null || airQuality === null ? (
           <div>Loading</div>
         ) : (
           <>
