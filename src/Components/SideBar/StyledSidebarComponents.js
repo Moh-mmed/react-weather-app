@@ -176,7 +176,7 @@ export const StyledUIrays = styled.div`
       & > span:nth-child(2) {
         display: inline-block;
         font-size: 0.5rem;
-        padding: 3px;
+        padding: 3px 4px;
         background-color: #cce16a;
         border-radius: 15px;
         color: #13150a;

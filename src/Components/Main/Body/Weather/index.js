@@ -1,13 +1,15 @@
 import React from 'react';
 import WeatherContext from "../../../../WeatherContext";
-import sunny_day from "../../../../imgs/sunny_day.jpg";
-import partly_cloudy_day from "../../../../imgs/partly_cloudy_day.jpg";
-import cloudy_day from "../../../../imgs/cloudy_day.jpg";
-import snowy_day from "../../../../imgs/snowy_day.jpg";
-import rainy_day from "../../../../imgs/rainy_day.jpg";
-import shower_day from "../../../../imgs/shower_day.jpg";
-import thunderstorm_day from "../../../../imgs/thunderstorm_day.jpg";
-import foggy_day from "../../../../imgs/foggy_day.jpg";
+import {
+  sunny_day,
+  partly_cloudy_day,
+  cloudy_day,
+  snowy_day,
+  rainy_day,
+  shower_day,
+  thunderstorm_day,
+  foggy_day,
+} from './Images'
 import {
   StyledWeatherContainer,
   StyledHeading,
@@ -57,7 +59,6 @@ const Weather = () => {
           const { description, icon, id, main } = weather[0]
           const backImg = setBackgroundImg(main, id)
           const imgSrc = `http://openweathermap.org/img/wn/${icon}@2x.png`;
-          console.log(weatherData);
           feels_like = Math.round(feels_like); 
           temp = Math.round(temp); 
           return (
@@ -73,8 +74,8 @@ const Weather = () => {
               </StyledHeading>
               <div>
                 <StyledDegree>
-                  <span>{feels_like}°C</span>
                   <span>{temp}°C</span>
+                  <span>{feels_like}°C</span>
                 </StyledDegree>
                 <StyledCondition>{description}</StyledCondition>
               </div>

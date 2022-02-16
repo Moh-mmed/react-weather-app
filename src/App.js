@@ -39,7 +39,11 @@ function App() {
           headers: { Accept: "application/json" },
         })
         .then((response) => {
-          setCurrCity(response.data[0].name);
+          // setCurrCity(response.data[0].name);
+          setCurrCity({
+            city: response.data[0].name,
+            country: response.data[0].country,
+          });
           setSearchCity(response.data[0].name)
         })
         .catch((err) => {
@@ -99,7 +103,11 @@ function App() {
               lon: Number(response.data[0].lon),
             };
             setCoords(cityCoords);
-            setCurrCity(response.data[0].name)
+            setCurrCity({
+            city: response.data[0].name,
+            country: response.data[0].country,
+            });
+            console.log(response.data)
             localStorage.setItem("coordinates", JSON.stringify(cityCoords));
           } else {
              console.log("You entered a wrong city");

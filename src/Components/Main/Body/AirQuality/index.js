@@ -42,7 +42,6 @@ const AirQuality = () => {
     <WeatherContext.Consumer>
       {({ airQuality, weatherData }) => {
         if (airQuality !== null && weatherData !== null) {
-          console.log(airQuality)
           const {wind_deg} = weatherData.current
           const { components, main } = airQuality.list[0];
           let pm = Math.ceil(components.pm2_5);
