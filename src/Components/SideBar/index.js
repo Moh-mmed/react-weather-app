@@ -35,8 +35,31 @@ const getUVI = (UVI) => {
   else if(UVI <=10) return "very high"
   else return "extreme"
 }
+const getTiming = (sunrise, sunset, time, timezone) => {
+  let today = moment.unix(time).format("ddd DD MMM");
+  let Sunrise = moment(sunrise * 1000)
+    .utcOffset(timezone / 60)
+    .format("LT");
+  let Sunset = moment(sunset * 1000)
+    .utcOffset(timezone / 60)
+    .format("LT");
+  let clock = moment(time * 1000)
+    .utcOffset(timezone / 60)
+    .format("LT");
+  if (time >= sunrise && time < sunset) {
+    let day = true;
+    let dayDuration = (sunset - sunrise) / 60;
+    let timeElapsed = (time - sunrise) / 60;
+    let widthUnit = 100 / dayDuration;
+    let width = widthUnit * timeElapsed;
+
+    return { day, width, today, Sunrise, Sunset, clock };
+  }
+  return { day: false, width: 0, today, Sunrise, Sunset, clock };
+};
 const SideBar = () => {
- const [activeLink, setActiveLink] = useState(false)
+  const [activeLink, setActiveLink] = useState(false)
+   
   // const [currLink, setCurrLink] = useState(window.history)
   // useEffect(() => {
   //   console.log(currLink);
@@ -47,28 +70,30 @@ const SideBar = () => {
     <WeatherContext.Consumer>
       {({airQuality, weatherData, currCity }) => {
         if (weatherData !== null && airQuality !== null) {
+         
           const { current, timezone_offset } = weatherData;
-          const { dt, temp, uvi, sunrise, sunset } =
-            current;
-          const { city, country} = currCity;
+          const { dt, temp, uvi, sunrise, sunset } = current;
+          const { city, country } = currCity;
           let UVI = Math.round(uvi);
-          let today = moment.unix(dt).format("ddd DD MMM");
-          let Sunrise = moment(sunrise * 1000)
-            .utcOffset(timezone_offset / 60)
-            .format("LT");
-          let Sunset = moment(sunset*1000)
-            .utcOffset(timezone_offset / 60)
-            .format("LT");
-
-          console.log(weatherData);
+          
+          const { day, width, today, Sunrise, Sunset, clock } = getTiming(
+            sunrise,
+            sunset,
+            dt,
+            timezone_offset
+          );
+          
           return (
             <StyledSideBar>
               <StyledTodaysInfo>
                 <StyledDate>
                   <span>{today}</span>
-                  <span>
-                    {city}, {country}
-                  </span>
+                  <div>
+                    <span>
+                      {city}, {country}
+                    </span>
+                    <span>{clock}</span>
+                  </div>
                 </StyledDate>
                 <StyledTemp>
                   <span>{Math.round(temp)}°C</span>
@@ -76,15 +101,14 @@ const SideBar = () => {
               </StyledTodaysInfo>
               <StyledSunContainer>
                 <StyledSunPath>
-                  <StyledPath day={true}>
-                    <StyledPathColoring variant={60} day={true} />
-                    {/* between 0 and 100*/}
+                  <StyledPath day={day}>
+                    <StyledPathColoring width={width} day={day} />
                   </StyledPath>
-                  <StyledSunIcon variant={40} />
+                  <StyledSunIcon width={width} />
                 </StyledSunPath>
-                <StyledStartNode variant={true} />
-                <StyledMovingNode day={true} variant={40} />
-                <StyledEndNode variant={false} />
+                <StyledStartNode day={true} />
+                <StyledMovingNode day={day} width={width} />
+                <StyledEndNode day={day} />
                 <StyledSunInfo>
                   <div>
                     <span>sunrise</span>

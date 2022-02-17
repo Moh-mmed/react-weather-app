@@ -39,13 +39,18 @@ export const StyledDate = styled.div`
   flex-direction: column;
   justify-content: space-between;
   height: 50px;
-  & > span:nth-child(1) {
+  width: 50%;
+  & > span {
     font-size: 1.2rem;
     font-weight: 600;
   }
-  & > span:nth-child(2) {
+  & > div {
+    display: flex;
+    justify-content: space-between;
     font-size: 0.8rem;
-    font-weight: 400;
+    &>span:nth-child(2){
+      font-weight:600
+    }
   }
 `;
 export const StyledTemp = styled.div`
@@ -82,7 +87,7 @@ export const StyledPath = styled.div`
 export const StyledPathColoring = styled.div`
   background-color: ${(props) =>
     props.day ? "rgb(0 187 255 / 7%)" : "none"};
-  width: ${(props) => `${props.variant}%`};
+  width: ${(props) => `${props.width}%`};
   height: 100%;
   top: 0;
   border: none;
@@ -93,7 +98,7 @@ export const StyledSunIcon = styled.div`
   bottom: -8px;
   position: absolute;
   transform-origin: right;
-  transform: ${(props) => `rotate(${degreeCalc(props.variant)}deg)`};
+  transform: ${(props) => `rotate(${degreeCalc(props.width)}deg)`};
   &::after {
     content: "";
     position: absolute;
@@ -114,15 +119,16 @@ export const StyledStartNode = styled.span`
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background-color: ${(props) => (props.variant ? "#00afef" : "#29364c")};
+  background-color: ${(props) => (props.day ? "#00afef" : "#29364c")};
 `;
 export const StyledMovingNode = styled(StyledStartNode)`
   display: ${(props) => (props.day ? "inline-block" : "none")};
-  left: ${(props)=>`${21 + props.variant * 2.35}px`};
+  left: ${(props)=>`${21 + props.width * 2.35}px`};
   background-color: #00afef
 `;
 export const StyledEndNode = styled(StyledStartNode)`
   left: 256px;
+  background-color: #29364c;
 `;
 export const StyledSunInfo = styled.div`
   margin-top: 1rem;
