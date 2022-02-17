@@ -87,13 +87,13 @@ const SideBar = () => {
             <StyledSideBar>
               <StyledTodaysInfo>
                 <StyledDate>
-                  <span>{today}</span>
                   <div>
-                    <span>
-                      {city}, {country}
-                    </span>
+                    <span>{today}</span>
                     <span>{clock}</span>
                   </div>
+                  <span>
+                    {city}, {country}
+                  </span>
                 </StyledDate>
                 <StyledTemp>
                   <span>{Math.round(temp)}°C</span>

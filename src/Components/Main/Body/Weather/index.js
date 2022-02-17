@@ -28,7 +28,7 @@ const setBackgroundImg = (forecast, id) => {
       if(id >=500 && id<=504) return rainy_day;
       return shower_day;
     case "drizzle":
-      return sunny_day;
+      return rainy_day;
     case "snow":
       return snowy_day;
     case "clear":

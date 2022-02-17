@@ -1,26 +1,19 @@
 import styled from "styled-components";
-import img from "../../../../imgs/rainy_tomorrow.jpg";
-const season = {
-  winter: 'winter',
-  spring: 'spring',
-  summer: 'summer',
-  fall: 'fall'
-}
-function tempRange(temp) {
-  const { winter, spring, summer, fall } = season
-  let currSeason = winter
-  switch (currSeason) {
+
+function tempRange(temp,season) {
+  switch (season) {
     case "winter":
-      return temp / (10/47) + 33; // between 0 and 10
+      return temp / (10 / 47) + 33; // between 0 and 10
     case "spring":
-      return (temp - 8) / (7/47) + 33; // between 8 and 15
+      return (temp - 8) / (7 / 47) + 33; // between 8 and 15
     case "summer":
-      return (temp - 20) / (25/47) + 33; // between 20 and 45
+      return (temp - 20) / (25 / 47) + 33; // between 20 and 45
     case "fall":
-      return (temp - 5) / (15/47) + 33; // between 5 and 20
+      return (temp - 5) / (15 / 47) + 33; // between 5 and 20
     default:
-      return temp / (45/47) + 33; // between 0 and 45
+      return temp / (45 / 47) + 33; // between 0 and 45
   }
+  
 }
 
 export const StyledTodaysWeather = styled.div`
@@ -49,12 +42,14 @@ export const StyledTempTomorrow = styled.div`
   flex-direction: column;
   justify-content: space-between;
   text-transform: capitalize;
-  background: url(${img});
+  background: ${(props)=>`url(${props.img})`};
   background-size: cover;
   border-radius: 20px;
   box-shadow: 5px 5px 8px 3px rgb(41 54 76 / 13%);
   padding: 20px 30px;
   & > div:nth-child(1) {
+    font-size: 1.3rem;
+    font-weight: 600;
   }
   & > div:nth-child(2) {
     display: flex;
@@ -101,17 +96,16 @@ export const StyledImgContainer = styled.div`
   border: 1px solid #dfdfdf;
   max-height: 50px;
   max-width: 50px;
-  padding: 8px;
 `;
 export const StyledDailyIcon = styled.img`
-  width: 25px;
+  width: 40px;
 `;
 export const StyledBulletContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  height: ${(props) => `${tempRange(props.variant)}%`};
+  height: ${(props) => `${tempRange(props.temp, props.season)}%`};
   max-height: 70%;
   min-height: 33%;
   width: 100%;

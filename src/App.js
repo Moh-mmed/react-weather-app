@@ -107,7 +107,6 @@ function App() {
             city: response.data[0].name,
             country: response.data[0].country,
             });
-            console.log(response.data)
             localStorage.setItem("coordinates", JSON.stringify(cityCoords));
           } else {
              console.log("You entered a wrong city");

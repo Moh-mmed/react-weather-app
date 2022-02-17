@@ -39,17 +39,15 @@ export const StyledDate = styled.div`
   flex-direction: column;
   justify-content: space-between;
   height: 50px;
-  width: 50%;
-  & > span {
-    font-size: 1.2rem;
-    font-weight: 600;
-  }
+  width: 60%;
+  font-size: 0.8rem;
   & > div {
     display: flex;
     justify-content: space-between;
-    font-size: 0.8rem;
-    &>span:nth-child(2){
-      font-weight:600
+    align-items: center;
+    & > span:nth-child(1) {
+      font-size: 1.2rem;
+      font-weight: 600;
     }
   }
 `;
