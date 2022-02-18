@@ -8,6 +8,7 @@ import Nav from "./Components/Main/NavBar";
 import SideBar from "./Components/SideBar";
 import TodaysTemperatures from "./Components/Main/Body/TodaysTemperatures";
 import NextFiveDays from "./Components/Main/Body/NextFiveDays";
+import Spinner from "./Spinner";
 import ErrorPage from './Components/ErrorPage'
 
 
@@ -166,8 +167,8 @@ function App() {
   return (
     <WeatherContext.Provider value={{ weatherData, airQuality, currCity }}>
       <div className="App">
-        {weatherData === null || airQuality === null ? (
-          <div>Loading</div>
+        {weatherData === null || airQuality === null || currCity === null ? (
+          <Spinner/>
         ) : (
           <>
             <div className="Main">

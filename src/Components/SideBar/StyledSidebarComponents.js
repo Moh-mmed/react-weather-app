@@ -11,7 +11,7 @@ const degreeCalc = (deg) => {
 export const StyledSideBar = styled.div`
   display: flex;
   flex-direction: column;
-  min-height: 100%;
+  min-height: 100vh;
   min-width: 350px;
   background-color: #EBEFF0;
   padding: 0 2em;
@@ -206,7 +206,7 @@ export const StyledFollowingDays = styled.div`
   flex-direction: column;
   margin-bottom: 15px;
 `;
-export const PredictionDay = styled.div`
+export const Day = styled.div`
   background-color: #fff;
   display: flex;
   justify-content: space-between;
@@ -244,9 +244,6 @@ export const PredictionDay = styled.div`
       }
     }
   }
-`;
-export const StyledSunImg = styled.img`
-  width: 35px;
 `;
 export const StyledFollowingFiveDays = styled.div`
   display: flex;

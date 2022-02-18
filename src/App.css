@@ -12,6 +12,7 @@ body {
   display: flex;
   margin: auto;
   width: 1349px;
+  height: 100vh;
 }
 .Main {
   width: 74%;

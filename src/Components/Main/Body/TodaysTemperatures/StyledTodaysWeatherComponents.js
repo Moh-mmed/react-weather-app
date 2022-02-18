@@ -13,7 +13,6 @@ function tempRange(temp,season) {
     default:
       return temp / (45 / 47) + 33; // between 0 and 45
   }
-  
 }
 
 export const StyledTodaysWeather = styled.div`
