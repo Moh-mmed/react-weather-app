@@ -87,11 +87,7 @@ const TodaysTemperatures = () => {
       <StyledTemperatures>
         {Object.keys(todayTemperatures).length === 4 && (
           <>
-            <DayTemp
-              time="morning"
-              season={season}
-              data={todayTemperatures.more}
-            />
+            <DayTemp time="morning" season={season} data={todayTemperatures.more}/>
             <DayTemp time="afternoon" season={season} data={todayTemperatures.day} />
             <DayTemp time="evening" season={season} data={todayTemperatures.eve} />
             <DayTemp time="night" season={season} data={todayTemperatures.night} />

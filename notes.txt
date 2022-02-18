@@ -1,4 +1,5 @@
 main color: #00afef
+light main color: #00afef7a
 FontDarkBlue: #29364C
 FontBlack: #13150a
 First dark Gray: #6a6a6a

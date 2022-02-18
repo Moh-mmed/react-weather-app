@@ -1,89 +1,32 @@
-import React from 'react';
+import React, { useContext, useState } from "react";
+import moment from "moment"
+import WeatherContext from "../../../../WeatherContext";
+import DayTemp from './DayTemp';
 import {
   StyledTemperatures,
   StyledTempHeading,
   StyledHeading,
-  StyledTempTomorrow,
   StyledTodaysWeather,
-  StyledDailyTemp,
-  StyledImgContainer,
-  StyledDailyIcon,
-  StyledBulletContainer,
-  StyledBullet,
-  StyledDailyDegree,
 } from "./StyledNextFiveDaysComponents";
-import cloudy from "../../../../imgs/all-cloudy.png";
-import partlyCloudy from "../../../../imgs/partly_cloudy_tomorrow.jpg";
-import snowy from "../../../../imgs/snowy_tomorrow.jpg";
-import sunny from "../../../../imgs/sun.png";
+
 const NextFiveDays = () => {
+  const { weatherData } = useContext(WeatherContext);
+  const [todayTemperatures, setTodayTemperatures] = useState([]);
+  const nextFiveDaysWeather = weatherData.daily.slice(3);
+console.log(nextFiveDaysWeather)
   return (
     <StyledTodaysWeather>
       <StyledTempHeading>
         <StyledHeading>
-          Next Five <br />
-          days' temperature
+          Next five days' weather 
         </StyledHeading>
       </StyledTempHeading>
-      <StyledTempTomorrow>
-        <div>Tomorrow</div>
-        <div>
-          <span>20°c</span>
-          <span>rainy</span>
-        </div>
-      </StyledTempTomorrow>
       <StyledTemperatures>
-        <StyledDailyTemp>
-          <StyledBulletContainer variant={0}>
-            <StyledImgContainer>
-              <StyledDailyIcon src={cloudy} alt="cloudy" />
-            </StyledImgContainer>
-            <StyledBullet />
-          </StyledBulletContainer>
-          <StyledDailyDegree>
-            <span>0°</span>
-            <span>morning</span>
-          </StyledDailyDegree>
-        </StyledDailyTemp>
-        <StyledDailyTemp>
-          <StyledBulletContainer variant={10}>
-            <StyledImgContainer>
-              <StyledDailyIcon src={snowy} alt="snowy" />
-            </StyledImgContainer>
-            <StyledBullet />
-          </StyledBulletContainer>
-          <StyledDailyDegree>
-            <span>10°</span>
-            <span>afternoon</span>
-          </StyledDailyDegree>
-        </StyledDailyTemp>
-        <StyledDailyTemp>
-          <StyledBulletContainer variant={3}>
-            <StyledImgContainer>
-              <StyledDailyIcon src={partlyCloudy} alt="partly cloudy" />
-            </StyledImgContainer>
-            <StyledBullet />
-          </StyledBulletContainer>
-          <StyledDailyDegree>
-            <span>3°</span>
-            <span>evening</span>
-          </StyledDailyDegree>
-        </StyledDailyTemp>
-        <StyledDailyTemp>
-          <StyledBulletContainer variant={-1}>
-            <StyledImgContainer>
-              <StyledDailyIcon src={sunny} alt="cloudy" />
-            </StyledImgContainer>
-            <StyledBullet />
-          </StyledBulletContainer>
-          <StyledDailyDegree>
-            <span>-1°</span>
-            <span>night</span>
-          </StyledDailyDegree>
-        </StyledDailyTemp>
+        {nextFiveDaysWeather.length === 5 &&
+          nextFiveDaysWeather.map((day,index) => <DayTemp data={day} key={index} />)}
       </StyledTemperatures>
     </StyledTodaysWeather>
-  );
+  ); 
 };
 
 export default NextFiveDays;

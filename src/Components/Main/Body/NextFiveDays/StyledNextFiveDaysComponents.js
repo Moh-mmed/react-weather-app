@@ -26,15 +26,15 @@ function tempRange(temp) {
 export const StyledTodaysWeather = styled.div`
   grid-column-start: 1;
   grid-column-end: 3;
-  display: grid;
-  grid-template-columns: auto 30%;
-  grid-template-rows: 25% auto;
-  grid-gap: 3%;
+padding: 1rem;
 `;
 
 export const StyledTempHeading = styled.div`
+  grid-column-start: 1;
+  grid-column-end: 3;
   display: flex;
   align-items: center;
+  height: 20%;
 `; 
 export const StyledHeading = styled.span`
   line-height: 30px;
@@ -42,36 +42,11 @@ export const StyledHeading = styled.span`
   font-weight: 600;
 `; 
 
-export const StyledTempTomorrow = styled.div`
-  grid-row: 1 / span 2;
-  grid-column: 2 / span 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  text-transform: capitalize;
-  background: url(${img});
-  background-size: cover;
-  border-radius: 20px;
-  box-shadow: 5px 5px 8px 3px rgb(41 54 76 / 13%);
-  padding: 20px 30px;
-  & > div:nth-child(1) {
-  }
-  & > div:nth-child(2) {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 65px;
-    & > span:nth-child(1) {
-      font-size: 2.1rem;
-      font-weight: 700;
-      color: #13150a;
-    }
-  }
-`; 
 export const StyledTemperatures = styled.div`
+  height: 80%;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-gap: 1%;
+  grid-template-columns: repeat(5, 1fr);
+  grid-gap: 2%;
 `; 
 
 export const StyledDailyTemp = styled.div`
@@ -80,7 +55,6 @@ export const StyledDailyTemp = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  padding: 10px;
   &:not(:last-child)::after {
     position: absolute;
     content: "";
@@ -92,26 +66,17 @@ export const StyledDailyTemp = styled.div`
     background-color: rgb(223 223 223 / 50%);
   }
 `;
-export const StyledImgContainer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #fff;
-  border-radius: 50%;
-  border: 1px solid #dfdfdf;
-  max-height: 50px;
-  max-width: 50px;
-  padding: 8px;
-`;
 export const StyledDailyIcon = styled.img`
-  width: 25px;
+  width: 60px;
+  background-color: #00afef7a;
+  border-radius: 50%;
 `;
 export const StyledBulletContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  height: ${(props) => `${tempRange(props.variant)}%`};
+  height: 60%;
   max-height: 70%;
   min-height: 33%;
   width: 100%;
