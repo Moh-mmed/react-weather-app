@@ -58,12 +58,11 @@ const getTiming = (sunrise, sunset, time, timezone) => {
 };
 const SideBar = () => {
   const [activeLink, setActiveLink] = useState(false)
-  const { airQuality, weatherData, currCity } = useContext(WeatherContext);
+  const { weatherData, currCity } = useContext(WeatherContext);
   // const [currLink, setCurrLink] = useState(window.history)
   // useEffect(() => {
   //   console.log(currLink);
   // }, [activeLink]);
-  console.log(weatherData)
  
     const { current, timezone_offset, daily } = weatherData;
     const { dt, temp, uvi, sunrise, sunset } = current;

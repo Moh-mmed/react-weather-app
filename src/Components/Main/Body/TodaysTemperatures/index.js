@@ -14,7 +14,8 @@ import {
 import DayTemp from './DayTemp';
 
 const TodaysTemperatures = () => {
-  const {weatherData } = useContext(WeatherContext);
+  const { weatherData } = useContext(WeatherContext);
+  console.log("Todays Temperatures");
   const [todayTemperatures, setTodayTemperatures] = useState({});
   const { daily, hourly, lat, lon } = weatherData
   const { dt } = weatherData.current;
@@ -23,10 +24,12 @@ const TodaysTemperatures = () => {
   const backImg = setBackgroundImg(main, id);
   const month = moment(dt * 1000).month();
   const season = findSeason(month)
+
+  let temperaturesObject = {}
+  //Find today's historical temperatures
   useEffect(() => {
-    setTodayTemperatures({})
     const todayWeatherHistory = async () => {
-      const milliseconds = (moment.unix(dt).hours()-2)*3600;
+      const milliseconds = (moment.unix(dt).hours() - 2) * 3600;
       const startTime = dt - milliseconds;
       const weatherHistoryURL = `https://history.openweathermap.org/data/2.5/history/city?lat=${lat}&lon=${lon}&units=metric&type=hour&start=${startTime}&appid=99eb51721a50689c8175af2560a2b07c`;
       await axios
@@ -35,45 +38,43 @@ const TodaysTemperatures = () => {
         })
         .then((response) => {
           response.data.list.forEach((element) => {
-            const {main, weather, dt} = element
-            const hour = Number(moment(dt * 1000).hours());
-            const day = Number(moment(dt * 1000).day());
-            if (day === moment(dt * 1000).day()) {
-              const temperature = Math.ceil(main.temp);
-              const icon = weather[0].icon;
-              const data = { temperature, icon };
-              if (hour === 6) setTodayTemperatures((state)=>({...state, more: data}));
-              else if (hour === 12) setTodayTemperatures((state) => ({ ...state, day: data }));
-              else if (hour === 18) setTodayTemperatures((state) => ({ ...state, eve: data }));
-              else if (hour === 23) setTodayTemperatures((state) => ({ ...state, night: data }));
-            }
+            // console.log("Get todays' passed hours");
+            const { main, weather, dt: hourlyTime } = element;
+            const hour = Number(moment.unix(hourlyTime).hours());
+            const temperature = Math.ceil(main.temp);
+            const icon = weather[0].icon;
+            const data = { temperature, icon };
+            if (hour === 6)temperaturesObject.more = data;
+            else if (hour === 12)temperaturesObject.day = data;
+            else if (hour === 18)temperaturesObject.eve = data;
+            else if (hour === 23) temperaturesObject.night = data;
           });
+          setTodayTemperatures(temperaturesObject);
         })
         .catch((err) => {
           console.log(err);
         });
     };
 
+    // Get todays' passed hours
     todayWeatherHistory();
-
+    // Get todays' rest hours
     hourly.forEach((element) => {
-      const { temp, weather, dt } = element;
-      let hour = Number(moment(dt * 1000).hours());
-      let day = Number(moment(dt * 1000).day());
-      if (day === moment(dt * 1000).day()) {
-         const temperature = Math.ceil(temp);
-         const icon = weather[0].icon;
-         const data = { temperature, icon };
-              if (hour === 6)
-                setTodayTemperatures((state) => ({ ...state, more: data }));
-              else if (hour === 12)
-                setTodayTemperatures((state) => ({ ...state, day: data }));
-              else if (hour === 18)
-                setTodayTemperatures((state) => ({ ...state, eve: data }));
-              else if (hour === 23)
-                setTodayTemperatures((state) => ({ ...state, night: data }));
+      const { temp, weather, dt: hourlyTime } = element;
+      let hour = Number(moment.unix(hourlyTime).hours());
+      let day = Number(moment.unix(hourlyTime).day());
+      if (day === moment.unix(dt).day()) {
+        const data = {
+          temperature: Math.ceil(temp),
+          icon: weather[0].icon,
+        };
+        if (hour === 6) temperaturesObject.more = data;
+        else if (hour === 12) temperaturesObject.day = data;
+        else if (hour === 18) temperaturesObject.eve = data;
+        else if (hour === 23) temperaturesObject.night = data;
       }
     });
+
   }, [weatherData]);
 
   return (

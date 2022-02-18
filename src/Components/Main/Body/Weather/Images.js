@@ -7,13 +7,24 @@ import shower_day from "../../../../imgs/shower_day.jpg";
 import thunderstorm_day from "../../../../imgs/thunderstorm_day.jpg";
 import foggy_day from "../../../../imgs/foggy_day.jpg";
 
-export {
-  sunny_day,
-  partly_cloudy_day,
-  cloudy_day,
-  snowy_day,
-  rainy_day,
-  shower_day,
-  thunderstorm_day,
-  foggy_day,
-};
+export const setBackgroundImg = (forecast, id) => {
+  forecast = forecast.toLowerCase();
+  switch (forecast) {
+    case "rain":
+      if (id >= 500 && id <= 504) return rainy_day;
+      return shower_day;
+    case "drizzle":
+      return rainy_day;
+    case "snow":
+      return snowy_day;
+    case "clear":
+      return sunny_day;
+    case "clouds":
+      if (id === 801) return partly_cloudy_day;
+      return cloudy_day;
+    case "thunderstorm":
+      return thunderstorm_day;
+    default:
+      return foggy_day;
+  }
+}; 

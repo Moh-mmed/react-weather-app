@@ -9,7 +9,7 @@ const DayTemp = (props) => {
   const { weather, temp,dt } = props.data
   const temperature = Math.ceil(temp.day) 
   const { main, icon } = weather[0];
-   const date = moment.unix(dt).format("MMMM DD");
+  const date = moment.unix(dt).format("MMMM DD");
   return (
     <StyledDailyTemp>
       <StyledDailyIcon

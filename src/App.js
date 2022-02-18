@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext } from "react";
+import { useState, useEffect} from "react";
 import { Route, Routes } from "react-router-dom"
 import WeatherContext from "./WeatherContext"
 import './App.css';
@@ -20,32 +20,29 @@ function App() {
   const [airQuality, setAirQuality] = useState(null);
   const [isLoading, setIsLoading] = useState(false)
 
-
   const KEY = "99eb51721a50689c8175af2560a2b07c";
-  
-  // const handleSearchCity = async (e) => {
-  //   await setSearchCity(e)
-  // };
 
   //Find coordinates using location
   // first we check if localStorage has saved coordinates, if not we get coordinates using Location API
   // If user turn on location, the user should ask for detecting coordinates using location
   useEffect(() => {
+    console.log("find location")
     let coordinates = JSON.parse(localStorage.getItem("coordinates"));
     // Find city name
     const findCityName = async (cor) => {
+      console.log("Axios running")
       const reverseURL = `https://api.openweathermap.org/geo/1.0/reverse?lat=${cor.lat}&lon=${cor.lon}&limit=5&appid=${KEY}`;
       await axios
         .get(reverseURL, {
           headers: { Accept: "application/json" },
         })
         .then((response) => {
-          // setCurrCity(response.data[0].name);
           setCurrCity({
             city: response.data[0].name,
             country: response.data[0].country,
           });
-          setSearchCity(response.data[0].name)
+          // setSearchCity(null)// or remove this line to prevent rerendering findWeather and findAirQuality
+          console.log("location's found")
         })
         .catch((err) => {
           console.log(err);
@@ -89,8 +86,12 @@ function App() {
     }
   },[])
 
+
+
+
   // Find coordinates for entered city 
   useEffect(() => {
+  console.log("find coordinates")
   const findCoordinates = async () => {
       let coordinatesURL = `http://api.openweathermap.org/geo/1.0/direct?q=${searchCity}&limit=5&appid=${KEY}`;
       await axios
@@ -109,6 +110,7 @@ function App() {
             country: response.data[0].country,
             });
             localStorage.setItem("coordinates", JSON.stringify(cityCoords));
+            console.log("coordinates are found")
           } else {
              console.log("You entered a wrong city");
           }
@@ -116,44 +118,55 @@ function App() {
         .catch((err) => {
           console.log(err);
         });
-  };
+    };
+    // If the searchCity is null means coordinates already exist
     if (searchCity !== null) {
-     findCoordinates();
-  }
+    console.log("Find coordinates is running...")
+    findCoordinates();
+  };
   }, [searchCity]);
+
+
+
 
 
 // Find Weather data
   useEffect(() => {
+    console.log("find weather");
     if (coords !== null) {
-    const findWeather = async () => {
+      console.log("Inside Weather")
       const weatherURL = `https://api.openweathermap.org/data/2.5/onecall?lat=${coords.lat}&lon=${coords.lon}&units=metric&appid=${KEY}`;
-      await axios
-        .get(weatherURL, {
-          headers: { Accept: "application/json" },
-        })
-        .then((response) => {
-          setWeatherData(response.data);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    };
+      const findWeather = async () => {
+        await axios
+          .get(weatherURL, {
+            headers: { Accept: "application/json" },
+          })
+          .then((response) => {
+            console.log("weather's found");
+            setWeatherData(response.data);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      };
     findWeather();
-  }
+    }
  }, [coords]);
 
 
 // Find Air Quality
   useEffect(() => {
+    console.log("find air quality");
     if (coords !== null) {
+      console.log("Inside air quality")
+      const airQualityURL = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${coords.lat}&lon=${coords.lon}&appid=${KEY}`;
       const findAirQuality = async () => {
-        const airQualityURL = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${coords.lat}&lon=${coords.lon}&appid=${KEY}`;
         await axios
           .get(airQualityURL, {
             headers: { Accept: "application/json" },
           })
           .then((response) => {
+            console.log("air quality's found");
             setAirQuality(response.data);
           })
           .catch((err) => {
@@ -164,15 +177,29 @@ function App() {
     }
   }, [coords]); 
 
+
+
+
+
+
+
+
+
   return (
     <WeatherContext.Provider value={{ weatherData, airQuality, currCity }}>
       <div className="App">
         {weatherData === null || airQuality === null || currCity === null ? (
-          <Spinner/>
+          <Spinner />
         ) : (
           <>
             <div className="Main">
-              <Nav city={searchCity} handleSearchCity={setSearchCity} />
+              <Nav
+                city={searchCity}
+                handleSearchCity={setSearchCity}
+                handleWeatherData={setWeatherData}
+                handleAirQuality={setAirQuality}
+                  handleCurrCity={setCurrCity}
+              />
               <Routes>
                 <Route path="/" element={<Body />}>
                   <Route index element={<TodaysTemperatures />} />

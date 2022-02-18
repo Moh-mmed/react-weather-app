@@ -1,7 +1,7 @@
 import { createContext } from "react";
 const WeatherContext = createContext({
-  weatherData: "",
-  currCity: "Istanbul",
-  airQuality: "",
+  weatherData: null,
+  currCity: null,
+  airQuality: null,
 });
 export default WeatherContext

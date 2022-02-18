@@ -1,4 +1,4 @@
-import React from "react";
+import { useContext } from "react";
 import WeatherContext from "../../../../WeatherContext";
 import icon from "../../../../imgs/air_quality.png"
 import backImg from "../../../../imgs/clear_air.jpg";
@@ -38,66 +38,61 @@ const getWindDirection = (deg) => {
 }
 
 const AirQuality = () => {
+  const { weatherData, airQuality } = useContext(WeatherContext);
+ 
+  const {wind_deg} = weatherData.current
+  const { components, main } = airQuality.list[0];
+  let pm = Math.ceil(components.pm2_5);
+  let aqi = 0;
+  for (let key in components) {
+    // Find greater air quality index
+    if (key !== "co" && components[key] > aqi) {
+        aqi = Math.ceil(components[key]);
+    }
+  }
   return (
-    <WeatherContext.Consumer>
-      {({ airQuality, weatherData }) => {
-        if (airQuality !== null && weatherData !== null) {
-          const {wind_deg} = weatherData.current
-          const { components, main } = airQuality.list[0];
-          let pm = Math.ceil(components.pm2_5);
-          let aqi = 0;
-          for (let key in components) {
-            if (key !== "co" && components[key] > aqi) {
-                aqi = Math.ceil(components[key]);
-            }
-          }
-            return (
-              <StyledAirQualityContainer img={backImg}>
-                <StyledHeading>
-                  <StyledImgContainer>
-                    <StyledImg src={icon} alt="wind img" />
-                  </StyledImgContainer>
-                  <StyledDesc>
-                    <span>air quality</span>
-                    <span>main pollution: PM {pm}</span>
-                  </StyledDesc>
-                </StyledHeading>
-                <div>
-                  <StyledDegree>
-                    <span>{aqi}</span>
-                    <span>aqi</span>
-                  </StyledDegree>
-                  <StyledCondition>
-                    {getWindDirection(wind_deg)}
-                  </StyledCondition>
-                </div>
-                <StyledStats>
-                  <StyledLevel>
-                    <StyledLevelSpan variant={main.aqi === 1 && true}>
-                      good
-                    </StyledLevelSpan>
-                    <StyledLevelSpan variant={main.aqi === 2 && true}>
-                      fair
-                    </StyledLevelSpan>
-                    <StyledLevelSpan variant={main.aqi === 3 && true}>
-                      standard
-                    </StyledLevelSpan>
-                    <StyledLevelSpan variant={main.aqi === 4 && true}>
-                      poor
-                    </StyledLevelSpan>
-                    <StyledLevelSpan variant={main.aqi === 5 && true}>
-                      hazardous
-                    </StyledLevelSpan>
-                  </StyledLevel>
-                  <StyledProgressBarContainer>
-                    <StyledProgressBar variant={main.aqi} />
-                  </StyledProgressBarContainer>
-                </StyledStats>
-              </StyledAirQualityContainer>
-            );
-        }
-      }}
-    </WeatherContext.Consumer>
+    <StyledAirQualityContainer img={backImg}>
+      <StyledHeading>
+        <StyledImgContainer>
+          <StyledImg src={icon} alt="wind img" />
+        </StyledImgContainer>
+        <StyledDesc>
+          <span>air quality</span>
+          <span>main pollution: PM {pm}</span>
+        </StyledDesc>
+      </StyledHeading>
+      <div>
+        <StyledDegree>
+          <span>{aqi}</span>
+          <span>aqi</span>
+        </StyledDegree>
+        <StyledCondition>
+          {getWindDirection(wind_deg)}
+        </StyledCondition>
+      </div>
+      <StyledStats>
+        <StyledLevel>
+          <StyledLevelSpan variant={main.aqi === 1 && true}>
+            good
+          </StyledLevelSpan>
+          <StyledLevelSpan variant={main.aqi === 2 && true}>
+            fair
+          </StyledLevelSpan>
+          <StyledLevelSpan variant={main.aqi === 3 && true}>
+            standard
+          </StyledLevelSpan>
+          <StyledLevelSpan variant={main.aqi === 4 && true}>
+            poor
+          </StyledLevelSpan>
+          <StyledLevelSpan variant={main.aqi === 5 && true}>
+            hazardous
+          </StyledLevelSpan>
+        </StyledLevel>
+        <StyledProgressBarContainer>
+          <StyledProgressBar variant={main.aqi} />
+        </StyledProgressBarContainer>
+      </StyledStats>
+    </StyledAirQualityContainer>
   );
 };
 

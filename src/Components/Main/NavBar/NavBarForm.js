@@ -6,39 +6,46 @@ import {
   StyledSearchImgContainer,
   StyledImg,
 } from "./StyledNavComponents";
-const NavBarForm = (props) => {
-  const [enteredCity, setEnteredCity] = useState("");
-   const inputField = useRef(null);
-  const {handleSearchCity} = props
-    const handleFormSubmit = (e) => {
-      e.preventDefault();
-      if (enteredCity !== "") {
-        handleSearchCity(enteredCity);
-        inputField.current.value = "";
-        inputField.current.blur();
-      }
+const NavBarForm = ({
+  handleSearchCity,
+  handleWeatherData,
+  handleAirQuality,
+  handleCurrCity
+}) => {
+  const [enteredCity, setEnteredCity] = useState(undefined);
+  const inputField = useRef(null);
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    if (enteredCity !== undefined) {
+      handleWeatherData(null);
+      handleAirQuality(null);
+      handleCurrCity(null);
+      handleSearchCity(enteredCity);
+      inputField.current.value = "";
+      inputField.current.blur();
+    }
   };
-  
-   useEffect(() => {
-     inputField.current.focus();
-   }, []);
-  
-    return (
-      <StyledSearchbar>
-        <form onSubmit={handleFormSubmit}>
-          <StyledInput
-            ref={inputField}
-            type="text"
-            placeholder="Search anything"
-            className="search-bar"
-            onChange={(e) => setEnteredCity(e.target.value)}
-          />
-        </form>
-        <StyledSearchImgContainer>
-          <StyledImg src={search} alt="search img"/>
-        </StyledSearchImgContainer>
-      </StyledSearchbar>
-    );
+
+  useEffect(() => {
+    inputField.current.focus();
+  }, []);
+
+  return (
+    <StyledSearchbar>
+      <form onSubmit={handleFormSubmit}>
+        <StyledInput
+          ref={inputField}
+          type="text"
+          placeholder="Search"
+          className="search-bar"
+          onChange={(e) => setEnteredCity(e.target.value)}
+        />
+      </form>
+      <StyledSearchImgContainer>
+        <StyledImg src={search} alt="search img" />
+      </StyledSearchImgContainer>
+    </StyledSearchbar>
+  );
 };
 
 export default NavBarForm;

@@ -11,7 +11,6 @@ import {
 const NextFiveDays = () => {
   const { weatherData } = useContext(WeatherContext);
   const nextFiveDaysWeather = weatherData.daily.slice(3);
-console.log(nextFiveDaysWeather)
   return (
     <StyledTodaysWeather>
       <StyledTempHeading>
