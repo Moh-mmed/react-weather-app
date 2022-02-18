@@ -2,10 +2,7 @@ import React from 'react'
 import moment from "moment"
 import {
   StyledDailyTemp,
-  StyledImgContainer,
   StyledDailyIcon,
-  StyledBulletContainer,
-  StyledBullet,
   StyledDailyDegree,
 } from "./StyledNextFiveDaysComponents";
 const DayTemp = (props) => {
@@ -15,15 +12,13 @@ const DayTemp = (props) => {
    const date = moment.unix(dt).format("MMMM DD");
   return (
     <StyledDailyTemp>
-      <StyledBulletContainer temp={temperature}>
-        <StyledDailyIcon
-          src={`http://openweathermap.org/img/wn/${icon}@2x.png`}
-          alt="cloudy"
-        />
-        {/* <StyledBullet /> */}
-      </StyledBulletContainer>
+      <StyledDailyIcon
+        src={`http://openweathermap.org/img/wn/${icon}@2x.png`}
+        alt="cloudy"
+      />
       <StyledDailyDegree>
         <span>{temperature}°</span>
+        <span>{main}</span>
         <span>{date}</span>
       </StyledDailyDegree>
     </StyledDailyTemp>

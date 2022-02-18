@@ -1,5 +1,4 @@
-import React, { useContext, useState } from "react";
-import moment from "moment"
+import React, { useContext} from "react";
 import WeatherContext from "../../../../WeatherContext";
 import DayTemp from './DayTemp';
 import {
@@ -11,14 +10,13 @@ import {
 
 const NextFiveDays = () => {
   const { weatherData } = useContext(WeatherContext);
-  const [todayTemperatures, setTodayTemperatures] = useState([]);
   const nextFiveDaysWeather = weatherData.daily.slice(3);
 console.log(nextFiveDaysWeather)
   return (
     <StyledTodaysWeather>
       <StyledTempHeading>
         <StyledHeading>
-          Next five days' weather 
+          Next five days' temperatures 
         </StyledHeading>
       </StyledTempHeading>
       <StyledTemperatures>
