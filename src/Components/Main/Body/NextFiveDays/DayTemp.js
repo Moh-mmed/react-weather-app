@@ -13,7 +13,7 @@ const DayTemp = (props) => {
   return (
     <StyledDailyTemp>
       <StyledDailyIcon
-        src={`http://openweathermap.org/img/wn/${icon}@2x.png`}
+        src={`https://openweathermap.org/img/wn/${icon}@2x.png`}
         alt="cloudy"
       />
       <StyledDailyDegree>

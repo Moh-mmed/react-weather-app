@@ -25,9 +25,9 @@ weather,
 } = weatherData.current;
 const { description, icon, id, main } = weather[0]
 const backImg = setBackgroundImg(main, id)
-const imgSrc = `http://openweathermap.org/img/wn/${icon}@2x.png`;
+const imgSrc = `https://openweathermap.org/img/wn/${icon}@2x.png`;
 return (
-  <StyledWeatherContainer img={backImg}>
+  <StyledWeatherContainer img={backImg} alt="today's weather">
     <StyledHeading>
       <StyledImgContainer>
         <StyledImg src={imgSrc} alt="wind img" />

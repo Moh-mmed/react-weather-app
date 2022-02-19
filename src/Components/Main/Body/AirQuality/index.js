@@ -51,7 +51,7 @@ const AirQuality = () => {
     }
   }
   return (
-    <StyledAirQualityContainer img={backImg}>
+    <StyledAirQualityContainer img={backImg} alt="today's air quality">
       <StyledHeading>
         <StyledImgContainer>
           <StyledImg src={icon} alt="wind img" />

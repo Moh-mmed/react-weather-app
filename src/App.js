@@ -52,7 +52,7 @@ function App() {
       setCoords(coordinates);
       findCityName(coordinates);
     } else {
-      const getLocation = async () => {
+     (async () => {
         let cityCoords;
         let getCoordinatesWithLocation = new Promise((resolve, reject) => {
           let opts = {
@@ -81,8 +81,7 @@ function App() {
           navigator.geolocation.getCurrentPosition(success, fail, opts);
         });
        await getCoordinatesWithLocation;
-      };
-      getLocation();
+      })();
     }
   },[])
 
@@ -93,7 +92,7 @@ function App() {
   useEffect(() => {
   console.log("find coordinates")
   const findCoordinates = async () => {
-      let coordinatesURL = `http://api.openweathermap.org/geo/1.0/direct?q=${searchCity}&limit=5&appid=${KEY}`;
+      let coordinatesURL = `https://api.openweathermap.org/geo/1.0/direct?q=${searchCity}&limit=5&appid=${KEY}`;
       await axios
         .get(coordinatesURL, {
           headers: { Accept: "application/json" },
@@ -176,13 +175,6 @@ function App() {
       findAirQuality();
     }
   }, [coords]); 
-
-
-
-
-
-
-
 
 
   return (

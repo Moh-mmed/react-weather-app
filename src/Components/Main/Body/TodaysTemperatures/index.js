@@ -95,7 +95,7 @@ const TodaysTemperatures = () => {
           </>
         )}
       </StyledTemperatures>
-      <StyledTempTomorrow img={backImg}>
+      <StyledTempTomorrow img={backImg} alt="tomorrow's weather">
         <div>Tomorrow</div>
         <div>
           <span>{tomorrowTemp}°c</span>
