@@ -1,5 +1,5 @@
 import React, { useContext} from "react";
-import WeatherContext from "../../../../WeatherContext";
+import WeatherContext from "../../../../contexts/WeatherContext";
 import DayTemp from './DayTemp';
 import {
   StyledTemperatures,

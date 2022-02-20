@@ -6,7 +6,6 @@ import {
   StyledImage,
 } from "./StyledNavComponents";
 import NavBarForm from './NavBarForm';
-import Tooltip from "./Tooltip";
 
 const Nav = ({
   handleSearchCity,

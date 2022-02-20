@@ -255,7 +255,7 @@ export const StyledFollowingFiveDays = styled.div`
     
   }
 `;
-export const StyledNextFiveDaysLink = styled.div`
+export const StyledButton = styled.div`
   background-color: ${(props) => (props.variant ? "#29364C" : "#00afef")};
   display: flex;
   align-items: center;

@@ -64,7 +64,7 @@ export const StyledTempTomorrow = styled.div`
 `; 
 export const StyledTemperatures = styled.div`
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: ${(props)=>props.variant?"repeat(1, 1fr)":"repeat(4, 1fr)"};
   grid-gap: 1%;
 `; 
 

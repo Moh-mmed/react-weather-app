@@ -5,8 +5,8 @@ import Home from "./Components/Home";
 function AppTest() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="*" element={<ErrorPage />} />
+    <Route path="/" element={<Home/>} />
+    <Route path="*" element={<ErrorPage />} />
     </Routes>
   );
 }

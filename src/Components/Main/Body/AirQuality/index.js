@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import WeatherContext from "../../../../WeatherContext";
+import WeatherContext from "../../../../contexts/WeatherContext";
 import icon from "../../../../imgs/air_quality.png"
 import backImg from "../../../../imgs/clear_air.jpg";
 import {

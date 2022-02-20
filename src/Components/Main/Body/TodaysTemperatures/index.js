@@ -1,7 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
 import axios from "axios"
 import moment from "moment";
-import WeatherContext from '../../../../WeatherContext';
+import WeatherContext from '../../../../contexts/WeatherContext';
+import WidgetError from "../../../WidgetError"
 import { setBackgroundImg } from "./Images";
 import { findSeason } from '../../../../helpers/findSeason';
 import {
@@ -15,8 +16,8 @@ import DayTemp from './DayTemp';
 
 const TodaysTemperatures = () => {
   const { weatherData } = useContext(WeatherContext);
-  console.log("Todays Temperatures");
   const [todayTemperatures, setTodayTemperatures] = useState({});
+  const [errorLoading, setErrorLoading] = useState(false);
   const { daily, hourly, lat, lon } = weatherData
   const { dt } = weatherData.current;
   const { main, id} = daily[1].weather[0];
@@ -38,7 +39,6 @@ const TodaysTemperatures = () => {
         })
         .then((response) => {
           response.data.list.forEach((element) => {
-            // console.log("Get todays' passed hours");
             const { main, weather, dt: hourlyTime } = element;
             const hour = Number(moment.unix(hourlyTime).hours());
             const temperature = Math.ceil(main.temp);
@@ -50,9 +50,11 @@ const TodaysTemperatures = () => {
             else if (hour === 23) temperaturesObject.night = data;
           });
           setTodayTemperatures(temperaturesObject);
+          setErrorLoading(false)
         })
         .catch((err) => {
           console.log(err);
+          setErrorLoading(true)
         });
     };
 
@@ -76,7 +78,6 @@ const TodaysTemperatures = () => {
     });
 
   }, [weatherData]);
-
   return (
     <StyledTodaysWeather>
       <StyledTempHeading>
@@ -85,14 +86,36 @@ const TodaysTemperatures = () => {
           temperature today?
         </StyledHeading>
       </StyledTempHeading>
-      <StyledTemperatures>
-        {Object.keys(todayTemperatures).length === 4 && (
-          <>
-            <DayTemp time="morning" season={season} data={todayTemperatures.more}/>
-            <DayTemp time="afternoon" season={season} data={todayTemperatures.day} />
-            <DayTemp time="evening" season={season} data={todayTemperatures.eve} />
-            <DayTemp time="night" season={season} data={todayTemperatures.night} />
-          </>
+      <StyledTemperatures variant={errorLoading}>
+        {!errorLoading ? (
+          Object.keys(todayTemperatures).length ? (
+            <>
+              <DayTemp
+                time="morning"
+                season={season}
+                data={todayTemperatures.more}
+              />
+              <DayTemp
+                time="afternoon"
+                season={season}
+                data={todayTemperatures.day}
+              />
+              <DayTemp
+                time="evening"
+                season={season}
+                data={todayTemperatures.eve}
+              />
+              <DayTemp
+                time="night"
+                season={season}
+                data={todayTemperatures.night}
+              />
+            </>
+          ) : (
+            <div>loading</div>
+          )
+        ) : (
+          <WidgetError />
         )}
       </StyledTemperatures>
       <StyledTempTomorrow img={backImg} alt="tomorrow's weather">

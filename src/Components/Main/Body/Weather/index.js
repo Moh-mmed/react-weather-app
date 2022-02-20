@@ -1,5 +1,5 @@
 import {useContext} from 'react';
-import WeatherContext from "../../../../WeatherContext";
+import WeatherContext from "../../../../contexts/WeatherContext";
 import { setBackgroundImg } from './Images';
 import {
   StyledWeatherContainer,
@@ -14,7 +14,6 @@ import {
 
 const Weather = () => {
 const { weatherData } = useContext(WeatherContext);
-console.log("Weather")
 const {
 feels_like,
 humidity,

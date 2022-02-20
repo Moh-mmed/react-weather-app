@@ -1,15 +1,22 @@
-import {Outlet } from "react-router-dom";
 import Weather from "./Weather";
 import AirQuality from "./AirQuality";
+import TodaysTemperatures from "./TodaysTemperatures";
+import NextFiveDays from "./NextFiveDays";
 import { StyledBodyContainer } from "./StyledBodyContainer";
+import { useContext } from "react";
+import WeatherContext from "../../../contexts/WeatherContext";
 
-const Body = () => {
+const Body = ({ children }) => {
+  const {nextFiveDays} = useContext(WeatherContext)
   return (
-    <StyledBodyContainer>
-      <Weather />
-      <AirQuality />
-      <Outlet />
-    </StyledBodyContainer>
+    <>
+      {children}
+      <StyledBodyContainer>
+        <Weather />
+        <AirQuality />
+        {!nextFiveDays ? <TodaysTemperatures /> : <NextFiveDays />}
+      </StyledBodyContainer>
+    </>
   );
 };
 
