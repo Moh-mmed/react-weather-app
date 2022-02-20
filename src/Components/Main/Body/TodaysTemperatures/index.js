@@ -2,7 +2,8 @@ import React, { useContext, useEffect, useState } from 'react';
 import axios from "axios"
 import moment from "moment";
 import WeatherContext from '../../../../contexts/WeatherContext';
-import WidgetError from "../../../WidgetError"
+import Error from "../../../Error"
+import Spinner from '../../../Spinner';
 import { setBackgroundImg } from "./Images";
 import { findSeason } from '../../../../helpers/findSeason';
 import {
@@ -112,10 +113,10 @@ const TodaysTemperatures = () => {
               />
             </>
           ) : (
-            <div>loading</div>
+            <Spinner />
           )
         ) : (
-          <WidgetError />
+          <Error />
         )}
       </StyledTemperatures>
       <StyledTempTomorrow img={backImg} alt="tomorrow's weather">

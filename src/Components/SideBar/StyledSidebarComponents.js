@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import {colors} from "../../constants"
 import img from "../../imgs/sun.png";
 
 const degreeCalc = (deg) => {
@@ -13,7 +14,7 @@ export const StyledSideBar = styled.div`
   flex-direction: column;
   min-height: 100vh;
   min-width: 350px;
-  background-color: #EBEFF0;
+  background-color: ${colors.firstLightGray};
   padding: 0 2em;
 `;
 
@@ -54,7 +55,7 @@ export const StyledDate = styled.div`
 export const StyledTemp = styled.div`
   font-size: 2.3rem;
   font-weight: 500;
-  color: #00afef;
+  color: ${colors.mainColor};
 `;
 
 
@@ -66,7 +67,7 @@ export const StyledSunContainer = styled.div`
 `;
 export const StyledSunPath = styled.div`
   height: 140px;
-  border-bottom: 2px solid #00afef;
+  border-bottom: 2px solid ${colors.mainColor};
   position: relative;
   overflow: hidden;
 `;
@@ -78,7 +79,8 @@ export const StyledPath = styled.div`
   width: 240px;
   height: 240px;
   border-radius: 50%;
-  border: dashed 2px ${(props) => (props.day ? "#00afef" : "#29364c")};
+  border: dashed 2px
+    ${(props) => (props.day ? colors.mainColor : colors.FontDarkBlue)};
   text-align: center;
   overflow: hidden;
 `;
@@ -117,16 +119,16 @@ export const StyledStartNode = styled.span`
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background-color: ${(props) => (props.day ? "#00afef" : "#29364c")};
+  background-color: ${(props) => (props.day ? colors.mainColor : colors.FontDarkBlue)};
 `;
 export const StyledMovingNode = styled(StyledStartNode)`
   display: ${(props) => (props.day ? "inline-block" : "none")};
-  left: ${(props)=>`${21 + props.width * 2.35}px`};
-  background-color: #00afef
+  left: ${(props) => `${21 + props.width * 2.35}px`};
+  background-color: ${colors.mainColor};
 `;
 export const StyledEndNode = styled(StyledStartNode)`
   left: 256px;
-  background-color: #29364c;
+  background-color: ${colors.FontDarkBlue};
 `;
 export const StyledSunInfo = styled.div`
   margin-top: 1rem;
@@ -148,7 +150,7 @@ export const StyledSunInfo = styled.div`
       font-size: 0.75rem;
       font-weight: 400;
       letter-spacing: 1px;
-      color: #6a6a6a;
+      color: ${colors.FirstDarkGray};
     }
   }
 `;
@@ -161,7 +163,7 @@ export const StyledUIrays = styled.div`
   height: 75px;
   width: 100%;
   padding: 20px;
-  background-color: #29364c;
+  background-color: ${colors.FontDarkBlue};
   color: #fff;
   border-radius: 15px;
   & > div:nth-child(2) {
@@ -181,9 +183,9 @@ export const StyledUIrays = styled.div`
         display: inline-block;
         font-size: 0.5rem;
         padding: 3px 4px;
-        background-color: #cce16a;
+        background-color: ${colors.lightGreen};
         border-radius: 15px;
-        color: #13150a;
+        color: ${colors.FontBlack};
       }
     }
     & > div:nth-child(2) {
@@ -224,13 +226,13 @@ export const Day = styled.div`
     & > div:nth-child(1) {
       font-size: 0.7rem;
       font-weight: 400;
-      color: #6a6a6a;
+      color: ${colors.FirstDarkGray};
     }
     & > div:nth-child(2) {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      color: #13150a;
+      color: ${colors.FontBlack};
       text-transform: capitalize;
       font-size: 0.9rem;
       font-weight: 700;
@@ -240,7 +242,7 @@ export const Day = styled.div`
         width: 65px;
         font-size: 0.9rem;
         font-weight: 600;
-        color: #00afef;
+        color: ${colors.mainColor};
       }
     }
   }
@@ -250,13 +252,10 @@ export const StyledFollowingFiveDays = styled.div`
   justify-content: flex-end;
   height: 60px;
   padding: 15px 0 0;
-  & > a {
-    text-decoration: none;
-    
-  }
 `;
 export const StyledButton = styled.div`
-  background-color: ${(props) => (props.variant ? "#29364C" : "#00afef")};
+  background-color: ${(props) =>
+    props.variant ? colors.FontDarkBlue : colors.mainColor};
   display: flex;
   align-items: center;
   border-radius: 15px;

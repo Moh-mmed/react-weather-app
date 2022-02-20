@@ -1,5 +1,5 @@
 import styled from "styled-components";
-
+import {colors} from "../../../../constants"
 function tempRange(temp,season) {
   switch (season) {
     case "winter":
@@ -41,7 +41,7 @@ export const StyledTempTomorrow = styled.div`
   flex-direction: column;
   justify-content: space-between;
   text-transform: capitalize;
-  background: ${(props)=>`url(${props.img})`};
+  background: ${(props) => `url(${props.img})`};
   background-size: cover;
   border-radius: 20px;
   box-shadow: 5px 5px 8px 3px rgb(41 54 76 / 13%);
@@ -58,7 +58,7 @@ export const StyledTempTomorrow = styled.div`
     & > span:nth-child(1) {
       font-size: 2.1rem;
       font-weight: 700;
-      color: #13150a;
+      color: ${colors.FontBlack};
     }
   }
 `; 
@@ -92,7 +92,7 @@ export const StyledImgContainer = styled.div`
   justify-content: center;
   background-color: #fff;
   border-radius: 50%;
-  border: 1px solid #dfdfdf;
+  border: 1px solid ${colors.secondLightGray};
   max-height: 50px;
   max-width: 50px;
 `;
@@ -112,7 +112,7 @@ export const StyledBulletContainer = styled.div`
 export const StyledBullet = styled.div`
   width: 7px;
   height: 7px;
-  background-color: #29364c;
+  background-color: ${colors.FontDarkBlue};
   border-radius: 50%;
   margin-top: 10px;
 `;
@@ -132,7 +132,7 @@ export const StyledDailyDegree = styled.div`
   & > span:nth-child(2) {
     text-transform: capitalize;
     font-size: 0.7rem;
-    color: #6a6a6a;
+    color: ${colors.FirstDarkGray};
   }
 `;
 

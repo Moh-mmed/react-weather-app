@@ -1,4 +1,5 @@
 import styled, { keyframes} from "styled-components";
+import { colors } from "../../constants";
 
 export const NavContainer = styled.div`
   display: flex;
@@ -29,7 +30,7 @@ export const StyledInput = styled.input`
   border-radius: 10px;
   font-size: 0.95em;
   font-weight: 500;
-  color: #6a6a6a;
+  color: ${colors.FirstDarkGray};
   outline: none;
   border: none;
   &::placeholder {

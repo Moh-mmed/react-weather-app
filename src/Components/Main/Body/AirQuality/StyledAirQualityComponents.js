@@ -1,5 +1,5 @@
 import styled from "styled-components";
-
+import {colors} from "../../../../constants"
 
 const getProgressWidth = (index) => {
   switch (index) {
@@ -72,8 +72,8 @@ export const StyledDegree = styled.div`
     font-weight: 600;
     text-transform: uppercase;
     font-size: 0.7rem;
-    background-color: #cce16a;
-    color: #13150a;
+    background-color: ${colors.lightGreen};
+    color: ${colors.FontBlack};
     padding: 2px 5px;
     border-radius: 7px;
   }
@@ -102,9 +102,10 @@ export const StyledLevel = styled.div`
 export const StyledLevelSpan = styled.span`
   position: relative;
   font-size: 0.6rem;
-  color: ${(props) => (props.variant ? "#fff" : "#29364C")};
+  color: ${(props) => (props.variant ? "#fff" : colors.FontDarkBlue)};
   padding: 7px;
-  background-color: ${(props) => (props.variant ? "#29364c" : "none")};
+  background-color: ${(props) =>
+    props.variant ? colors.FontDarkBlue : "none"};
   border-radius: 8px;
   box-shadow: ${(props) =>
     props.variant ? "3px 3px 4px 1px rgb(41 54 76 / 13%)" : "none"};
@@ -116,7 +117,8 @@ export const StyledLevelSpan = styled.span`
     height: 0;
     border-left: 6px solid transparent;
     border-right: 6px solid transparent;
-    border-top: 6px solid ${(props) => (props.variant ? "#29364c" : "none")};
+    border-top: 6px solid
+      ${(props) => (props.variant ? colors.FontDarkBlue : "none")};
     bottom: -6px;
     left: 50%;
     transform: translateX(-50%);
@@ -127,7 +129,7 @@ export const StyledProgressBarContainer = styled.div`
   margin: 0 auto;
   width: 90%;
   height: 6px;
-  background-color: #ebebeb;
+  background-color: ${colors.firstLightGray};
   border-radius: 20px;
   overflow: hidden;
 `;
@@ -141,7 +143,7 @@ export const StyledProgressBar = styled.div`
       transparent 66%
     ),
     -webkit-linear-gradient(top, rgba(255, 255, 255, 0.25), rgba(0, 0, 0, 0.2)),
-    -webkit-linear-gradient(left, #00afef, #00afef);
+    -webkit-linear-gradient(left, ${colors.mainColor}, ${colors.mainColor});
 
   background-size: 20px 10px, 100% 100%, 100% 100%;
   width: ${(props) => `${getProgressWidth(props.variant)}%`};

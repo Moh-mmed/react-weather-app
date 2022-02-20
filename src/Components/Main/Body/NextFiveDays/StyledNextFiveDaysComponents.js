@@ -1,5 +1,5 @@
 import styled from "styled-components";
-
+import {colors} from "../../../../constants"
 export const StyledTodaysWeather = styled.div`
   grid-column-start: 1;
   grid-column-end: 3;
@@ -48,7 +48,7 @@ export const StyledDailyTemp = styled.div`
 `;
 export const StyledDailyIcon = styled.img`
   width: 60px;
-  background-color: #00afef7a;
+  background-color: ${colors.lightMainColor};
   border-radius: 50%;
 `;
 
@@ -66,7 +66,7 @@ export const StyledDailyDegree = styled.div`
     text-transform: capitalize;
     font-size: 0.8rem;
     margin: 1rem 0;
-    color: #6a6a6a;
+    color: ${colors.FirstDarkGray};
   }
 `;
 

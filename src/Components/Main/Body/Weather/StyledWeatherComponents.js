@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { colors } from "../../../../constants";
 export const StyledWeatherContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -66,7 +67,7 @@ export const StyledDegree = styled.div`
 export const StyledCondition = styled.div`
   font-weight: 600;
   font-size: 0.75rem;
-  color: #13150a;
+  color: ${colors.FontBlack};
 `;
 
 export const StyledStats = styled.div`
@@ -92,16 +93,16 @@ export const StyledStats = styled.div`
     }
   }
   & > div:nth-child(1) {
-    background-color: #29364c;
+    background-color: ${colors.FontDarkBlue};
     color: #fff;
   }
   & > div:nth-child(2) {
-    background-color: #cce16a;
-    color: #13150a;
+    background-color: ${colors.lightGreen};
+    color: ${colors.FontBlack};
   }
   & > div:nth-child(3) {
     background-color: #fff;
     border-radius: 20px;
-    color: #13150a;
+    color: ${colors.FontBlack};
   }
 `;

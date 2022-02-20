@@ -1,13 +1,15 @@
 import { Route, Routes } from "react-router-dom";
-import ErrorPage from "./Components/ErrorPage";
 import Home from "./Components/Home";
+import Error from "./Components/Error";
 
 function AppTest() {
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="*" element={<ErrorPage />} />
-    </Routes>
+    <div style={{height: "100vh"}}>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="*" element={<Error />} />
+      </Routes>
+    </div>
   );
 }
 
