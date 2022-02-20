@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import search from "../../../imgs/search.png";
+import Tooltip from "./Tooltip";
 import {
   StyledSearchbar,
   StyledInput,
@@ -10,7 +11,8 @@ const NavBarForm = ({
   handleSearchCity,
   handleWeatherData,
   handleAirQuality,
-  handleCurrCity
+  handleCurrCity,
+  cityNotFound,
 }) => {
   const [enteredCity, setEnteredCity] = useState(undefined);
   const inputField = useRef(null);
@@ -29,7 +31,6 @@ const NavBarForm = ({
   useEffect(() => {
     inputField.current.focus();
   }, []);
-
   return (
     <StyledSearchbar>
       <form onSubmit={handleFormSubmit}>
@@ -44,6 +45,7 @@ const NavBarForm = ({
       <StyledSearchImgContainer>
         <StyledImg src={search} alt="search img" />
       </StyledSearchImgContainer>
+      {cityNotFound && <Tooltip/>}
     </StyledSearchbar>
   );
 };

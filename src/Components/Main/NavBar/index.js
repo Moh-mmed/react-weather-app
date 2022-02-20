@@ -6,12 +6,14 @@ import {
   StyledImage,
 } from "./StyledNavComponents";
 import NavBarForm from './NavBarForm';
+import Tooltip from "./Tooltip";
 
 const Nav = ({
   handleSearchCity,
   handleWeatherData,
   handleAirQuality,
-  handleCurrCity
+  handleCurrCity,
+  cityNotFound
 }) => {
   return (
     <NavContainer>
@@ -19,6 +21,7 @@ const Nav = ({
         <StyledImage src={logo} alt="Weather logo" />
       </StyledLogo>
       <NavBarForm
+        cityNotFound={cityNotFound}
         handleSearchCity={handleSearchCity}
         handleWeatherData={handleWeatherData}
         handleAirQuality={handleAirQuality}

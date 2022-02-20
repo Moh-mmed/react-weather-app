@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { keyframes} from "styled-components";
 
 export const NavContainer = styled.div`
   display: flex;
@@ -15,6 +15,7 @@ export const StyledImage = styled.img`
 `;
 
 export const StyledSearchbar = styled.div`
+position: relative;
   display: flex;
   justify-content: end;
   position: relative;
@@ -43,5 +44,31 @@ export const StyledSearchImgContainer = styled.div`
 export const StyledImg = styled.img`
   width: 21px
 `;
-
+const displayTooltip = keyframes`
+0%{opacity: 0}
+20%{opacity: 1}
+80%{opacity: 1}
+100%{opacity: 0}
+`;
+export const StyledTooltip = styled.div`
+  position: absolute;
+  opacity: 0;
+  top: 58px;
+  left: 33%;
+  background-color: #ff5346de;
+  border-radius: 15px;
+  padding: 15px 13px;
+  font-size: 0.7rem;
+  color: #fff;
+  animation: ${displayTooltip} 3s ease-in;
+  &::after {
+    content: "";
+    position: absolute;
+    top: -6px;
+    left: 15px;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 6px solid #ff5346de;
+  }
+`;
 

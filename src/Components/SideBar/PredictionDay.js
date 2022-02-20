@@ -6,7 +6,7 @@ const PredictionDay = (props) => {
     const temperature = Math.ceil(temp.day)
     const feelsLike = Math.ceil(feels_like.day)
     const {icon, main,description} = weather[0]
-    const imgSrc = `http://openweathermap.org/img/wn/${icon}@2x.png`;
+    const imgSrc = `https://openweathermap.org/img/wn/${icon}@2x.png`;
     const date = moment.unix(dt).format("MMMM DD")
     return (
       <Day>

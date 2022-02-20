@@ -18,7 +18,7 @@ function App() {
   const [coords, setCoords] = useState(null);
   const [weatherData, setWeatherData] = useState(null);
   const [airQuality, setAirQuality] = useState(null);
-  const [isLoading, setIsLoading] = useState(false)
+  const [cityNotFound, setCityNotFound] = useState(false)
 
   const KEY = "99eb51721a50689c8175af2560a2b07c";
 
@@ -37,11 +37,12 @@ function App() {
           headers: { Accept: "application/json" },
         })
         .then((response) => {
-          setCurrCity({
-            city: response.data[0].name,
-            country: response.data[0].country,
-          });
-          // setSearchCity(null)// or remove this line to prevent rerendering findWeather and findAirQuality
+           let currentCity = {
+             city: response.data[0].name,
+             country: response.data[0].country,
+           };
+           setCurrCity(currentCity);
+           localStorage.setItem("currentCity", JSON.stringify(currentCity));
           console.log("location's found")
         })
         .catch((err) => {
@@ -85,9 +86,6 @@ function App() {
     }
   },[])
 
-
-
-
   // Find coordinates for entered city 
   useEffect(() => {
   console.log("find coordinates")
@@ -103,15 +101,21 @@ function App() {
               lat: Number(response.data[0].lat),
               lon: Number(response.data[0].lon),
             };
+            let currentCity = {
+              city: response.data[0].name,
+              country: response.data[0].country,
+            };
             setCoords(cityCoords);
-            setCurrCity({
-            city: response.data[0].name,
-            country: response.data[0].country,
-            });
+            setCurrCity(currentCity);
             localStorage.setItem("coordinates", JSON.stringify(cityCoords));
+            localStorage.setItem("currentCity", JSON.stringify(currentCity));
             console.log("coordinates are found")
           } else {
-             console.log("You entered a wrong city");
+            console.log("You entered a wrong city");
+            setCityNotFound(true);
+            setCoords(JSON.parse(localStorage.getItem("coordinates")));
+            setCurrCity(JSON.parse(localStorage.getItem("currentCity")));
+            setTimeout(() => setCityNotFound(false), 4000);
           }
         })
         .catch((err) => {
@@ -124,10 +128,6 @@ function App() {
     findCoordinates();
   };
   }, [searchCity]);
-
-
-
-
 
 // Find Weather data
   useEffect(() => {
@@ -187,10 +187,12 @@ function App() {
             <div className="Main">
               <Nav
                 city={searchCity}
+                cityNotFound={cityNotFound}
                 handleSearchCity={setSearchCity}
                 handleWeatherData={setWeatherData}
                 handleAirQuality={setAirQuality}
-                  handleCurrCity={setCurrCity}
+                handleCurrCity={setCurrCity}
+                handleCityNotFound={setCityNotFound}
               />
               <Routes>
                 <Route path="/" element={<Body />}>
