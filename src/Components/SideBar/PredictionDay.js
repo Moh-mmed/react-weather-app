@@ -2,7 +2,6 @@ import React from 'react'
 import moment from "moment"
 import { Day} from "./StyledSidebarComponents";
 const PredictionDay = (props) => {
-  console.log(props.data)
    const { timezone_offset } = props.timezoneOffset;
     const { feels_like, temp, weather, dt } = props.data
     const temperature = Math.ceil(temp.day)
