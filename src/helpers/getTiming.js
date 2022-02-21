@@ -1,14 +1,14 @@
 import moment from "moment";
 const getTiming = (sunrise, sunset, time, timezone) => {
-  let today = moment.unix(time).format("ddd DD MMM");
+  let today = moment.unix(time).utcOffset(timezone / 3600).format("ddd DD MMM");
   let Sunrise = moment(sunrise * 1000)
-    .utcOffset(timezone / 60)
+    .utcOffset(timezone / 3600)
     .format("LT");
   let Sunset = moment(sunset * 1000)
-    .utcOffset(timezone / 60)
+    .utcOffset(timezone / 3600)
     .format("LT");
   let clock = moment(time * 1000)
-    .utcOffset(timezone / 60)
+    .utcOffset(timezone / 3600)
     .format("LT");
   if (time >= sunrise && time < sunset) {
     let day = true;

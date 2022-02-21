@@ -88,8 +88,8 @@ const SideBar = ({ handleNextFiveDaysDisplay }) => {
       </StyledUIrays>
       <StyledPredictionHeading>weather prediction</StyledPredictionHeading>
       <StyledFollowingDays>
-        <PredictionDay data={daily[1]} />
-        <PredictionDay data={daily[2]} />
+        <PredictionDay data={daily[1]} timezoneOffset={timezone_offset} />
+        <PredictionDay data={daily[2]} timezoneOffset={timezone_offset} />
       </StyledFollowingDays>
       <StyledFollowingFiveDays>
         <StyledButton
