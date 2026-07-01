@@ -1,4 +1,4 @@
-import React, { useContext} from "react";
+import React, { useContext } from "react";
 import WeatherContext from "../../../../contexts/WeatherContext";
 import DayTemp from './DayTemp';
 import {
@@ -10,20 +10,22 @@ import {
 
 const NextFiveDays = () => {
   const { weatherData } = useContext(WeatherContext);
-  const nextFiveDaysWeather = weatherData.daily.slice(3);
+  const nextFiveDaysWeather = weatherData.daily.slice(1);
   return (
     <StyledTodaysWeather>
       <StyledTempHeading>
         <StyledHeading>
-          Next five days' temperatures 
+          Next five days' temperatures
         </StyledHeading>
       </StyledTempHeading>
       <StyledTemperatures>
-        {nextFiveDaysWeather.length === 5 &&
-          nextFiveDaysWeather.map((day,index) => <DayTemp data={day} key={index} />)}
+        {nextFiveDaysWeather.length > 0 &&
+          nextFiveDaysWeather.map((day, index) => (
+            <DayTemp data={day} key={index} />
+          ))}
       </StyledTemperatures>
     </StyledTodaysWeather>
-  ); 
+  );
 };
 
 export default NextFiveDays;

@@ -2,11 +2,11 @@ import React from 'react'
 import moment from "moment"
 import { Day} from "./StyledSidebarComponents";
 const PredictionDay = (props) => {
-   const { timezone_offset } = props.timezoneOffset;
-    const { feels_like, temp, weather, dt } = props.data
-    const temperature = Math.ceil(temp.day)
-    const feelsLike = Math.ceil(feels_like.day)
-    const {icon, main,description} = weather[0]
+    const timezone_offset = props.timezoneOffset;
+    const { feels_like, temp, weather, dt } = props.data;
+    const temperature = Math.ceil(temp.day);
+    const feelsLike = Math.ceil(feels_like.day);
+    const { icon, main, description } = weather[0];
     const imgSrc = `https://openweathermap.org/img/wn/${icon}@2x.png`;
     const date = moment
       .unix(dt)

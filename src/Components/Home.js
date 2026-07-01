@@ -6,6 +6,9 @@ import Nav from "./Main/NavBar";
 import Body from "./Main/Body";
 import SideBar from "./SideBar";
 import Spinner from "./Spinner";
+import Error from "./Error";
+import { OPEN_WEATHER_API_KEY } from "../helpers/openWeather";
+import { buildOpenWeatherPayload } from "../helpers/openWeatherAdapter";
 
 
 
@@ -18,17 +21,35 @@ const Home = () => {
   const [airQuality, setAirQuality] = useState(null);
   const [cityNotFound, setCityNotFound] = useState(false);
   const [nextFiveDays, setNextFiveDays] = useState(false);
+  const [apiError, setApiError] = useState("");
 
-  const KEY = "99eb51721a50689c8175af2560a2b07c";
+  const handleApiError = (err, fallbackMessage) => {
+    const status = err?.response?.status;
+    if (status === 401) {
+      setApiError(
+        "OpenWeather rejected the request. Add a valid REACT_APP_OPENWEATHER_API_KEY to your .env file."
+      );
+      return;
+    }
+
+    setApiError(fallbackMessage);
+  };
 
   //Find coordinates using location
   // first we check if localStorage has saved coordinates, if not we get coordinates using Location API
   // If user turn on location, the user should ask for detecting coordinates using location
   useEffect(() => {
+    if (!OPEN_WEATHER_API_KEY) {
+      setApiError(
+        "Missing REACT_APP_OPENWEATHER_API_KEY. Create a .env file with a valid OpenWeather key."
+      );
+      return;
+    }
+
     let coordinates = JSON.parse(localStorage.getItem("coordinates"));
     // Find city name
     const findCityName = async (cor) => {
-      const reverseURL = `https://api.openweathermap.org/geo/1.0/reverse?lat=${cor.lat}&lon=${cor.lon}&limit=5&appid=${KEY}`;
+      const reverseURL = `https://api.openweathermap.org/geo/1.0/reverse?lat=${cor.lat}&lon=${cor.lon}&limit=5&appid=${OPEN_WEATHER_API_KEY}`;
       await axios
         .get(reverseURL, {
           headers: { Accept: "application/json" },
@@ -40,9 +61,11 @@ const Home = () => {
           };
           setCurrCity(currentCity);
           localStorage.setItem("currentCity", JSON.stringify(currentCity));
+          setApiError("");
         })
         .catch((err) => {
           console.log(err);
+          handleApiError(err, "Unable to resolve the current city from your location.");
         });
     };
     if (coordinates !== null) {
@@ -70,7 +93,7 @@ const Home = () => {
           const fail = (err) => {
             // Istanbul coordinates as default
             cityCoords = { lat: 41.01, lon: 28.66 };
-            localStorage.setItem("coordinates", JSON.stringify(coords));
+            localStorage.setItem("coordinates", JSON.stringify(cityCoords));
             setCoords(cityCoords);
             findCityName(cityCoords);
             reject("Location is INACTIVE");
@@ -84,8 +107,12 @@ const Home = () => {
 
   // Find coordinates for entered city
   useEffect(() => {
+    if (!OPEN_WEATHER_API_KEY) {
+      return;
+    }
+
     const findCoordinates = async () => {
-      let coordinatesURL = `https://api.openweathermap.org/geo/1.0/direct?q=${searchCity}&limit=5&appid=${KEY}`;
+      let coordinatesURL = `https://api.openweathermap.org/geo/1.0/direct?q=${searchCity}&limit=5&appid=${OPEN_WEATHER_API_KEY}`;
       await axios
         .get(coordinatesURL, {
           headers: { Accept: "application/json" },
@@ -104,6 +131,7 @@ const Home = () => {
             setCurrCity(currentCity);
             localStorage.setItem("coordinates", JSON.stringify(cityCoords));
             localStorage.setItem("currentCity", JSON.stringify(currentCity));
+            setApiError("");
           } else {
             setCityNotFound(true);
             setCoords(JSON.parse(localStorage.getItem("coordinates")));
@@ -113,6 +141,7 @@ const Home = () => {
         })
         .catch((err) => {
           console.log(err);
+          handleApiError(err, "Unable to look up that city right now.");
         });
     };
     // If the searchCity is null means coordinates already exist
@@ -123,28 +152,49 @@ const Home = () => {
 
   // Find Weather data
   useEffect(() => {
-    if (coords !== null) {
-      const weatherURL = `https://api.openweathermap.org/data/2.5/onecall?lat=${coords.lat}&lon=${coords.lon}&units=metric&appid=${KEY}`;
+    let isMounted = true;
+
+    if (coords !== null && OPEN_WEATHER_API_KEY) {
+      const currentWeatherURL = `https://api.openweathermap.org/data/2.5/weather?lat=${coords.lat}&lon=${coords.lon}&units=metric&appid=${OPEN_WEATHER_API_KEY}`;
+      const forecastURL = `https://api.openweathermap.org/data/2.5/forecast?lat=${coords.lat}&lon=${coords.lon}&units=metric&appid=${OPEN_WEATHER_API_KEY}`;
+      const uviURL = `https://api.openweathermap.org/data/2.5/uvi?lat=${coords.lat}&lon=${coords.lon}&appid=${OPEN_WEATHER_API_KEY}`;
+
       const findWeather = async () => {
-        await axios
-          .get(weatherURL, {
-            headers: { Accept: "application/json" },
-          })
-          .then((response) => {
-            setWeatherData(response.data);
-          })
-          .catch((err) => {
-            console.log(err);
-          });
+        try {
+          const [currentResponse, forecastResponse, uviResponse] = await Promise.all([
+            axios.get(currentWeatherURL, { headers: { Accept: "application/json" } }),
+            axios.get(forecastURL, { headers: { Accept: "application/json" } }),
+            axios.get(uviURL, { headers: { Accept: "application/json" } }),
+          ]);
+
+          if (!isMounted) return;
+
+          const payload = buildOpenWeatherPayload(
+            currentResponse,
+            forecastResponse,
+            uviResponse
+          );
+
+          setWeatherData(payload);
+          setApiError("");
+        } catch (err) {
+          if (!isMounted) return;
+          console.log(err);
+          handleApiError(err, "Unable to load the weather forecast.");
+        }
       };
       findWeather();
     }
+
+    return () => {
+      isMounted = false;
+    };
   }, [coords]);
 
   // Find Air Quality
   useEffect(() => {
-    if (coords !== null) {
-      const airQualityURL = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${coords.lat}&lon=${coords.lon}&appid=${KEY}`;
+    if (coords !== null && OPEN_WEATHER_API_KEY) {
+      const airQualityURL = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${coords.lat}&lon=${coords.lon}&appid=${OPEN_WEATHER_API_KEY}`;
       const findAirQuality = async () => {
         await axios
           .get(airQualityURL, {
@@ -152,9 +202,11 @@ const Home = () => {
           })
           .then((response) => {
             setAirQuality(response.data);
+            setApiError("");
           })
           .catch((err) => {
             console.log(err);
+            handleApiError(err, "Unable to load the air quality report.");
           });
       };
       findAirQuality();
@@ -166,7 +218,9 @@ const Home = () => {
       value={{ weatherData, airQuality, currCity, nextFiveDays }}
     >
       <div className="App">
-        {weatherData === null || airQuality === null || currCity === null ? (
+        {apiError ? (
+          <Error message={apiError} />
+        ) : weatherData === null || airQuality === null || currCity === null ? (
           <Spinner />
         ) : (
           <>

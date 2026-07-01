@@ -39,6 +39,16 @@ Instead, it will copy all the configuration files and the transitive dependencie
 
 You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
+## Environment Setup
+
+Create a `.env` file in the project root and add your OpenWeather API key:
+
+```bash
+REACT_APP_OPENWEATHER_API_KEY=your_openweather_api_key_here
+```
+
+You can copy `.env.example` as a starting point.
+
 ## Learn More
 
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).

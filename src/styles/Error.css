@@ -1,5 +1,6 @@
 .main {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 3rem;
@@ -7,4 +8,12 @@
 }
 .main > img {
   width: 20%;
+}
+.main > p {
+  max-width: 32rem;
+  text-align: center;
+  margin-top: 1rem;
+  color: #29364C;
+  font-weight: 600;
+  line-height: 1.4;
 }

@@ -8,8 +8,10 @@ import {
   StyledDailyDegree,
 } from "./StyledTodaysWeatherComponents";
 const DayTemp = (props) => {
-  const { time, data, season } = props
-  const { temperature, icon } = data;
+  const { time, data, season } = props;
+  const temperature = data?.temperature ?? 0;
+  const icon = data?.icon ?? "01d";
+
   return (
     <StyledDailyTemp>
       <StyledBulletContainer temp={temperature} season={season}>
