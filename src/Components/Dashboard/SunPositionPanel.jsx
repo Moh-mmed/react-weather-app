@@ -2,7 +2,7 @@ import getTiming from "../../helpers/getTiming";
 import { getUviDescription } from "../../helpers/getUVI";
 import { getSunArcPoint, SUN_ARC_BASE } from "../../helpers/sunArc";
 import {
-  Panel,
+  SunPanel,
   PanelTitle,
   ArcWrap,
   ArcLabels,
@@ -38,7 +38,7 @@ const SunPositionPanel = ({ weatherData }) => {
   const uviCopy = getUviDescription(Number.isFinite(uvi) ? uvi : null);
 
   return (
-    <Panel $delay="0s">
+    <SunPanel $delay="0s">
       <PanelTitle>
         <SunIcon />
         Sun Position
@@ -84,7 +84,7 @@ const SunPositionPanel = ({ weatherData }) => {
           </UvDesc>
         </UvChip>
       </ArcWrap>
-    </Panel>
+    </SunPanel>
   );
 };
 

@@ -434,6 +434,10 @@ export const ArcWrap = styled.div`
   align-items: center;
 `;
 
+export const SunPanel = styled(Panel)`
+  overflow: visible;
+`;
+
 export const ArcLabels = styled.div`
   display: flex;
   justify-content: space-between;
@@ -462,13 +466,15 @@ export const ArcLabelValue = styled.div`
 export const UvChip = styled.div`
   margin-top: 14px;
   width: 100%;
+  height: auto;
+  min-height: 0;
   display: flex;
   align-items: flex-start;
   gap: 12px;
   background: rgba(226, 105, 74, 0.12);
   border: 1px solid rgba(226, 105, 74, 0.3);
   border-radius: 14px;
-  padding: 14px 14px 16px;
+  padding: 14px 14px 18px;
   box-sizing: border-box;
 `;
 
@@ -483,6 +489,7 @@ export const UvDesc = styled.div`
   font-size: 12px;
   color: ${theme.textLo};
   line-height: 1.55;
+  min-width: 0;
 
   b {
     color: ${theme.textHi};
