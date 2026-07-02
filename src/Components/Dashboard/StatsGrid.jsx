@@ -1,7 +1,15 @@
+import { useEffect, useRef, useState } from "react";
 import { getDewPoint } from "../../helpers/getDewPoint";
 import { getWindDirectionAbbr } from "../../helpers/getWindDirection";
 import {
-  StatsGrid as StatsGridShell,
+  StatsCarouselArrow,
+  StatsCarouselDot,
+  StatsCarouselDots,
+  StatsCarouselFooter,
+  StatsCarouselNav,
+  StatsCarouselPanel,
+  StatsCarouselSlide,
+  StatsCarouselViewport,
   StatTile,
   StatTop,
   StatLabel,
@@ -15,6 +23,14 @@ const StatIcon = ({ children }) => (
 );
 
 const StatsGrid = ({ weatherData }) => {
+  const trackRef = useRef(null);
+  const dragStateRef = useRef({
+    active: false,
+    startX: 0,
+    startScrollLeft: 0,
+  });
+  const scrollRafRef = useRef(0);
+  const [activeIndex, setActiveIndex] = useState(0);
   const { current } = weatherData;
   const {
     pressure,
@@ -96,21 +112,131 @@ const StatsGrid = ({ weatherData }) => {
     },
   ];
 
+  const scrollToIndex = (index, behavior = "smooth") => {
+    const track = trackRef.current;
+    if (!track) return;
+
+    const nextIndex = Math.max(0, Math.min(index, stats.length - 1));
+    track.scrollTo({
+      left: nextIndex * track.clientWidth,
+      behavior,
+    });
+    setActiveIndex(nextIndex);
+  };
+
+  const handleScroll = () => {
+    const track = trackRef.current;
+    if (!track) return;
+
+    window.cancelAnimationFrame(scrollRafRef.current);
+    scrollRafRef.current = window.requestAnimationFrame(() => {
+      const nextIndex = Math.round(track.scrollLeft / track.clientWidth);
+      setActiveIndex(Math.max(0, Math.min(nextIndex, stats.length - 1)));
+    });
+  };
+
+  const handlePointerDown = (event) => {
+    if (event.pointerType !== "mouse" || event.button !== 0) return;
+
+    const track = trackRef.current;
+    if (!track) return;
+
+    dragStateRef.current = {
+      active: true,
+      startX: event.clientX,
+      startScrollLeft: track.scrollLeft,
+    };
+
+    track.setPointerCapture?.(event.pointerId);
+  };
+
+  const handlePointerMove = (event) => {
+    const track = trackRef.current;
+    const { active, startX, startScrollLeft } = dragStateRef.current;
+
+    if (!active || !track || event.pointerType !== "mouse") return;
+
+    event.preventDefault();
+    track.scrollLeft = startScrollLeft - (event.clientX - startX);
+  };
+
+  const stopDragging = () => {
+    dragStateRef.current.active = false;
+  };
+
+  useEffect(
+    () => () => {
+      window.cancelAnimationFrame(scrollRafRef.current);
+    },
+    []
+  );
+
   return (
-    <StatsGridShell>
-      {stats.map((stat) => (
-        <StatTile key={stat.label}>
-          <StatTop>
-            <StatLabel>{stat.label}</StatLabel>
-            <StatIcon>{stat.icon}</StatIcon>
-          </StatTop>
-          <StatValue>
-            {stat.value}
-            <small>{stat.unit}</small>
-          </StatValue>
-        </StatTile>
-      ))}
-    </StatsGridShell>
+    <StatsCarouselPanel $delay="0.15s">
+      <StatsCarouselViewport
+        ref={trackRef}
+        onScroll={handleScroll}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={stopDragging}
+        onPointerCancel={stopDragging}
+        onPointerLeave={stopDragging}
+        aria-label="Weather statistics carousel"
+      >
+        {stats.map((stat) => (
+          <StatsCarouselSlide key={stat.label}>
+            <StatTile>
+              <StatTop>
+                <StatLabel>{stat.label}</StatLabel>
+                <StatIcon>{stat.icon}</StatIcon>
+              </StatTop>
+              <StatValue>
+                {stat.value}
+                <small>{stat.unit}</small>
+              </StatValue>
+            </StatTile>
+          </StatsCarouselSlide>
+        ))}
+      </StatsCarouselViewport>
+
+      <StatsCarouselFooter>
+        <StatsCarouselDots role="group" aria-label="Weather statistics positions">
+          {stats.map((stat, index) => (
+            <StatsCarouselDot
+              key={stat.label}
+              type="button"
+              aria-label={`Show ${stat.label}`}
+              aria-pressed={activeIndex === index}
+              $active={activeIndex === index}
+              onClick={() => scrollToIndex(index)}
+            />
+          ))}
+        </StatsCarouselDots>
+
+        <StatsCarouselNav>
+          <StatsCarouselArrow
+            type="button"
+            aria-label="Previous statistic"
+            onClick={() => scrollToIndex(activeIndex - 1)}
+            disabled={activeIndex === 0}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </StatsCarouselArrow>
+          <StatsCarouselArrow
+            type="button"
+            aria-label="Next statistic"
+            onClick={() => scrollToIndex(activeIndex + 1)}
+            disabled={activeIndex === stats.length - 1}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M9 6l6 6-6 6" />
+            </svg>
+          </StatsCarouselArrow>
+        </StatsCarouselNav>
+      </StatsCarouselFooter>
+    </StatsCarouselPanel>
   );
 };
 

@@ -1,6 +1,6 @@
 import getTiming from "../../helpers/getTiming";
 import { getUviDescription } from "../../helpers/getUVI";
-import { getSunArcPoint, getSunArcPath, SUN_ARC_BASE } from "../../helpers/sunArc";
+import { getSunArcPoint, SUN_ARC_BASE } from "../../helpers/sunArc";
 import {
   Panel,
   PanelTitle,
@@ -33,7 +33,6 @@ const SunPositionPanel = ({ weatherData }) => {
     timezone_offset
   );
   const progress = day ? width / 100 : 0;
-  const activeArc = getSunArcPath(progress);
   const arcPoint = getSunArcPoint(progress);
   const UVI = Number.isFinite(uvi) ? Math.round(uvi) : "--";
   const uviCopy = getUviDescription(Number.isFinite(uvi) ? uvi : null);
@@ -54,15 +53,14 @@ const SunPositionPanel = ({ weatherData }) => {
             strokeDasharray="2 7"
             strokeLinecap="round"
           />
-          {day && (
-            <path
-              d={activeArc}
-              stroke="#4FA3D9"
-              strokeWidth="3"
-              fill="none"
-              strokeLinecap="round"
-            />
-          )}
+          <path
+            d={SUN_ARC_BASE}
+            stroke="#4FA3D9"
+            strokeWidth="3"
+            fill="none"
+            strokeLinecap="round"
+            vectorEffect="non-scaling-stroke"
+          />
           {day && (
             <SunDot cx={arcPoint.x} cy={arcPoint.y} r="8" fill="#F4A93B" />
           )}

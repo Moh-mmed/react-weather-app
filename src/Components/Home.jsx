@@ -144,6 +144,7 @@ const Home = () => {
       const currentWeatherURL = `https://api.openweathermap.org/data/2.5/weather?lat=${coords.lat}&lon=${coords.lon}&units=metric&appid=${OPEN_WEATHER_API_KEY}`;
       const forecastURL = `https://api.openweathermap.org/data/2.5/forecast?lat=${coords.lat}&lon=${coords.lon}&units=metric&appid=${OPEN_WEATHER_API_KEY}`;
       const uviURL = `https://api.openweathermap.org/data/2.5/uvi?lat=${coords.lat}&lon=${coords.lon}&appid=${OPEN_WEATHER_API_KEY}`;
+      const oneCallURL = `https://api.openweathermap.org/data/3.0/onecall?lat=${coords.lat}&lon=${coords.lon}&exclude=minutely,daily,alerts&units=metric&appid=${OPEN_WEATHER_API_KEY}`;
 
       const findWeather = async () => {
         try {
@@ -153,12 +154,23 @@ const Home = () => {
             axios.get(uviURL, { headers: { Accept: "application/json" } }),
           ]);
 
+          let oneCallResponse = null;
+
+          try {
+            oneCallResponse = await axios.get(oneCallURL, {
+              headers: { Accept: "application/json" },
+            });
+          } catch (oneCallErr) {
+            console.warn("48-hour outlook unavailable:", oneCallErr);
+          }
+
           if (!isMounted) return;
 
           const payload = buildOpenWeatherPayload(
             currentResponse,
             forecastResponse,
-            uviResponse
+            uviResponse,
+            oneCallResponse
           );
 
           setWeatherData(payload);

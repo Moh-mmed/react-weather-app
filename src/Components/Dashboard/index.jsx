@@ -96,13 +96,13 @@ const Dashboard = ({
         <LeftColumn>
           <HeroPanel weatherData={weatherData} />
           <HourlyOutlook weatherData={weatherData} />
-          <StatsGrid weatherData={weatherData} />
+          <ForecastList weatherData={weatherData} />
         </LeftColumn>
 
         <RightColumn>
           <SunPositionPanel weatherData={weatherData} />
           <AirQualityPanel airQuality={airQuality} />
-          <ForecastList weatherData={weatherData} />
+          <StatsGrid weatherData={weatherData} />
         </RightColumn>
       </DashboardMain>
     </DashboardApp>

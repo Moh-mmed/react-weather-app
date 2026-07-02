@@ -7,6 +7,7 @@ import {
   HourLabel,
   HourValue,
   HourIcon,
+  HourlyEmpty,
 } from "./StyledDashboard";
 
 const ClockIcon = () => (
@@ -17,36 +18,40 @@ const ClockIcon = () => (
 );
 
 const HourlyOutlook = ({ weatherData }) => {
-  const { outlook24h, timezone_offset } = weatherData;
+  const { outlook48h, timezone_offset } = weatherData;
 
   return (
     <Panel $delay="0.05s">
       <PanelTitle>
         <ClockIcon />
-        24-Hour Outlook
+        48-Hour Outlook
       </PanelTitle>
       <HourlyRow>
-        {outlook24h.map((entry) => {
-          const label = entry.isNow
-            ? "Now"
-            : moment
-                .unix(entry.dt)
-                .utcOffset(timezone_offset / 3600)
-                .format("ha")
-                .toUpperCase();
-          const icon = entry.weather?.[0]?.icon ?? "01d";
+        {outlook48h.length ? (
+          outlook48h.map((entry) => {
+            const label = moment
+              .unix(entry.dt)
+              .utcOffset(timezone_offset / 3600)
+              .format("ha")
+              .toUpperCase();
+            const icon = entry.weather?.[0]?.icon ?? "01d";
 
-          return (
-            <HourCard key={entry.dt} $active={entry.isNow}>
-              <HourLabel $active={entry.isNow}>{label}</HourLabel>
-              <HourIcon
-                src={`https://openweathermap.org/img/wn/${icon}@2x.png`}
-                alt=""
-              />
-              <HourValue>{Math.round(entry.temp)}°</HourValue>
-            </HourCard>
-          );
-        })}
+            return (
+              <HourCard key={entry.dt} $interpolated={entry.isInterpolated}>
+                <HourLabel>{label}</HourLabel>
+                <HourIcon
+                  src={`https://openweathermap.org/img/wn/${icon}@2x.png`}
+                  alt=""
+                />
+                <HourValue>{Math.round(entry.temp)}°</HourValue>
+              </HourCard>
+            );
+          })
+        ) : (
+          <HourlyEmpty>
+            48-hour hourly forecast requires OpenWeather One Call 3.0 access.
+          </HourlyEmpty>
+        )}
       </HourlyRow>
     </Panel>
   );

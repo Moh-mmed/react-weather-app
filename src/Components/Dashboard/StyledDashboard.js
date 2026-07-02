@@ -108,11 +108,11 @@ export const Column = styled.div`
 `;
 
 export const LeftColumn = styled(Column)`
-  grid-template-rows: auto auto 1fr;
+  grid-template-rows: auto auto auto 1fr;
 `;
 
 export const RightColumn = styled(Column)`
-  grid-template-rows: auto auto 1fr;
+  grid-template-rows: auto auto auto;
 `;
 
 export const Panel = styled.section`
@@ -240,6 +240,15 @@ export const HourCard = styled.div`
   border: 1px solid
     ${(props) =>
       props.$active ? "rgba(79,163,217,0.35)" : "transparent"};
+  opacity: ${(props) => (props.$interpolated ? 0.7 : 1)};
+`;
+
+export const HourlyEmpty = styled.div`
+  display: flex;
+  align-items: center;
+  min-height: 116px;
+  font-size: 12px;
+  color: ${theme.textLo};
 `;
 
 export const HourLabel = styled.div`
@@ -259,16 +268,118 @@ export const HourIcon = styled.img`
   height: 26px;
 `;
 
-export const StatsGrid = styled.section`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(2, 1fr);
-  gap: 14px;
-  min-height: 0;
+export const StatsCarouselPanel = styled(Panel)`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 164px;
+  padding: 18px 18px 14px;
+`;
 
-  @media (max-width: ${breakpoints.desktop}) {
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(3, 1fr);
+export const StatsCarouselViewport = styled.div`
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  touch-action: pan-x;
+  cursor: grab;
+  border-radius: 18px;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
+`;
+
+export const StatsCarouselSlide = styled.div`
+  flex: 0 0 100%;
+  min-width: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  box-sizing: border-box;
+  height: 100%;
+  padding-right: 0;
+`;
+
+export const StatsCarouselFooter = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 20px;
+`;
+
+export const StatsCarouselDots = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+export const StatsCarouselDot = styled.button`
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: ${(props) => (props.$active ? "#4FA3D9" : "#8CA1B4")};
+  opacity: ${(props) => (props.$active ? 1 : 0.6)};
+  cursor: pointer;
+  transition: transform 160ms ease, opacity 160ms ease, background 160ms ease;
+
+  &:hover {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(79, 163, 217, 0.7);
+    outline-offset: 3px;
+  }
+`;
+
+export const StatsCarouselNav = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+`;
+
+export const StatsCarouselArrow = styled.button`
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 1px solid ${theme.panelLine};
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: ${theme.textHi};
+  cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+
+  &:hover {
+    background: rgba(79, 163, 217, 0.12);
+    border-color: rgba(79, 163, 217, 0.45);
+    transform: translateY(-1px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(79, 163, 217, 0.7);
+    outline-offset: 3px;
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  &:disabled {
+    opacity: 0.38;
+    cursor: default;
+    transform: none;
   }
 `;
 
@@ -280,6 +391,7 @@ export const StatTile = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  height: 100%;
 `;
 
 export const StatTop = styled.div`
@@ -449,62 +561,90 @@ export const ForecastPanel = styled(Panel)`
   flex-direction: column;
 `;
 
-export const ForecastList = styled.div`
-  margin-top: 12px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-height: 0;
-`;
-
-export const ForecastRow = styled.div`
-  display: grid;
-  grid-template-columns: 34px 1fr auto auto;
-  align-items: center;
-  gap: 14px;
-  padding: 12px 4px;
-  border-bottom: 1px solid ${theme.panelLine};
-  background: ${(props) =>
-    props.$today ? "rgba(79,163,217,0.08)" : "transparent"};
-  border-radius: ${(props) => (props.$today ? "12px" : "0")};
-  border-bottom: ${(props) => (props.$today ? "none" : `1px solid ${theme.panelLine}`)};
-
-  &:last-child {
-    border-bottom: none;
-  }
-`;
-
-export const ForecastIcon = styled.img`
-  width: 24px;
-  height: 24px;
-`;
-
 export const ForecastDay = styled.div`
   font-size: 13px;
   font-weight: 600;
+  line-height: 1.2;
 `;
 
 export const ForecastCond = styled.div`
-  font-size: 11px;
+  font-size: 12px;
   color: ${theme.textLo};
   text-transform: capitalize;
 `;
 
-export const ForecastPrecip = styled.div`
-  font-family: ${theme.fonts.mono};
-  font-size: 11px;
-  color: ${theme.sky};
-  text-align: right;
+export const ForecastGrid = styled.div`
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 10px;
+  min-height: 0;
+
+  @media (max-width: ${breakpoints.desktop}) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  @media (max-width: ${breakpoints.tablet}) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (max-width: ${breakpoints.mobile}) {
+    grid-template-columns: 1fr;
+  }
 `;
 
-export const ForecastRange = styled.div`
+export const ForecastCard = styled.div`
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid ${theme.panelLine};
+  border-radius: 18px;
+  padding: 12px 12px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 204px;
+`;
+
+export const ForecastCardTop = styled.div`
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+`;
+
+export const ForecastIcon = styled.img`
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+`;
+
+export const ForecastTempRow = styled.div`
   font-family: ${theme.fonts.mono};
-  font-size: 13px;
-  text-align: right;
+  font-size: 16px;
+  font-weight: 600;
 
   .lo {
     color: ${theme.textLo};
+    font-weight: 400;
+  }
+`;
+
+export const ForecastMeta = styled.div`
+  display: grid;
+  gap: 5px;
+  margin-top: auto;
+`;
+
+export const ForecastMetaRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 11px;
+  color: ${theme.textLo};
+
+  b {
+    color: ${theme.textHi};
+    font-family: ${theme.fonts.mono};
+    font-weight: 500;
   }
 `;
 
