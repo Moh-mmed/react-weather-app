@@ -19,6 +19,7 @@ import {
 
 const getWindDirection = (deg) => {
   deg = Number(deg)
+  if (!Number.isFinite(deg)) return "Unknown wind";
   if(deg >= 348 || deg < 11 ) return "North"
   if(deg >= 11 && deg < 33 ) return "North Northeast";
   if(deg >= 33 && deg < 56 ) return "Northeast";
@@ -35,6 +36,7 @@ const getWindDirection = (deg) => {
   if(deg >= 281 && deg < 303 ) return "West Northwest"
   if (deg >= 303 && deg < 326) return "Northwest";
   if (deg >= 326 && deg < 348) return "North Northwest";
+  return "Unknown wind";
 }
 
 const AirQuality = () => {

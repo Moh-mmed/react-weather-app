@@ -31,7 +31,8 @@ const SideBar = ({ handleNextFiveDaysDisplay }) => {
   const { current, timezone_offset, daily } = weatherData;
   const { dt, temp, uvi, sunrise, sunset } = current;
   const { city, country } = currCity;
-  let UVI = Math.round(uvi);
+  const safeTemp = Number.isFinite(temp) ? Math.round(temp) : "--";
+  const UVI = Number.isFinite(uvi) ? Math.round(uvi) : 0;
   const { day, width, today, Sunrise, Sunset, clock } = getTiming(
     sunrise,
     sunset,
@@ -52,7 +53,7 @@ const SideBar = ({ handleNextFiveDaysDisplay }) => {
           </span>
         </StyledDate>
         <StyledTemp>
-          <span>{Math.round(temp)}°C</span>
+          <span>{safeTemp}°C</span>
         </StyledTemp>
       </StyledTodaysInfo>
       <StyledSunContainer>

@@ -25,6 +25,8 @@ weather,
 const { description, icon, id, main } = weather[0]
 const backImg = setBackgroundImg(main, id)
 const imgSrc = `https://openweathermap.org/img/wn/${icon}@2x.png`;
+const displayTemp = Number.isFinite(temp) ? Math.round(temp) : "--";
+const displayFeelsLike = Number.isFinite(feels_like) ? Math.round(feels_like) : "--";
 return (
   <StyledWeatherContainer img={backImg} alt="today's weather">
     <StyledHeading>
@@ -38,8 +40,8 @@ return (
     </StyledHeading>
     <div>
       <StyledDegree>
-        <span>{Math.round(temp)}°C</span>
-        <span>{Math.round(feels_like)}°C</span>
+        <span>{displayTemp}°C</span>
+        <span>{displayFeelsLike}°C</span>
       </StyledDegree>
       <StyledCondition>{description}</StyledCondition>
     </div>

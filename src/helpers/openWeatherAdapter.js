@@ -15,7 +15,7 @@ const buildHourlyForToday = (forecastList, current, timezoneOffset) => {
 
   const currentEntry = {
     dt: current.dt,
-    temp: current.main.temp,
+    temp: current.temp,
     weather: current.weather,
   };
 
@@ -54,8 +54,20 @@ export const buildOpenWeatherPayload = (
   forecastResponse,
   uviResponse
 ) => {
+  const currentData = currentResponse.data;
+  const main = currentData.main || {};
+  const wind = currentData.wind || {};
+
   const current = {
-    ...currentResponse.data,
+    ...currentData,
+    temp: main.temp ?? null,
+    feels_like: main.feels_like ?? null,
+    pressure: main.pressure ?? null,
+    humidity: main.humidity ?? null,
+    visibility: currentData.visibility ?? null,
+    wind_deg: wind.deg ?? null,
+    sunrise: currentData.sys?.sunrise ?? null,
+    sunset: currentData.sys?.sunset ?? null,
     uvi: uviResponse?.data?.value ?? null,
   };
 

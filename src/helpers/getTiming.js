@@ -1,5 +1,22 @@
 import moment from "moment";
 const getTiming = (sunrise, sunset, time, timezone) => {
+  const hasValidInput =
+    Number.isFinite(sunrise) &&
+    Number.isFinite(sunset) &&
+    Number.isFinite(time) &&
+    Number.isFinite(timezone);
+
+  if (!hasValidInput) {
+    return {
+      day: false,
+      width: 0,
+      today: "--",
+      Sunrise: "--",
+      Sunset: "--",
+      clock: "--",
+    };
+  }
+
   let today = moment.unix(time).utcOffset(timezone / 3600).format("ddd DD MMM");
   let Sunrise = moment(sunrise * 1000)
     .utcOffset(timezone / 3600)
