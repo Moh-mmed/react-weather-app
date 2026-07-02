@@ -10,7 +10,8 @@ export const StyledWeatherContainer = styled.div`
   border-radius: 20px;
   box-shadow: 4px 4px 8px 5px rgb(41 54 76 / 13%);
   min-height: 280px;
-  min-width: 390px;
+  width: 100%;
+  min-width: 0;
   padding: 20px 30px;
 `;
 export const StyledHeading = styled.div`
@@ -81,7 +82,8 @@ export const StyledStats = styled.div`
     justify-content: space-around;
     align-items: center;
     border-radius: 20px;
-    width: 90px;
+    width: 100%;
+    min-width: 0;
     padding: 8px 5px;
     & > span:nth-child(1) {
       font-size: 0.6rem;

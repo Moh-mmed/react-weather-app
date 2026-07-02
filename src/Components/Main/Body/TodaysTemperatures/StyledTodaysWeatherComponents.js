@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import {colors} from "../../../../constants"
+import { colors, breakpoints } from "../../../../constants";
 function tempRange(temp,season) {
   switch (season) {
     case "winter":
@@ -22,6 +22,12 @@ export const StyledTodaysWeather = styled.div`
   grid-template-columns: auto 30%;
   grid-template-rows: 25% auto;
   grid-gap: 3%;
+
+  @media (max-width: ${breakpoints.tablet}) {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    grid-gap: 1rem;
+  }
 `;
 
 export const StyledTempHeading = styled.div`
@@ -46,6 +52,12 @@ export const StyledTempTomorrow = styled.div`
   border-radius: 20px;
   box-shadow: 5px 5px 8px 3px rgb(41 54 76 / 13%);
   padding: 20px 30px;
+  min-height: 200px;
+
+  @media (max-width: ${breakpoints.tablet}) {
+    grid-row: auto;
+    grid-column: 1;
+  }
   & > div:nth-child(1) {
     font-size: 1.3rem;
     font-weight: 600;
@@ -64,8 +76,18 @@ export const StyledTempTomorrow = styled.div`
 `; 
 export const StyledTemperatures = styled.div`
   display: grid;
-  grid-template-columns: ${(props)=>props.variant?"repeat(1, 1fr)":"repeat(4, 1fr)"};
+  grid-template-columns: ${(props) =>
+    props.variant ? "repeat(1, 1fr)" : "repeat(4, 1fr)"};
   grid-gap: 1%;
+
+  @media (max-width: ${breakpoints.tablet}) {
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 0.5rem;
+  }
+
+  @media (max-width: ${breakpoints.mobile}) {
+    grid-template-columns: 1fr;
+  }
 `; 
 
 export const StyledDailyTemp = styled.div`

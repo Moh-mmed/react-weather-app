@@ -3,20 +3,55 @@
   padding: 0;
   box-sizing: border-box;
 }
+
+html,
+body {
+  overflow-x: hidden;
+}
+
 body {
   font-family: "Montserrat", sans-serif;
   color: #29364c;
 }
+
 .App {
   display: flex;
-  margin: auto;
-  width: 1349px;
-  height: 100vh;
+  width: 100%;
+  max-width: 100%;
+  min-height: 100vh;
+  margin: 0 auto;
 }
+
 .Main {
-  width: 74%;
+  flex: 1 1 74%;
+  min-width: 0;
   padding: 0 3rem;
 }
+
 .Side-Bar {
-  width: 26%;
+  flex: 0 0 26%;
+  min-width: 0;
+}
+
+@media (max-width: 1024px) {
+  .App {
+    flex-direction: column;
+  }
+
+  .Main {
+    width: 100%;
+    flex: 1 1 auto;
+    padding: 0 1.5rem;
+  }
+
+  .Side-Bar {
+    width: 100%;
+    flex: 1 1 auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .Main {
+    padding: 0 1rem;
+  }
 }

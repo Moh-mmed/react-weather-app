@@ -1,31 +1,57 @@
 import styled, { keyframes} from "styled-components";
-import { colors } from "../../../constants";
+import { colors, breakpoints } from "../../../constants";
 
 export const NavContainer = styled.div`
   display: flex;
   align-items: center;
   max-height: 80px;
+
+  @media (max-width: ${breakpoints.tablet}) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+    padding: 1rem 0;
+    max-height: none;
+  }
 `;
 
 export const StyledLogo = styled.div`
-display: flex;
-width: 50%;
+  display: flex;
+  width: 50%;
+
+  @media (max-width: ${breakpoints.tablet}) {
+    width: 100%;
+    justify-content: center;
+  }
 `
 export const StyledImage = styled.img`
   width: 115px;
 `;
 
 export const StyledSearchbar = styled.div`
-position: relative;
+  position: relative;
   display: flex;
   justify-content: end;
-  position: relative;
   width: 50%;
+
+  & > form {
+    width: 100%;
+  }
+
+  @media (max-width: ${breakpoints.tablet}) {
+    width: 100%;
+    justify-content: stretch;
+  }
 `;
 export const StyledInput = styled.input`
   position: relative;
   min-width: 300px;
+  width: 100%;
   padding: 1em 0.9em;
+
+  @media (max-width: ${breakpoints.tablet}) {
+    min-width: 0;
+  }
   background-color: #ebeff0;
   border-radius: 10px;
   font-size: 0.95em;
@@ -39,8 +65,10 @@ export const StyledInput = styled.input`
 `;
 export const StyledSearchImgContainer = styled.div`
   position: absolute;
-  top: 15px;
+  top: 50%;
   right: 10px;
+  transform: translateY(-50%);
+  pointer-events: none;
 `;
 export const StyledImg = styled.img`
   width: 21px

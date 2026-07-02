@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import {colors} from "../../../../constants"
+import { colors, breakpoints } from "../../../../constants";
 export const StyledTodaysWeather = styled.div`
   grid-column-start: 1;
   grid-column-end: 3;
@@ -24,6 +24,18 @@ export const StyledTemperatures = styled.div`
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   grid-gap: 2%;
+
+  @media (max-width: ${breakpoints.desktop}) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (max-width: ${breakpoints.tablet}) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: ${breakpoints.mobile}) {
+    grid-template-columns: 1fr;
+  }
 `; 
 
 

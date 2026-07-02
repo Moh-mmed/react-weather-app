@@ -13,7 +13,8 @@ export const StyledSideBar = styled.div`
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  min-width: 350px;
+  width: 100%;
+  min-width: 0;
   background-color: ${colors.firstLightGray};
   padding: 0 2em;
 `;
