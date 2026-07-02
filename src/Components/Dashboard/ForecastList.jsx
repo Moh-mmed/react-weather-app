@@ -25,6 +25,7 @@ const CalendarIcon = () => (
 const ForecastList = ({ weatherData }) => {
   const { daily, timezone_offset } = weatherData;
   const forecastDays = daily.slice(0, 7);
+  const forecastColumns = Math.max(1, forecastDays.length);
 
   return (
     <ForecastPanel $delay="0.1s">
@@ -32,7 +33,7 @@ const ForecastList = ({ weatherData }) => {
         <CalendarIcon />
         7-Day Forecast
       </PanelTitle>
-      <ForecastGrid>
+      <ForecastGrid $columns={forecastColumns}>
         {forecastDays.map((day) => {
           const { weather, temp, dt, pop, humidity, wind_speed } = day;
           const { icon, main, description } = weather[0];

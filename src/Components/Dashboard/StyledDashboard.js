@@ -578,24 +578,12 @@ export const ForecastCond = styled.div`
 export const ForecastGrid = styled.div`
   margin-top: 12px;
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(${({ $columns = 7 }) => $columns}, minmax(0, 1fr));
   gap: 10px;
   width: 100%;
   min-height: 0;
   align-items: stretch;
   justify-content: stretch;
-
-  @media (max-width: ${breakpoints.desktop}) {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  @media (max-width: ${breakpoints.tablet}) {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  @media (max-width: ${breakpoints.mobile}) {
-    grid-template-columns: 1fr;
-  }
 `;
 
 export const ForecastCard = styled.div`
@@ -609,6 +597,8 @@ export const ForecastCard = styled.div`
   min-height: 204px;
   min-width: 0;
   width: 100%;
+  max-width: none;
+  flex: none;
   box-sizing: border-box;
   align-self: stretch;
 `;
