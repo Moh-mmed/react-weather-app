@@ -578,7 +578,10 @@ export const ForecastGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 10px;
+  width: 100%;
   min-height: 0;
+  align-items: stretch;
+  justify-content: stretch;
 
   @media (max-width: ${breakpoints.desktop}) {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -602,6 +605,10 @@ export const ForecastCard = styled.div`
   flex-direction: column;
   gap: 8px;
   min-height: 204px;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+  align-self: stretch;
 `;
 
 export const ForecastCardTop = styled.div`
