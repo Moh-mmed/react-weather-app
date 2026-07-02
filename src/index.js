@@ -1,13 +1,3 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './App';
-import { BrowserRouter } from "react-router-dom";
-
-ReactDOM.render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
-  </React.StrictMode>,
-  document.getElementById("root")
-);
+// CRA resolves `src/index.js` before `src/index.jsx` as the webpack entry.
+// This shim keeps the app bootstrap in index.jsx while satisfying the entry lookup.
+import "./index.jsx";
