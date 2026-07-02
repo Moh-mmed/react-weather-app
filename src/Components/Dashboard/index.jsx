@@ -20,6 +20,7 @@ import StatsGrid from "./StatsGrid";
 import SunPositionPanel from "./SunPositionPanel";
 import AirQualityPanel from "./AirQualityPanel";
 import ForecastList from "./ForecastList";
+import { formatTime24 } from "../../helpers/timeFormat";
 
 const BrandIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" width="30" height="30" aria-hidden="true">
@@ -56,10 +57,7 @@ const Dashboard = ({
     .utcOffset(timezone_offset / 3600)
     .format("ddd DD MMM")
     .toUpperCase();
-  const clock = moment
-    .unix(dt)
-    .utcOffset(timezone_offset / 3600)
-    .format("HH:mm");
+  const clock = formatTime24(dt, timezone_offset);
 
   return (
     <DashboardApp>

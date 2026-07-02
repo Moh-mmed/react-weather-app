@@ -1,4 +1,4 @@
-import moment from "moment";
+import { formatHour24 } from "../../helpers/timeFormat";
 import {
   Panel,
   PanelTitle,
@@ -29,11 +29,7 @@ const HourlyOutlook = ({ weatherData }) => {
       <HourlyRow>
         {outlook48h.length ? (
           outlook48h.map((entry) => {
-            const label = moment
-              .unix(entry.dt)
-              .utcOffset(timezone_offset / 3600)
-              .format("ha")
-              .toUpperCase();
+            const label = `${formatHour24(entry.dt, timezone_offset)}:00`;
             const icon = entry.weather?.[0]?.icon ?? "01d";
 
             return (

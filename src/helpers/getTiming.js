@@ -1,4 +1,5 @@
 import moment from "moment";
+import { formatTime24 } from "./timeFormat";
 const getTiming = (sunrise, sunset, time, timezone) => {
   const hasValidInput =
     Number.isFinite(sunrise) &&
@@ -18,15 +19,9 @@ const getTiming = (sunrise, sunset, time, timezone) => {
   }
 
   let today = moment.unix(time).utcOffset(timezone / 3600).format("ddd DD MMM");
-  let Sunrise = moment.unix(sunrise)
-    .utcOffset(timezone / 3600)
-    .format("hh:mm A");
-  let Sunset = moment.unix(sunset)
-    .utcOffset(timezone / 3600)
-    .format("hh:mm A");
-  let clock = moment.unix(time)
-    .utcOffset(timezone / 3600)
-    .format("hh:mm A");
+  let Sunrise = formatTime24(sunrise, timezone);
+  let Sunset = formatTime24(sunset, timezone);
+  let clock = formatTime24(time, timezone);
   if (time >= sunrise && time < sunset) {
     let day = true;
     let dayDuration = (sunset - sunrise) / 60;
