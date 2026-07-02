@@ -462,12 +462,13 @@ export const UvChip = styled.div`
   margin-top: 14px;
   width: 100%;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
   background: rgba(226, 105, 74, 0.12);
   border: 1px solid rgba(226, 105, 74, 0.3);
   border-radius: 14px;
-  padding: 12px 14px;
+  padding: 14px 14px 16px;
+  box-sizing: border-box;
 `;
 
 export const UvNum = styled.div`
@@ -480,7 +481,7 @@ export const UvNum = styled.div`
 export const UvDesc = styled.div`
   font-size: 12px;
   color: ${theme.textLo};
-  line-height: 1.4;
+  line-height: 1.55;
 
   b {
     color: ${theme.textHi};
