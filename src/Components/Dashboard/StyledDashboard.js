@@ -54,7 +54,7 @@ export const BrandWord = styled.div`
 
 export const Headline = styled.div`
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 14px;
   text-align: right;
 
@@ -84,6 +84,7 @@ export const HeadlineTemp = styled.div`
   font-family: ${theme.fonts.display};
   font-weight: 600;
   font-size: 32px;
+  line-height: 1;
   color: ${theme.sky};
 `;
 
