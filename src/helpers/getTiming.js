@@ -18,15 +18,15 @@ const getTiming = (sunrise, sunset, time, timezone) => {
   }
 
   let today = moment.unix(time).utcOffset(timezone / 3600).format("ddd DD MMM");
-  let Sunrise = moment(sunrise * 1000)
+  let Sunrise = moment.unix(sunrise)
     .utcOffset(timezone / 3600)
-    .format("LT");
-  let Sunset = moment(sunset * 1000)
+    .format("hh:mm A");
+  let Sunset = moment.unix(sunset)
     .utcOffset(timezone / 3600)
-    .format("LT");
-  let clock = moment(time * 1000)
+    .format("hh:mm A");
+  let clock = moment.unix(time)
     .utcOffset(timezone / 3600)
-    .format("LT");
+    .format("hh:mm A");
   if (time >= sunrise && time < sunset) {
     let day = true;
     let dayDuration = (sunset - sunrise) / 60;

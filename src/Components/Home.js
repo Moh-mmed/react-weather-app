@@ -2,16 +2,11 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import "../styles/Home.css";
 import WeatherContext from "../contexts/WeatherContext";
-import Nav from "./Main/NavBar";
-import Body from "./Main/Body";
-import SideBar from "./SideBar";
+import Dashboard from "./Dashboard";
 import Spinner from "./Spinner";
 import Error from "./Error";
 import { OPEN_WEATHER_API_KEY } from "../helpers/openWeather";
 import { buildOpenWeatherPayload } from "../helpers/openWeatherAdapter";
-
-
-
 
 const Home = () => {
   const [searchCity, setSearchCity] = useState(null);
@@ -20,7 +15,6 @@ const Home = () => {
   const [weatherData, setWeatherData] = useState(null);
   const [airQuality, setAirQuality] = useState(null);
   const [cityNotFound, setCityNotFound] = useState(false);
-  const [nextFiveDays, setNextFiveDays] = useState(false);
   const [apiError, setApiError] = useState("");
 
   const handleApiError = (err, fallbackMessage) => {
@@ -35,9 +29,6 @@ const Home = () => {
     setApiError(fallbackMessage);
   };
 
-  //Find coordinates using location
-  // first we check if localStorage has saved coordinates, if not we get coordinates using Location API
-  // If user turn on location, the user should ask for detecting coordinates using location
   useEffect(() => {
     if (!OPEN_WEATHER_API_KEY) {
       setApiError(
@@ -47,7 +38,6 @@ const Home = () => {
     }
 
     let coordinates = JSON.parse(localStorage.getItem("coordinates"));
-    // Find city name
     const findCityName = async (cor) => {
       const reverseURL = `https://api.openweathermap.org/geo/1.0/reverse?lat=${cor.lat}&lon=${cor.lon}&limit=5&appid=${OPEN_WEATHER_API_KEY}`;
       await axios
@@ -90,8 +80,7 @@ const Home = () => {
             findCityName(cityCoords);
             resolve(cityCoords);
           };
-          const fail = (err) => {
-            // Istanbul coordinates as default
+          const fail = () => {
             cityCoords = { lat: 41.01, lon: 28.66 };
             localStorage.setItem("coordinates", JSON.stringify(cityCoords));
             setCoords(cityCoords);
@@ -105,7 +94,6 @@ const Home = () => {
     }
   }, []);
 
-  // Find coordinates for entered city
   useEffect(() => {
     if (!OPEN_WEATHER_API_KEY) {
       return;
@@ -144,13 +132,11 @@ const Home = () => {
           handleApiError(err, "Unable to look up that city right now.");
         });
     };
-    // If the searchCity is null means coordinates already exist
     if (searchCity !== null) {
       findCoordinates();
     }
   }, [searchCity]);
 
-  // Find Weather data
   useEffect(() => {
     let isMounted = true;
 
@@ -191,7 +177,6 @@ const Home = () => {
     };
   }, [coords]);
 
-  // Find Air Quality
   useEffect(() => {
     if (coords !== null && OPEN_WEATHER_API_KEY) {
       const airQualityURL = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${coords.lat}&lon=${coords.lon}&appid=${OPEN_WEATHER_API_KEY}`;
@@ -214,34 +199,23 @@ const Home = () => {
   }, [coords]);
 
   return (
-    <WeatherContext.Provider
-      value={{ weatherData, airQuality, currCity, nextFiveDays }}
-    >
-      <div className="App">
-        {apiError ? (
-          <Error message={apiError} />
-        ) : weatherData === null || airQuality === null || currCity === null ? (
-          <Spinner />
-        ) : (
-          <>
-            <div className="Main">
-              <Nav
-                city={searchCity}
-                cityNotFound={cityNotFound}
-                handleSearchCity={setSearchCity}
-                handleWeatherData={setWeatherData}
-                handleAirQuality={setAirQuality}
-                handleCurrCity={setCurrCity}
-                handleCityNotFound={setCityNotFound}
-              />
-              <Body />
-            </div>
-            <div className="Side-Bar">
-              <SideBar handleNextFiveDaysDisplay={setNextFiveDays} />
-            </div>
-          </>
-        )}
-      </div>
+    <WeatherContext.Provider value={{ weatherData, airQuality, currCity }}>
+      {apiError ? (
+        <Error message={apiError} />
+      ) : weatherData === null || airQuality === null || currCity === null ? (
+        <Spinner />
+      ) : (
+        <Dashboard
+          weatherData={weatherData}
+          airQuality={airQuality}
+          currCity={currCity}
+          cityNotFound={cityNotFound}
+          handleSearchCity={setSearchCity}
+          handleWeatherData={setWeatherData}
+          handleAirQuality={setAirQuality}
+          handleCurrCity={setCurrCity}
+        />
+      )}
     </WeatherContext.Provider>
   );
 };

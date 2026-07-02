@@ -5,53 +5,28 @@
 }
 
 html,
+body,
+#root {
+  height: 100%;
+}
+
+html,
 body {
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 body {
-  font-family: "Montserrat", sans-serif;
-  color: #29364c;
+  font-family: "Inter", sans-serif;
+  color: #eef3f7;
+  background: #0a1826;
 }
 
-.App {
-  display: flex;
-  width: 100%;
-  max-width: 100%;
-  min-height: 100vh;
-  margin: 0 auto;
+::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
 }
 
-.Main {
-  flex: 1 1 74%;
-  min-width: 0;
-  padding: 0 3rem;
-}
-
-.Side-Bar {
-  flex: 0 0 26%;
-  min-width: 0;
-}
-
-@media (max-width: 1024px) {
-  .App {
-    flex-direction: column;
-  }
-
-  .Main {
-    width: 100%;
-    flex: 1 1 auto;
-    padding: 0 1.5rem;
-  }
-
-  .Side-Bar {
-    width: 100%;
-    flex: 1 1 auto;
-  }
-}
-
-@media (max-width: 768px) {
-  .Main {
-    padding: 0 1rem;
-  }
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 99px;
 }

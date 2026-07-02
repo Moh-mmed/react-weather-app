@@ -4,16 +4,18 @@
   justify-content: center;
   align-items: center;
   padding: 3rem;
-  height: 100%;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #0a1826, #0f2338);
 }
 .main > img {
   width: 20%;
+  max-width: 120px;
 }
 .main > p {
   max-width: 32rem;
   text-align: center;
   margin-top: 1rem;
-  color: #29364C;
+  color: #eef3f7;
   font-weight: 600;
   line-height: 1.4;
 }

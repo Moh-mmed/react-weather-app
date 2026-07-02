@@ -3,24 +3,45 @@ import moment from "moment";
 const formatLocalDate = (dt, timezoneOffset) =>
   moment.unix(dt).utcOffset(timezoneOffset / 3600).format("YYYY-MM-DD");
 
-const buildHourlyForToday = (forecastList, current, timezoneOffset) => {
-  const todayDate = formatLocalDate(current.dt, timezoneOffset);
-  const todayEntries = forecastList
-    .filter((entry) => formatLocalDate(entry.dt, timezoneOffset) === todayDate)
-    .map((entry) => ({
-      dt: entry.dt,
-      temp: entry.main.temp,
-      weather: entry.weather,
-    }));
+const mapForecastEntry = (entry) => ({
+  dt: entry.dt,
+  temp: entry.main.temp,
+  weather: entry.weather,
+  pop: entry.pop ?? 0,
+});
+
+const build24HourOutlook = (forecastList, current, timezoneOffset) => {
+  const now = current.dt;
+  const horizon = now + 24 * 3600;
+  const upcoming = forecastList
+    .filter((entry) => entry.dt >= now && entry.dt <= horizon)
+    .map(mapForecastEntry);
 
   const currentEntry = {
     dt: current.dt,
     temp: current.temp,
     weather: current.weather,
+    pop: 0,
+    isNow: true,
   };
 
-  const hourly = [currentEntry, ...todayEntries].sort((a, b) => a.dt - b.dt);
-  return hourly;
+  return [currentEntry, ...upcoming].sort((a, b) => a.dt - b.dt);
+};
+
+const buildHourlyForToday = (forecastList, current, timezoneOffset) => {
+  const todayDate = formatLocalDate(current.dt, timezoneOffset);
+  const todayEntries = forecastList
+    .filter((entry) => formatLocalDate(entry.dt, timezoneOffset) === todayDate)
+    .map(mapForecastEntry);
+
+  const currentEntry = {
+    dt: current.dt,
+    temp: current.temp,
+    weather: current.weather,
+    pop: 0,
+  };
+
+  return [currentEntry, ...todayEntries].sort((a, b) => a.dt - b.dt);
 };
 
 const buildDailySummary = (forecastList, timezoneOffset) => {
@@ -32,6 +53,11 @@ const buildDailySummary = (forecastList, timezoneOffset) => {
   }, {});
 
   return Object.values(grouped).map((items) => {
+    const temps = items.map((item) => item.main.temp);
+    const min = Math.round(Math.min(...temps));
+    const max = Math.round(Math.max(...temps));
+    const maxPop = Math.round(Math.max(...items.map((item) => item.pop ?? 0)) * 100);
+
     const middayEntry =
       items.find((item) => {
         const hour = Number(
@@ -42,9 +68,10 @@ const buildDailySummary = (forecastList, timezoneOffset) => {
 
     return {
       dt: middayEntry.dt,
-      temp: { day: Math.round(middayEntry.main.temp) },
+      temp: { day: max, min, max },
       feels_like: { day: Math.round(middayEntry.main.feels_like) },
       weather: middayEntry.weather,
+      pop: maxPop,
     };
   });
 };
@@ -66,22 +93,23 @@ export const buildOpenWeatherPayload = (
     humidity: main.humidity ?? null,
     visibility: currentData.visibility ?? null,
     wind_deg: wind.deg ?? null,
+    wind_speed: wind.speed ?? null,
+    clouds: currentData.clouds?.all ?? null,
     sunrise: currentData.sys?.sunrise ?? null,
     sunset: currentData.sys?.sunset ?? null,
     uvi: uviResponse?.data?.value ?? null,
   };
 
   const timezone_offset = forecastResponse.data.city.timezone;
-  const hourly = buildHourlyForToday(
-    forecastResponse.data.list,
-    current,
-    timezone_offset
-  );
-  const daily = buildDailySummary(forecastResponse.data.list, timezone_offset);
+  const forecastList = forecastResponse.data.list;
+  const hourly = buildHourlyForToday(forecastList, current, timezone_offset);
+  const outlook24h = build24HourOutlook(forecastList, current, timezone_offset);
+  const daily = buildDailySummary(forecastList, timezone_offset);
 
   return {
     current,
     hourly,
+    outlook24h,
     daily,
     timezone_offset,
     dt: current.dt,
