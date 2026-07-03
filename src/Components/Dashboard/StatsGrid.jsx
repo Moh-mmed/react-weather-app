@@ -58,8 +58,10 @@ const StatsGrid = ({ weatherData }) => {
       unit: "hPa",
       icon: (
         <>
-          <circle cx="12" cy="12" r="9" />
-          <path d="M12 8v4l3 2" />
+          <path d="M4 16a8 8 0 0 1 16 0" />
+          <path d="M12 16l4-5" />
+          <path d="M7 16h10" />
+          <circle cx="12" cy="16" r="1" />
         </>
       ),
     },

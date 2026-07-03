@@ -115,38 +115,74 @@ const buildHourlyForToday = (forecastList, current, timezoneOffset) => {
   return [currentEntry, ...todayEntries].sort((a, b) => a.dt - b.dt);
 };
 
-const buildGroupedDailySummary = (forecastList, timezoneOffset) => {
-  const grouped = forecastList.reduce((acc, item) => {
+const buildGroupedDailySummary = (forecastList, current, timezoneOffset) => {
+  const currentEntry = {
+    dt: current.dt,
+    main: {
+      temp: current.temp,
+      feels_like: current.feels_like ?? current.temp,
+      humidity: current.humidity,
+    },
+    weather: current.weather,
+    pop: 0,
+    wind: {
+      speed: current.wind_speed,
+    },
+  };
+
+  const grouped = [currentEntry, ...forecastList].reduce((acc, item) => {
     const dateKey = formatLocalDate(item.dt, timezoneOffset);
     if (!acc[dateKey]) acc[dateKey] = [];
     acc[dateKey].push(item);
     return acc;
   }, {});
 
-  return Object.values(grouped).map((items) => {
-    const temps = items.map((item) => item.main.temp);
-    const min = Math.round(Math.min(...temps));
-    const max = Math.round(Math.max(...temps));
-    const maxPop = Math.round(Math.max(...items.map((item) => item.pop ?? 0)) * 100);
+  return Object.values(grouped)
+    .map((items) => {
+      const temps = items
+        .map((item) => item.main?.temp)
+        .filter((temp) => Number.isFinite(temp));
+      const humidityValues = items
+        .map((item) => item.main?.humidity)
+        .filter((humidity) => Number.isFinite(humidity));
+      const windValues = items
+        .map((item) => item.wind?.speed)
+        .filter((speed) => Number.isFinite(speed));
 
-    const middayEntry =
-      items.find((item) => {
-        const hour = Number(
-          moment.unix(item.dt).utcOffset(timezoneOffset / 3600).hour()
-        );
-        return hour >= 11 && hour <= 15;
-      }) || items[0];
+      if (!temps.length) {
+        return null;
+      }
 
-    return {
-      dt: middayEntry.dt,
-      temp: { day: max, min, max },
-      feels_like: { day: Math.round(middayEntry.main.feels_like) },
-      weather: middayEntry.weather,
-      pop: maxPop,
-      humidity: middayEntry.main.humidity ?? null,
-      wind_speed: middayEntry.wind?.speed ?? null,
-    };
-  });
+      const min = Math.round(Math.min(...temps));
+      const max = Math.round(Math.max(...temps));
+      const maxPop = Math.round(Math.max(...items.map((item) => item.pop ?? 0)) * 100);
+      const averageHumidity = humidityValues.length
+        ? Math.round(
+            humidityValues.reduce((sum, humidity) => sum + humidity, 0) /
+              humidityValues.length
+          )
+        : null;
+      const maxWind = windValues.length ? Math.max(...windValues) : null;
+
+      const middayEntry =
+        items.find((item) => {
+          const hour = Number(
+            moment.unix(item.dt).utcOffset(timezoneOffset / 3600).hour()
+          );
+          return hour >= 11 && hour <= 15;
+        }) || items[0];
+
+      return {
+        dt: middayEntry.dt,
+        temp: { day: max, min, max },
+        feels_like: { day: Math.round(middayEntry.main.feels_like) },
+        weather: middayEntry.weather,
+        pop: maxPop,
+        humidity: averageHumidity,
+        wind_speed: maxWind,
+      };
+    })
+    .filter(Boolean);
 };
 
 const buildOneCallDailyForecast = (dailyForecast = []) =>
@@ -207,17 +243,24 @@ export const buildOpenWeatherPayload = (
       ? "OpenWeather One Call 3.0"
       : "interpolated 3-hour fallback";
   const oneCallDaily = buildOneCallDailyForecast(oneCallResponse?.data?.daily);
-  const daily =
-    oneCallDaily.length >= 7
-      ? oneCallDaily
-      : buildGroupedDailySummary(forecastList, timezone_offset).slice(0, 7);
-  const dailySource =
-    oneCallDaily.length >= 7
-      ? "OpenWeather One Call 3.0 daily"
-      : "grouped 3-hour fallback";
+  const daily = buildGroupedDailySummary(
+    forecastList,
+    current,
+    timezone_offset
+  ).slice(0, 7);
+  const dailySource = "aggregated-3hour";
+  const dailyDebug = daily.map((day) => ({
+    date: formatLocalDate(day.dt, timezone_offset),
+    high: day.temp.max,
+    low: day.temp.min,
+    humidity: day.humidity,
+  }));
 
   console.log(`48-hour outlook source: ${outlook48hSource}`);
-  console.log(`7-day forecast source: ${dailySource}`);
+  if (oneCallDaily.length >= 7) {
+    console.log("[7day] ignored alternate source: onecall-daily");
+  }
+  console.log(`[7day] source: ${dailySource}`, dailyDebug);
 
   return {
     current,

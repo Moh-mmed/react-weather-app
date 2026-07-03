@@ -26,12 +26,14 @@ const ForecastList = ({ weatherData }) => {
   const { daily, timezone_offset } = weatherData;
   const forecastDays = daily.slice(0, 7);
   const forecastColumns = Math.max(1, forecastDays.length);
+  const forecastTitle =
+    forecastDays.length === 7 ? "7-Day Forecast" : `${forecastDays.length}-Day Forecast`;
 
   return (
     <ForecastPanel $delay="0.1s">
       <PanelTitle>
         <CalendarIcon />
-        7-Day Forecast
+        {forecastTitle}
       </PanelTitle>
       <ForecastGrid $columns={forecastColumns}>
         {forecastDays.map((day) => {

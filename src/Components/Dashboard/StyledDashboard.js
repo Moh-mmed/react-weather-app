@@ -64,11 +64,15 @@ export const Headline = styled.div`
 `;
 
 export const HeadlinePlace = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   text-align: left;
 `;
 
 export const HeadlineDay = styled.div`
   font-size: 13px;
+  line-height: 1.25;
   color: ${theme.textLo};
   font-family: ${theme.fonts.mono};
   letter-spacing: 0.4px;
@@ -77,10 +81,13 @@ export const HeadlineDay = styled.div`
 
 export const HeadlineLoc = styled.div`
   font-size: 14px;
+  line-height: 1.25;
   font-weight: 600;
 `;
 
 export const HeadlineTemp = styled.div`
+  display: flex;
+  align-items: center;
   font-family: ${theme.fonts.display};
   font-weight: 600;
   font-size: 32px;
