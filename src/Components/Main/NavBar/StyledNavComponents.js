@@ -85,3 +85,54 @@ export const StyledTooltip = styled.div`
     border-bottom: 6px solid rgba(226, 105, 74, 0.92);
   }
 `;
+
+export const StyledDropdown = styled.ul`
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: ${theme.panel};
+  border: 1px solid ${theme.panelLine};
+  border-radius: 12px;
+  list-style: none;
+  padding: 8px 0;
+  margin: 0;
+  z-index: 10;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  max-height: 250px;
+  overflow-y: auto;
+`;
+
+export const StyledDropdownItem = styled.li`
+  padding: 10px 18px;
+  cursor: pointer;
+  color: ${theme.textHi};
+  font-family: ${theme.fonts.body};
+  display: flex;
+  flex-direction: column;
+  background: ${props => props.highlighted ? "rgba(255, 255, 255, 0.05)" : "transparent"};
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.05);
+  }
+`;
+
+export const StyledDropdownText = styled.span`
+  font-size: 14px;
+  font-weight: 500;
+`;
+
+export const StyledDropdownSubtext = styled.span`
+  font-size: 12px;
+  color: ${theme.textLo};
+  margin-top: 2px;
+`;
+
+export const StyledNoMatches = styled.div`
+  padding: 12px 18px;
+  color: ${theme.textLo};
+  font-family: ${theme.fonts.body};
+  font-size: 14px;
+  text-align: center;
+`;
