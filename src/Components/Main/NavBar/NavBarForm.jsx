@@ -1,19 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
+import clsx from "clsx";
 import Tooltip from "./Tooltip";
 import axios from "axios";
 import { OPEN_WEATHER_API_KEY } from "../../../helpers/openWeather";
-import {
-  StyledSearchbar,
-  StyledInput,
-  StyledDropdown,
-  StyledDropdownItem,
-  StyledDropdownText,
-  StyledDropdownSubtext,
-  StyledNoMatches,
-} from "./StyledNavComponents";
 
 const SearchIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16" className="shrink-0 pointer-events-none opacity-70">
     <circle cx="11" cy="11" r="7" />
     <line x1="21" y1="21" x2="16.65" y2="16.65" />
   </svg>
@@ -45,7 +37,6 @@ const NavBarForm = ({
       return;
     }
 
-    // Exclude coordinates pattern: e.g. "41.01, 28.66"
     const isCoords = /^-?\d+(\.\d+)?,\s*-?\d+(\.\d+)?$/.test(enteredCity.trim());
     if (isCoords) {
       setSuggestions([]);
@@ -78,7 +69,6 @@ const NavBarForm = ({
         }
       } catch (err) {
         console.error("Geocoding suggestions error:", err);
-        // Fail silently
         setSuggestions([]);
         setHasNoMatches(false);
         setIsOpen(false);
@@ -177,48 +167,59 @@ const NavBarForm = ({
   }, []);
 
   return (
-    <StyledSearchbar ref={containerRef}>
+    <div
+      ref={containerRef}
+      className="flex-1 max-w-[420px] min-w-[180px] relative flex items-center gap-2.5 bg-white/5 border border-panel-line rounded-full px-[18px] py-[11px] text-muted text-[14px]
+                 tablet:max-w-none tablet:w-full tablet:min-w-0"
+    >
       <SearchIcon />
-      <form onSubmit={handleFormSubmit}>
-        <StyledInput
+      <form onSubmit={handleFormSubmit} className="flex flex-1">
+        <input
           ref={inputField}
           type="text"
           placeholder="Search a city or coordinates…"
-          className="search-bar"
+          className="search-bar bg-transparent border-none outline-none flex-1 text-primary text-[14px] font-sans w-full placeholder:text-muted"
           value={enteredCity}
           onChange={(e) => setEnteredCity(e.target.value)}
           onKeyDown={handleKeyDown}
         />
       </form>
+
       {cityNotFound && <Tooltip />}
 
       {isOpen && (
-        <StyledDropdown>
+        <ul className="absolute top-[calc(100%+8px)] left-0 right-0 bg-navy-panel border border-panel-line rounded-xl list-none p-[8px_0] m-0 z-10 shadow-[0_8px_24px_rgba(0,0,0,0.4)] max-h-[250px] overflow-y-auto">
           {suggestions.length > 0 ? (
             suggestions.map((suggestion, index) => {
               const formattedLocation = suggestion.state
                 ? `${suggestion.state}, ${suggestion.country}`
                 : suggestion.country;
               return (
-                <StyledDropdownItem
+                <li
                   key={`${suggestion.lat}-${suggestion.lon}-${index}`}
-                  highlighted={index === activeIndex}
+                  className={clsx(
+                    "px-[18px] py-2.5 cursor-pointer text-primary font-sans flex flex-col transition-colors duration-150 ease-out",
+                    index === activeIndex ? "bg-white/5" : "bg-transparent",
+                    "hover:bg-white/5"
+                  )}
                   onClick={() => selectSuggestion(suggestion)}
                   onMouseEnter={() => setActiveIndex(index)}
                 >
-                  <StyledDropdownText>{suggestion.name}</StyledDropdownText>
-                  <StyledDropdownSubtext>{formattedLocation}</StyledDropdownSubtext>
-                </StyledDropdownItem>
+                  <span className="text-[14px] font-medium">{suggestion.name}</span>
+                  <span className="text-[12px] text-muted mt-0.5">{formattedLocation}</span>
+                </li>
               );
             })
           ) : isLoading ? (
-            <StyledNoMatches>Loading...</StyledNoMatches>
+            <div className="px-[18px] py-3 text-muted font-sans text-[14px] text-center">Loading...</div>
           ) : (
-            hasNoMatches && <StyledNoMatches>No matches</StyledNoMatches>
+            hasNoMatches && (
+              <div className="px-[18px] py-3 text-muted font-sans text-[14px] text-center">No matches</div>
+            )
           )}
-        </StyledDropdown>
+        </ul>
       )}
-    </StyledSearchbar>
+    </div>
   );
 };
 

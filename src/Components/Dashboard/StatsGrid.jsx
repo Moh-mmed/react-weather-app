@@ -1,21 +1,16 @@
 import { useEffect, useRef, useState } from "react";
+import clsx from "clsx";
 import { getDewPoint } from "../../helpers/getDewPoint";
 import { getWindDirectionAbbr } from "../../helpers/getWindDirection";
-import {
-  StatsCarouselDot,
-  StatsCarouselDots,
-  StatsCarouselFooter,
-  StatsCarouselPanel,
-  StatsCarouselSlide,
-  StatsCarouselViewport,
-  StatTile,
-  StatTop,
-  StatLabel,
-  StatValue,
-} from "./StyledDashboard";
 
 const StatIcon = ({ children }) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    className="w-[18px] h-[18px] text-accent-sky opacity-90"
+  >
     {children}
   </svg>
 );
@@ -116,7 +111,6 @@ const StatsGrid = ({ weatherData }) => {
   const scrollToIndex = (index, behavior = "smooth") => {
     const track = trackRef.current;
     if (!track) return;
-
     const nextIndex = Math.max(0, Math.min(index, stats.length - 1));
     track.scrollTo({
       left: nextIndex * track.clientWidth,
@@ -128,7 +122,6 @@ const StatsGrid = ({ weatherData }) => {
   const handleScroll = () => {
     const track = trackRef.current;
     if (!track) return;
-
     window.cancelAnimationFrame(scrollRafRef.current);
     scrollRafRef.current = window.requestAnimationFrame(() => {
       const nextIndex = Math.round(track.scrollLeft / track.clientWidth);
@@ -140,7 +133,6 @@ const StatsGrid = ({ weatherData }) => {
     if (e.button !== 0) return;
     const track = trackRef.current;
     if (!track) return;
-
     setIsDragging(true);
     dragStateRef.current = {
       active: true,
@@ -152,13 +144,10 @@ const StatsGrid = ({ weatherData }) => {
   const handleMouseMove = (e) => {
     const { active, startX, startScrollLeft } = dragStateRef.current;
     if (!active) return;
-
     const track = trackRef.current;
     if (!track) return;
-
     e.preventDefault();
-    const x = e.clientX;
-    const walk = x - startX;
+    const walk = e.clientX - startX;
     track.scrollLeft = startScrollLeft - walk;
   };
 
@@ -177,48 +166,73 @@ const StatsGrid = ({ weatherData }) => {
   );
 
   return (
-    <StatsCarouselPanel $delay="0.15s">
-      <StatsCarouselViewport
+    <section
+      className="relative overflow-hidden rounded-panel border border-panel-line bg-navy-panel bg-panel-pattern flex flex-col p-0 max-desktop:min-h-[164px] motion-safe:animate-rise"
+      style={{ animationDelay: "0.15s" }}
+    >
+      {/* Scrollable viewport */}
+      <div
         ref={trackRef}
         onScroll={handleScroll}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUpOrLeave}
         onMouseLeave={handleMouseUpOrLeave}
-        $isDragging={isDragging}
         aria-label="Weather statistics carousel"
+        className={clsx(
+          "flex-1 min-h-0 flex overflow-x-auto scroll-smooth no-scrollbar touch-pan-x rounded-[18px]",
+          "snap-x snap-mandatory",
+          "max-desktop:flex-none max-desktop:min-h-[120px]",
+          isDragging ? "cursor-grabbing" : "cursor-grab"
+        )}
       >
         {stats.map((stat) => (
-          <StatsCarouselSlide key={stat.label}>
-            <StatTile>
-              <StatTop>
-                <StatLabel>{stat.label}</StatLabel>
+          <div
+            key={stat.label}
+            className="flex-none w-full min-w-full snap-start snap-always box-border flex flex-col"
+          >
+            {/* Stat tile */}
+            <div className="p-[22px_24px_48px] flex flex-col justify-between flex-1 min-h-[100px]">
+              <div className="flex items-center justify-between">
+                <span className="text-[12px] text-muted capitalize">{stat.label}</span>
                 <StatIcon>{stat.icon}</StatIcon>
-              </StatTop>
-              <StatValue>
+              </div>
+              <div className="font-mono text-[22px] font-semibold mt-2.5">
                 {stat.value}
-                <small>{stat.unit}</small>
-              </StatValue>
-            </StatTile>
-          </StatsCarouselSlide>
+                <small className="text-[13px] text-muted font-normal ml-0.5">{stat.unit}</small>
+              </div>
+            </div>
+          </div>
         ))}
-      </StatsCarouselViewport>
+      </div>
 
-      <StatsCarouselFooter>
-        <StatsCarouselDots role="group" aria-label="Weather statistics positions">
+      {/* Dot navigation footer */}
+      <div className="absolute bottom-4 left-0 right-0 flex items-center justify-center pointer-events-none min-h-5">
+        <div
+          role="group"
+          aria-label="Weather statistics positions"
+          className="flex items-center gap-2 pointer-events-auto"
+        >
           {stats.map((stat, index) => (
-            <StatsCarouselDot
+            <button
               key={stat.label}
               type="button"
               aria-label={`Show ${stat.label}`}
               aria-pressed={activeIndex === index}
-              $active={activeIndex === index}
               onClick={() => scrollToIndex(index)}
+              className={clsx(
+                "w-2 h-2 p-0 border-0 rounded-full cursor-pointer transition-all duration-[160ms] ease-out",
+                "hover:scale-[1.12] hover:opacity-100",
+                "focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-sky/70 focus-visible:outline-offset-[3px]",
+                activeIndex === index
+                  ? "bg-accent-sky opacity-100"
+                  : "bg-muted opacity-60"
+              )}
             />
           ))}
-        </StatsCarouselDots>
-      </StatsCarouselFooter>
-    </StatsCarouselPanel>
+        </div>
+      </div>
+    </section>
   );
 };
 

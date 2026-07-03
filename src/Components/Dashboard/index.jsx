@@ -1,19 +1,5 @@
 import { useState, useEffect } from "react";
 import moment from "moment";
-import {
-  DashboardApp,
-  DashboardHeader,
-  Brand,
-  BrandWord,
-  Headline,
-  HeadlinePlace,
-  HeadlineDay,
-  HeadlineLoc,
-  HeadlineTemp,
-  DashboardMain,
-  LeftColumn,
-  RightColumn,
-} from "./StyledDashboard";
 import NavBarForm from "../Main/NavBar/NavBarForm";
 import HeroPanel from "./HeroPanel";
 import HourlyOutlook from "./HourlyOutlook";
@@ -43,7 +29,6 @@ const LiveClock = ({ timezoneOffset }) => {
   const [now, setNow] = useState(Math.floor(Date.now() / 1000));
 
   useEffect(() => {
-    // Update every 10 seconds (10000ms) to keep HH:mm accurate
     const interval = setInterval(() => {
       setNow(Math.floor(Date.now() / 1000));
     }, 10000);
@@ -80,15 +65,21 @@ const Dashboard = ({
   const safeTemp = Number.isFinite(temp) ? Math.round(temp) : "--";
 
   return (
-    <DashboardApp>
-      <DashboardHeader>
-        <Brand>
-          <BrandIcon />
-          <BrandWord>
-            Weather<em>Me</em>
-          </BrandWord>
-        </Brand>
+    /* Root app wrapper — full-height, dashboard radial gradient, flex column */
+    <div className="flex flex-col min-h-screen overflow-y-auto text-primary bg-dashboard-radial px-[clamp(20px,4vw,48px)] pt-7 pb-10 gap-5">
 
+      {/* Header */}
+      <header className="flex items-center justify-between gap-6 flex-wrap">
+
+        {/* Brand */}
+        <div className="flex items-center gap-2.5">
+          <BrandIcon />
+          <div className="font-display font-semibold text-[20px] tracking-[0.2px]">
+            Weather<em className="italic text-accent-sun">Me</em>
+          </div>
+        </div>
+
+        {/* Search form */}
         <NavBarForm
           cityNotFound={cityNotFound}
           handleSearchCity={handleSearchCity}
@@ -97,33 +88,41 @@ const Dashboard = ({
           handleCurrCity={handleCurrCity}
         />
 
-        <Headline>
-          <HeadlinePlace>
-            <HeadlineDay>
+        {/* Headline: date + city + temp */}
+        <div className="flex items-center gap-3.5 text-right max-desktop:text-left">
+          <div className="flex flex-col justify-center text-left">
+            <div className="text-[13px] leading-[1.25] text-muted font-mono tracking-[0.4px] uppercase">
               <LiveClock timezoneOffset={timezone_offset} />
-            </HeadlineDay>
-            <HeadlineLoc>
+            </div>
+            <div className="text-[14px] leading-[1.25] font-semibold">
               {city}, {country}
-            </HeadlineLoc>
-          </HeadlinePlace>
-          <HeadlineTemp>{safeTemp}°C</HeadlineTemp>
-        </Headline>
-      </DashboardHeader>
+            </div>
+          </div>
+          <div className="flex items-center font-display font-semibold text-[32px] leading-none text-accent-sky">
+            {safeTemp}°C
+          </div>
+        </div>
+      </header>
 
-      <DashboardMain>
-        <LeftColumn>
+      {/* Main bento grid — 2:1 columns on desktop, single column below */}
+      <main className="dashboard-main flex-1 grid gap-5 min-h-0"
+        style={{ gridTemplateColumns: "2.05fr 1fr" }}
+      >
+        {/* Left column */}
+        <div className="dashboard-column grid gap-5 min-h-0" style={{ gridTemplateRows: "auto auto 1fr" }}>
           <HeroPanel weatherData={weatherData} />
           <HourlyOutlook weatherData={weatherData} />
           <ForecastList weatherData={weatherData} />
-        </LeftColumn>
+        </div>
 
-        <RightColumn>
+        {/* Right column */}
+        <div className="dashboard-column grid gap-5 min-h-0" style={{ gridTemplateRows: "auto auto 1fr" }}>
           <SunPositionPanel weatherData={weatherData} />
           <AirQualityPanel airQuality={airQuality} />
           <StatsGrid weatherData={weatherData} />
-        </RightColumn>
-      </DashboardMain>
-    </DashboardApp>
+        </div>
+      </main>
+    </div>
   );
 };
 

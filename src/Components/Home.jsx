@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import "../styles/Home.css";
+
 import WeatherContext from "../contexts/WeatherContext";
 import Dashboard from "./Dashboard";
 import Spinner from "./Spinner";

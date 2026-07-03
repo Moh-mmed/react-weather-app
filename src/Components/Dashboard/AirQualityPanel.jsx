@@ -1,18 +1,7 @@
 import { getUsAqiFromComponents } from "../../helpers/getUsAqi";
-import {
-  Panel,
-  PanelTitle,
-  AqiTop,
-  AqiNum,
-  AqiTag,
-  AqiPollutant,
-  Gauge,
-  GaugeMarker,
-  GaugeScale,
-} from "./StyledDashboard";
 
 const AqiIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3.5 h-3.5 opacity-85">
     <path d="M3 12h4l2-6 4 12 2-6h6" />
   </svg>
 );
@@ -23,27 +12,52 @@ const AirQualityPanel = ({ airQuality }) => {
     getUsAqiFromComponents(components);
 
   return (
-    <Panel $delay="0.05s">
-      <PanelTitle>
+    <section
+      className="relative overflow-hidden rounded-panel border border-panel-line bg-navy-panel bg-panel-pattern p-[22px_24px] motion-safe:animate-rise"
+      style={{ animationDelay: "0.05s" }}
+    >
+      {/* Panel title */}
+      <div className="text-[12px] uppercase tracking-[1.2px] text-muted font-semibold mb-1 flex items-center gap-2">
         <AqiIcon />
         Air Quality
-      </PanelTitle>
-      <AqiTop>
-        <AqiNum>{aqi}</AqiNum>
-        <AqiTag>{label}</AqiTag>
-      </AqiTop>
-      <AqiPollutant>Main pollutant — {mainPollutant}</AqiPollutant>
-      <Gauge>
-        <GaugeMarker $left={markerPercent} />
-      </Gauge>
-      <GaugeScale>
-        <span>Good</span>
-        <span>Moderate</span>
-        <span>USG</span>
-        <span>Unhealthy</span>
-        <span>Hazardous</span>
-      </GaugeScale>
-    </Panel>
+      </div>
+
+      {/* AQI number + label badge */}
+      <div className="flex items-baseline gap-2.5 mt-1.5">
+        <div className="font-display font-semibold text-[40px] leading-none">{aqi}</div>
+        <div className="text-[12px] font-semibold px-2.5 py-1 rounded-full bg-accent-sun/[0.18] text-accent-sun">
+          {label}
+        </div>
+      </div>
+
+      {/* Main pollutant */}
+      <div className="text-[12px] text-muted mt-0.5">Main pollutant — {mainPollutant}</div>
+
+      {/* Gradient gauge bar */}
+      <div
+        className="mt-4 relative h-2 rounded-full"
+        style={{
+          background:
+            "linear-gradient(90deg, #5FB88A, #f4d93b, #F4A93B, #E2694A, #a85fd9)",
+        }}
+      >
+        {/* Marker — left% is data-driven so stays as inline style */}
+        <div
+          className="absolute -top-1 w-4 h-4 rounded-full border-[3px] border-[#f4d93b] -translate-x-1/2 shadow-[0_0_0_3px_rgba(0,0,0,0.25)]"
+          style={{
+            left: `${markerPercent}%`,
+            backgroundColor: "#0F2338",
+          }}
+        />
+      </div>
+
+      {/* Gauge scale labels */}
+      <div className="flex justify-between mt-2">
+        {["Good", "Moderate", "USG", "Unhealthy", "Hazardous"].map((l) => (
+          <span key={l} className="text-[10px] text-muted">{l}</span>
+        ))}
+      </div>
+    </section>
   );
 };
 
