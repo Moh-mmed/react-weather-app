@@ -15,22 +15,14 @@ export const DashboardApp = styled.div`
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  height: 100vh;
-  padding: 28px clamp(20px, 4vw, 48px);
+  padding: 28px clamp(20px, 4vw, 48px) 40px;
   gap: 20px;
   color: ${theme.textHi};
   background:
     radial-gradient(1100px 600px at 85% -10%, rgba(79, 163, 217, 0.14), transparent 60%),
     radial-gradient(900px 500px at 10% 110%, rgba(244, 169, 59, 0.1), transparent 60%),
     linear-gradient(180deg, ${theme.bg0}, ${theme.bg1});
-  overflow: hidden;
-
-  @media (max-width: ${breakpoints.desktop}) {
-    height: auto;
-    min-height: 100vh;
-    overflow: visible;
-    padding-bottom: 40px;
-  }
+  overflow-y: auto;
 `;
 
 export const DashboardHeader = styled.header`
@@ -629,17 +621,30 @@ export const ForecastGrid = styled.div`
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: repeat(${({ $columns = 7 }) => $columns}, minmax(0, 1fr));
+  grid-template-columns: repeat(${({ $columns = 7 }) => $columns}, minmax(110px, 1fr));
   gap: 10px;
   width: 100%;
   align-items: stretch;
   justify-content: stretch;
+  overflow-x: auto;
+  padding-bottom: 8px; /* space for scrollbar */
+
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 99px;
+  }
 
   @media (max-width: ${breakpoints.desktop}) {
     flex: none;
     display: flex;
     flex-wrap: wrap;
     grid-template-columns: unset;
+    overflow-x: visible;
+    padding-bottom: 0;
   }
 `;
 
@@ -701,9 +706,10 @@ export const ForecastMeta = styled.div`
 export const ForecastMetaRow = styled.div`
   display: flex;
   justify-content: space-between;
-  gap: 10px;
+  gap: 6px;
   font-size: 11px;
   color: ${theme.textLo};
+  white-space: nowrap;
 
   b {
     color: ${theme.textHi};
