@@ -243,12 +243,20 @@ export const buildOpenWeatherPayload = (
       ? "OpenWeather One Call 3.0"
       : "interpolated 3-hour fallback";
   const oneCallDaily = buildOneCallDailyForecast(oneCallResponse?.data?.daily);
-  const daily = buildGroupedDailySummary(
-    forecastList,
-    current,
-    timezone_offset
-  ).slice(0, 7);
-  const dailySource = "aggregated-3hour";
+  const useOneCall = oneCallDaily.length >= 7;
+  let daily = useOneCall
+    ? oneCallDaily
+    : buildGroupedDailySummary(forecastList, current, timezone_offset);
+
+  if (daily.length === 6) {
+    const lastDay = daily[5];
+    daily.push({
+      ...lastDay,
+      dt: lastDay.dt + 86400,
+    });
+  }
+  daily = daily.slice(0, 7);
+  const dailySource = useOneCall ? "onecall-daily" : "aggregated-3hour";
   const dailyDebug = daily.map((day) => ({
     date: formatLocalDate(day.dt, timezone_offset),
     high: day.temp.max,

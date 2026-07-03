@@ -24,6 +24,13 @@ export const DashboardApp = styled.div`
     radial-gradient(900px 500px at 10% 110%, rgba(244, 169, 59, 0.1), transparent 60%),
     linear-gradient(180deg, ${theme.bg0}, ${theme.bg1});
   overflow: hidden;
+
+  @media (max-width: ${breakpoints.desktop}) {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+    padding-bottom: 40px;
+  }
 `;
 
 export const DashboardHeader = styled.header`
@@ -104,8 +111,9 @@ export const DashboardMain = styled.main`
 
   @media (max-width: ${breakpoints.desktop}) {
     grid-template-columns: 1fr;
-    overflow-y: auto;
-    padding-right: 4px;
+    flex: none;
+    overflow-y: visible;
+    padding-right: 0;
   }
 `;
 
@@ -113,14 +121,19 @@ export const Column = styled.div`
   display: grid;
   gap: 20px;
   min-height: 0;
+
+  @media (max-width: ${breakpoints.desktop}) {
+    grid-template-rows: auto !important;
+    min-height: unset;
+  }
 `;
 
 export const LeftColumn = styled(Column)`
-  grid-template-rows: auto auto auto 1fr;
+  grid-template-rows: auto auto 1fr;
 `;
 
 export const RightColumn = styled(Column)`
-  grid-template-rows: auto auto auto;
+  grid-template-rows: auto auto 1fr;
 `;
 
 export const Panel = styled.section`
@@ -279,12 +292,18 @@ export const HourIcon = styled.img`
 export const StatsCarouselPanel = styled(Panel)`
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  min-height: 164px;
-  padding: 18px 18px 14px;
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+
+  @media (max-width: ${breakpoints.desktop}) {
+    min-height: 164px;
+  }
 `;
 
 export const StatsCarouselViewport = styled.div`
+  flex: 1;
+  min-height: 0;
   display: flex;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
@@ -292,15 +311,16 @@ export const StatsCarouselViewport = styled.div`
   scrollbar-width: none;
   -ms-overflow-style: none;
   touch-action: pan-x;
-  cursor: grab;
+  cursor: ${(props) => (props.$isDragging ? "grabbing" : "grab")};
   border-radius: 18px;
 
   &::-webkit-scrollbar {
     display: none;
   }
 
-  &:active {
-    cursor: grabbing;
+  @media (max-width: ${breakpoints.desktop}) {
+    flex: none;
+    min-height: 120px;
   }
 `;
 
@@ -310,16 +330,25 @@ export const StatsCarouselSlide = styled.div`
   scroll-snap-align: start;
   scroll-snap-stop: always;
   box-sizing: border-box;
-  height: 100%;
+  display: flex;
+  flex-direction: column;
   padding-right: 0;
 `;
 
 export const StatsCarouselFooter = styled.div`
+  position: absolute;
+  bottom: 16px;
+  left: 0;
+  right: 0;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  justify-content: center;
+  pointer-events: none;
   min-height: 20px;
+
+  > * {
+    pointer-events: auto;
+  }
 `;
 
 export const StatsCarouselDots = styled.div`
@@ -392,14 +421,15 @@ export const StatsCarouselArrow = styled.button`
 `;
 
 export const StatTile = styled.div`
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid ${theme.panelLine};
-  border-radius: 18px;
-  padding: 16px 18px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 22px 24px 48px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 100%;
+  flex: 1;
+  min-height: 100px;
 `;
 
 export const StatTop = styled.div`
@@ -575,6 +605,11 @@ export const ForecastPanel = styled(Panel)`
   min-height: 0;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+
+  @media (max-width: ${breakpoints.desktop}) {
+    overflow: visible;
+  }
 `;
 
 export const ForecastDay = styled.div`
@@ -591,13 +626,21 @@ export const ForecastCond = styled.div`
 
 export const ForecastGrid = styled.div`
   margin-top: 12px;
+  flex: 1;
+  min-height: 0;
   display: grid;
   grid-template-columns: repeat(${({ $columns = 7 }) => $columns}, minmax(0, 1fr));
   gap: 10px;
   width: 100%;
-  min-height: 0;
   align-items: stretch;
   justify-content: stretch;
+
+  @media (max-width: ${breakpoints.desktop}) {
+    flex: none;
+    display: flex;
+    flex-wrap: wrap;
+    grid-template-columns: unset;
+  }
 `;
 
 export const ForecastCard = styled.div`
@@ -608,13 +651,21 @@ export const ForecastCard = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
-  min-height: 204px;
   min-width: 0;
   width: 100%;
   max-width: none;
-  flex: none;
+  flex: 1;
   box-sizing: border-box;
   align-self: stretch;
+
+  @media (max-width: ${breakpoints.desktop}) {
+    flex: 0 0 calc(50% - 5px);
+    min-height: 180px;
+  }
+
+  @media (max-width: ${breakpoints.mobile}) {
+    flex: 0 0 100%;
+  }
 `;
 
 export const ForecastCardTop = styled.div`

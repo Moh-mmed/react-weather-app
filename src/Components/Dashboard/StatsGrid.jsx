@@ -2,11 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { getDewPoint } from "../../helpers/getDewPoint";
 import { getWindDirectionAbbr } from "../../helpers/getWindDirection";
 import {
-  StatsCarouselArrow,
   StatsCarouselDot,
   StatsCarouselDots,
   StatsCarouselFooter,
-  StatsCarouselNav,
   StatsCarouselPanel,
   StatsCarouselSlide,
   StatsCarouselViewport,
@@ -31,6 +29,7 @@ const StatsGrid = ({ weatherData }) => {
   });
   const scrollRafRef = useRef(0);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
   const { current } = weatherData;
   const {
     pressure,
@@ -137,33 +136,37 @@ const StatsGrid = ({ weatherData }) => {
     });
   };
 
-  const handlePointerDown = (event) => {
-    if (event.pointerType !== "mouse" || event.button !== 0) return;
+  const handleMouseDown = (e) => {
+    if (e.button !== 0) return;
+    const track = trackRef.current;
+    if (!track) return;
+
+    setIsDragging(true);
+    dragStateRef.current = {
+      active: true,
+      startX: e.clientX,
+      startScrollLeft: track.scrollLeft,
+    };
+  };
+
+  const handleMouseMove = (e) => {
+    const { active, startX, startScrollLeft } = dragStateRef.current;
+    if (!active) return;
 
     const track = trackRef.current;
     if (!track) return;
 
-    dragStateRef.current = {
-      active: true,
-      startX: event.clientX,
-      startScrollLeft: track.scrollLeft,
-    };
-
-    track.setPointerCapture?.(event.pointerId);
+    e.preventDefault();
+    const x = e.clientX;
+    const walk = x - startX;
+    track.scrollLeft = startScrollLeft - walk;
   };
 
-  const handlePointerMove = (event) => {
-    const track = trackRef.current;
-    const { active, startX, startScrollLeft } = dragStateRef.current;
-
-    if (!active || !track || event.pointerType !== "mouse") return;
-
-    event.preventDefault();
-    track.scrollLeft = startScrollLeft - (event.clientX - startX);
-  };
-
-  const stopDragging = () => {
-    dragStateRef.current.active = false;
+  const handleMouseUpOrLeave = () => {
+    if (dragStateRef.current.active) {
+      dragStateRef.current.active = false;
+      setIsDragging(false);
+    }
   };
 
   useEffect(
@@ -178,11 +181,11 @@ const StatsGrid = ({ weatherData }) => {
       <StatsCarouselViewport
         ref={trackRef}
         onScroll={handleScroll}
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={stopDragging}
-        onPointerCancel={stopDragging}
-        onPointerLeave={stopDragging}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUpOrLeave}
+        onMouseLeave={handleMouseUpOrLeave}
+        $isDragging={isDragging}
         aria-label="Weather statistics carousel"
       >
         {stats.map((stat) => (
@@ -214,29 +217,6 @@ const StatsGrid = ({ weatherData }) => {
             />
           ))}
         </StatsCarouselDots>
-
-        <StatsCarouselNav>
-          <StatsCarouselArrow
-            type="button"
-            aria-label="Previous statistic"
-            onClick={() => scrollToIndex(activeIndex - 1)}
-            disabled={activeIndex === 0}
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M15 18l-6-6 6-6" />
-            </svg>
-          </StatsCarouselArrow>
-          <StatsCarouselArrow
-            type="button"
-            aria-label="Next statistic"
-            onClick={() => scrollToIndex(activeIndex + 1)}
-            disabled={activeIndex === stats.length - 1}
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M9 6l6 6-6 6" />
-            </svg>
-          </StatsCarouselArrow>
-        </StatsCarouselNav>
       </StatsCarouselFooter>
     </StatsCarouselPanel>
   );
