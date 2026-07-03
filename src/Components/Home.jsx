@@ -182,31 +182,45 @@ const Home = () => {
         }
       };
       findWeather();
-    }
 
-    return () => {
-      isMounted = false;
-    };
+      // Poll every 10 minutes (600,000 ms)
+      const intervalId = setInterval(findWeather, 10 * 60 * 1000);
+
+      return () => {
+        isMounted = false;
+        clearInterval(intervalId);
+      };
+    }
   }, [coords]);
 
   useEffect(() => {
+    let isMounted = true;
+
     if (coords !== null && OPEN_WEATHER_API_KEY) {
       const airQualityURL = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${coords.lat}&lon=${coords.lon}&appid=${OPEN_WEATHER_API_KEY}`;
       const findAirQuality = async () => {
-        await axios
-          .get(airQualityURL, {
+        try {
+          const response = await axios.get(airQualityURL, {
             headers: { Accept: "application/json" },
-          })
-          .then((response) => {
-            setAirQuality(response.data);
-            setApiError("");
-          })
-          .catch((err) => {
-            console.log(err);
-            handleApiError(err, "Unable to load the air quality report.");
           });
+          if (!isMounted) return;
+          setAirQuality(response.data);
+          setApiError("");
+        } catch (err) {
+          if (!isMounted) return;
+          console.log(err);
+          handleApiError(err, "Unable to load the air quality report.");
+        }
       };
       findAirQuality();
+
+      // Poll every 10 minutes (600,000 ms)
+      const intervalId = setInterval(findAirQuality, 10 * 60 * 1000);
+
+      return () => {
+        isMounted = false;
+        clearInterval(intervalId);
+      };
     }
   }, [coords]);
 

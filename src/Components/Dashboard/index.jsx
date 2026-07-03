@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import moment from "moment";
 import {
   DashboardApp,
@@ -38,6 +39,31 @@ const BrandIcon = () => (
   </svg>
 );
 
+const LiveClock = ({ timezoneOffset }) => {
+  const [now, setNow] = useState(Math.floor(Date.now() / 1000));
+
+  useEffect(() => {
+    // Update every 10 seconds (10000ms) to keep HH:mm accurate
+    const interval = setInterval(() => {
+      setNow(Math.floor(Date.now() / 1000));
+    }, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const dayLabel = moment
+    .unix(now)
+    .utcOffset(timezoneOffset / 3600)
+    .format("ddd DD MMM")
+    .toUpperCase();
+  const clock = formatTime24(now, timezoneOffset);
+
+  return (
+    <>
+      {dayLabel} · {clock}
+    </>
+  );
+};
+
 const Dashboard = ({
   weatherData,
   airQuality,
@@ -49,15 +75,9 @@ const Dashboard = ({
   handleCurrCity,
 }) => {
   const { current, timezone_offset } = weatherData;
-  const { temp, dt } = current;
+  const { temp } = current;
   const { city, country } = currCity;
   const safeTemp = Number.isFinite(temp) ? Math.round(temp) : "--";
-  const dayLabel = moment
-    .unix(dt)
-    .utcOffset(timezone_offset / 3600)
-    .format("ddd DD MMM")
-    .toUpperCase();
-  const clock = formatTime24(dt, timezone_offset);
 
   return (
     <DashboardApp>
@@ -80,7 +100,7 @@ const Dashboard = ({
         <Headline>
           <HeadlinePlace>
             <HeadlineDay>
-              {dayLabel} · {clock}
+              <LiveClock timezoneOffset={timezone_offset} />
             </HeadlineDay>
             <HeadlineLoc>
               {city}, {country}
