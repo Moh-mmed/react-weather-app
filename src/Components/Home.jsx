@@ -8,6 +8,9 @@ import Error from "./Error";
 import { OPEN_WEATHER_API_KEY } from "../helpers/openWeather";
 import { buildOpenWeatherPayload } from "../helpers/openWeatherAdapter";
 
+// Session-level flag to avoid duplicate warnings for One Call 3.0 fallback
+let hasLoggedOneCallFallback = false;
+
 // ─── Location persistence ──────────────────────────────────────────────────
 const LOCATION_KEY = "weatherme:lastLocation";
 
@@ -246,7 +249,12 @@ const Home = () => {
               headers: { Accept: "application/json" },
             });
           } catch (oneCallErr) {
-            console.warn("48-hour outlook unavailable:", oneCallErr);
+            if (!hasLoggedOneCallFallback) {
+              console.info(
+                "[weather] One Call 3.0 not available on this API plan — using fallback"
+              );
+              hasLoggedOneCallFallback = true;
+            }
           }
 
           if (!isMounted) return;

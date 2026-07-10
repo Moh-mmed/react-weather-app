@@ -152,34 +152,43 @@ const NavBarForm = ({
       ? `${suggestion.name}, ${suggestion.state}, ${suggestion.country}`
       : `${suggestion.name}, ${suggestion.country}`;
 
+    // Update local state first before unmount is triggered
     setSuggestions([]);
     setIsOpen(false);
     setActiveIndex(-1);
+    setEnteredCity("");
 
+    if (inputField.current) {
+      inputField.current.blur();
+    }
+
+    // Trigger parent updates which may unmount this component
     handleWeatherData(null);
     handleAirQuality(null);
     handleCurrCity(null);
     handleSearchCity(formattedName);
-    setEnteredCity("");
-    if (inputField.current) {
-      inputField.current.blur();
-    }
   };
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
     if (enteredCity.trim() !== "") {
-      handleWeatherData(null);
-      handleAirQuality(null);
-      handleCurrCity(null);
-      handleSearchCity(enteredCity);
+      const cityToSearch = enteredCity;
+
+      // Update local state first before unmount is triggered
       setEnteredCity("");
       setSuggestions([]);
       setIsOpen(false);
       setActiveIndex(-1);
+
       if (inputField.current) {
         inputField.current.blur();
       }
+
+      // Trigger parent updates which may unmount this component
+      handleWeatherData(null);
+      handleAirQuality(null);
+      handleCurrCity(null);
+      handleSearchCity(cityToSearch);
     }
   };
 
@@ -223,12 +232,15 @@ const NavBarForm = ({
         if (!isMountedRef.current) return;
         const lat = Number(position.coords.latitude);
         const lon = Number(position.coords.longitude);
-        // Reset display state before injecting new coords (same pattern as selectSuggestion)
+        
+        // Reset display state local properties before parent triggers unmount
+        setGeoState("idle");
+
+        // Trigger parent state updates that unmount this component
         handleWeatherData(null);
         handleAirQuality(null);
         handleCurrCity(null);
         handleGeoCoords({ lat, lon });
-        setGeoState("idle");
       },
       () => {
         if (!isMountedRef.current) return;
