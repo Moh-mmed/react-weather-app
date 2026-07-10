@@ -58,6 +58,7 @@ const Dashboard = ({
   handleWeatherData,
   handleAirQuality,
   handleCurrCity,
+  handleGeoCoords,
 }) => {
   const { current, timezone_offset } = weatherData;
   const { temp } = current;
@@ -86,6 +87,7 @@ const Dashboard = ({
           handleWeatherData={handleWeatherData}
           handleAirQuality={handleAirQuality}
           handleCurrCity={handleCurrCity}
+          handleGeoCoords={handleGeoCoords}
         />
 
         {/* Headline: date + city + temp */}

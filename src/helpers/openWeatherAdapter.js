@@ -257,19 +257,6 @@ export const buildOpenWeatherPayload = (
   }
   daily = daily.slice(0, 7);
   const dailySource = useOneCall ? "onecall-daily" : "aggregated-3hour";
-  const dailyDebug = daily.map((day) => ({
-    date: formatLocalDate(day.dt, timezone_offset),
-    high: day.temp.max,
-    low: day.temp.min,
-    humidity: day.humidity,
-  }));
-
-  console.log(`48-hour outlook source: ${outlook48hSource}`);
-  if (oneCallDaily.length >= 7) {
-    console.log("[7day] ignored alternate source: onecall-daily");
-  }
-  console.log(`[7day] source: ${dailySource}`, dailyDebug);
-
   return {
     current,
     hourly,

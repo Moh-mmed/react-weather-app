@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
 import WeatherContext from "../contexts/WeatherContext";
@@ -7,6 +7,65 @@ import Spinner from "./Spinner";
 import Error from "./Error";
 import { OPEN_WEATHER_API_KEY } from "../helpers/openWeather";
 import { buildOpenWeatherPayload } from "../helpers/openWeatherAdapter";
+
+// ─── Location persistence ──────────────────────────────────────────────────
+const LOCATION_KEY = "weatherme:lastLocation";
+
+/**
+ * Persist the user's most recent location so the next visit loads instantly
+ * without waiting on a geolocation permission prompt.
+ */
+const saveLocation = (lat, lon, city, country) => {
+  try {
+    localStorage.setItem(LOCATION_KEY, JSON.stringify({ lat, lon, city, country }));
+  } catch (_) {
+    // localStorage unavailable (private browsing / quota exceeded) — fail silently
+  }
+};
+
+/**
+ * Read the saved location. Returns null on any failure (missing key, corrupted
+ * JSON, missing fields) so callers can fall through to geolocation safely.
+ * Also migrates legacy separate `coordinates` + `currentCity` keys transparently.
+ */
+const loadSavedLocation = () => {
+  try {
+    const raw = localStorage.getItem(LOCATION_KEY);
+    if (raw) {
+      const p = JSON.parse(raw);
+      if (
+        p &&
+        typeof p.lat === "number" &&
+        typeof p.lon === "number" &&
+        p.city &&
+        p.country
+      ) {
+        return p;
+      }
+    }
+    // Migration: read legacy separate keys so existing users don't lose their location
+    const oldCoords = JSON.parse(localStorage.getItem("coordinates"));
+    const oldCity   = JSON.parse(localStorage.getItem("currentCity"));
+    if (
+      oldCoords &&
+      typeof oldCoords.lat === "number" &&
+      typeof oldCoords.lon === "number" &&
+      oldCity?.city &&
+      oldCity?.country
+    ) {
+      return {
+        lat: oldCoords.lat,
+        lon: oldCoords.lon,
+        city: oldCity.city,
+        country: oldCity.country,
+      };
+    }
+    return null;
+  } catch {
+    return null;
+  }
+};
+// ──────────────────────────────────────────────────────────────────────────
 
 const Home = () => {
   const [searchCity, setSearchCity] = useState(null);
@@ -29,6 +88,46 @@ const Home = () => {
     setApiError(fallbackMessage);
   };
 
+  // Lifted to component level so it's callable from both the init useEffect
+  // and from handleGeoCoords (triggered by the geolocation button in NavBarForm).
+  // Saves weatherme:lastLocation after successful reverse geocode.
+  const findCityName = useCallback(async (cor) => {
+    const reverseURL = `https://api.openweathermap.org/geo/1.0/reverse?lat=${cor.lat}&lon=${cor.lon}&limit=5&appid=${OPEN_WEATHER_API_KEY}`;
+    await axios
+      .get(reverseURL, {
+        headers: { Accept: "application/json" },
+      })
+      .then((response) => {
+        const currentCity = {
+          city: response.data[0].name,
+          country: response.data[0].country,
+        };
+        setCurrCity(currentCity);
+        saveLocation(cor.lat, cor.lon, currentCity.city, currentCity.country);
+        setApiError("");
+      })
+      .catch((err) => {
+        console.error(err);
+        handleApiError(err, "Unable to resolve the current city from your location.");
+      });
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- closes over only stable state setters and a module-level constant
+  }, []);
+
+  // Called by the geolocation button in NavBarForm.
+  // Feeds {lat, lon} directly into the existing coords → weather-fetch flow,
+  // and kicks off reverse geocoding to update the header city name + persist location.
+  const handleGeoCoords = useCallback(
+    ({ lat, lon }) => {
+      const cityCoords = { lat, lon };
+      setWeatherData(null);
+      setAirQuality(null);
+      setCurrCity(null);
+      setCoords(cityCoords);
+      findCityName(cityCoords); // persists weatherme:lastLocation after reverse geocode
+    },
+    [findCityName]
+  );
+
   useEffect(() => {
     if (!OPEN_WEATHER_API_KEY) {
       setApiError(
@@ -37,62 +136,45 @@ const Home = () => {
       return;
     }
 
-    let coordinates = JSON.parse(localStorage.getItem("coordinates"));
-    const findCityName = async (cor) => {
-      const reverseURL = `https://api.openweathermap.org/geo/1.0/reverse?lat=${cor.lat}&lon=${cor.lon}&limit=5&appid=${OPEN_WEATHER_API_KEY}`;
-      await axios
-        .get(reverseURL, {
-          headers: { Accept: "application/json" },
-        })
-        .then((response) => {
-          let currentCity = {
-            city: response.data[0].name,
-            country: response.data[0].country,
-          };
-          setCurrCity(currentCity);
-          localStorage.setItem("currentCity", JSON.stringify(currentCity));
-          setApiError("");
-        })
-        .catch((err) => {
-          console.log(err);
-          handleApiError(err, "Unable to resolve the current city from your location.");
-        });
-    };
-    if (coordinates !== null) {
-      setCoords(coordinates);
-      findCityName(coordinates);
-    } else {
-      (async () => {
-        let cityCoords;
-        let getCoordinatesWithLocation = new Promise((resolve, reject) => {
-          let opts = {
-            enableHightAccuracy: true,
-            timeout: 1000 * 10,
-            maximumAge: 1000 * 60 * 5,
-          };
-          const success = (position) => {
-            cityCoords = {
-              lat: Number(position.coords.latitude),
-              lon: Number(position.coords.longitude),
-            };
-            localStorage.setItem("coordinates", JSON.stringify(cityCoords));
-            setCoords(cityCoords);
-            findCityName(cityCoords);
-            resolve(cityCoords);
-          };
-          const fail = () => {
-            cityCoords = { lat: 41.01, lon: 28.66 };
-            localStorage.setItem("coordinates", JSON.stringify(cityCoords));
-            setCoords(cityCoords);
-            findCityName(cityCoords);
-            reject("Location is INACTIVE");
-          };
-          navigator.geolocation.getCurrentPosition(success, fail, opts);
-        });
-        await getCoordinatesWithLocation;
-      })();
+    // Use saved location immediately — no geolocation prompt on return visits.
+    const saved = loadSavedLocation();
+    if (saved) {
+      setCoords({ lat: saved.lat, lon: saved.lon });
+      setCurrCity({ city: saved.city, country: saved.country });
+      return;
     }
-  }, []);
+
+    // No saved location: request geolocation (first-time visitors or cleared storage).
+    (async () => {
+      let cityCoords;
+      let getCoordinatesWithLocation = new Promise((resolve, reject) => {
+        let opts = {
+          enableHightAccuracy: true,
+          timeout: 1000 * 10,
+          maximumAge: 1000 * 60 * 5,
+        };
+        const success = (position) => {
+          cityCoords = {
+            lat: Number(position.coords.latitude),
+            lon: Number(position.coords.longitude),
+          };
+          setCoords(cityCoords);
+          findCityName(cityCoords); // persists weatherme:lastLocation after reverse geocode
+          resolve(cityCoords);
+        };
+        const fail = () => {
+          // Geolocation denied / unavailable — fall back to Istanbul.
+          // findCityName will persist this too, so next visit skips the prompt.
+          cityCoords = { lat: 41.01, lon: 28.66 };
+          setCoords(cityCoords);
+          findCityName(cityCoords);
+          reject("Location is INACTIVE");
+        };
+        navigator.geolocation.getCurrentPosition(success, fail, opts);
+      });
+      await getCoordinatesWithLocation;
+    })();
+  }, [findCityName]);
 
   useEffect(() => {
     if (!OPEN_WEATHER_API_KEY) {
@@ -107,28 +189,31 @@ const Home = () => {
         })
         .then((response) => {
           if (response.data.length > 0) {
-            let cityCoords = {
+            const cityCoords = {
               lat: Number(response.data[0].lat),
               lon: Number(response.data[0].lon),
             };
-            let currentCity = {
+            const currentCity = {
               city: response.data[0].name,
               country: response.data[0].country,
             };
             setCoords(cityCoords);
             setCurrCity(currentCity);
-            localStorage.setItem("coordinates", JSON.stringify(cityCoords));
-            localStorage.setItem("currentCity", JSON.stringify(currentCity));
+            saveLocation(cityCoords.lat, cityCoords.lon, currentCity.city, currentCity.country);
             setApiError("");
           } else {
+            // City not found: restore previous location from saved data
+            const prev = loadSavedLocation();
+            if (prev) {
+              setCoords({ lat: prev.lat, lon: prev.lon });
+              setCurrCity({ city: prev.city, country: prev.country });
+            }
             setCityNotFound(true);
-            setCoords(JSON.parse(localStorage.getItem("coordinates")));
-            setCurrCity(JSON.parse(localStorage.getItem("currentCity")));
             setTimeout(() => setCityNotFound(false), 4000);
           }
         })
         .catch((err) => {
-          console.log(err);
+          console.error(err);
           handleApiError(err, "Unable to look up that city right now.");
         });
     };
@@ -177,7 +262,7 @@ const Home = () => {
           setApiError("");
         } catch (err) {
           if (!isMounted) return;
-          console.log(err);
+          console.error(err);
           handleApiError(err, "Unable to load the weather forecast.");
         }
       };
@@ -208,7 +293,7 @@ const Home = () => {
           setApiError("");
         } catch (err) {
           if (!isMounted) return;
-          console.log(err);
+          console.error(err);
           handleApiError(err, "Unable to load the air quality report.");
         }
       };
@@ -240,6 +325,7 @@ const Home = () => {
           handleWeatherData={setWeatherData}
           handleAirQuality={setAirQuality}
           handleCurrCity={setCurrCity}
+          handleGeoCoords={handleGeoCoords}
         />
       )}
     </WeatherContext.Provider>
