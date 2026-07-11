@@ -68,7 +68,7 @@ const Dashboard = ({
 
   return (
     /* Root app wrapper — full-height, dashboard radial gradient, flex column */
-    <div className="flex flex-col min-h-screen overflow-y-auto text-primary bg-dashboard-radial px-[clamp(20px,4vw,48px)] pt-7 pb-10 gap-5">
+    <div className="flex flex-col min-h-screen desktop:h-screen desktop:min-h-0 desktop:overflow-hidden overflow-y-auto text-primary bg-dashboard-radial px-[clamp(20px,4vw,48px)] pt-7 pb-10 gap-5">
 
       {/* Header */}
       <header className="flex items-center justify-between gap-6 flex-wrap">

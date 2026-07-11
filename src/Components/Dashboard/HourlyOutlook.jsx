@@ -23,7 +23,7 @@ const HourlyOutlook = ({ weatherData }) => {
       </div>
 
       {/* Hourly scroll row */}
-      <div className="flex gap-1.5 overflow-x-auto pt-3.5 pb-1 custom-scrollbar" style={{ scrollbarWidth: "thin" }}>
+      <div className="flex gap-1.5 overflow-x-auto overflow-y-hidden pt-3.5 pb-2 custom-scrollbar" style={{ scrollbarWidth: "thin" }}>
         {outlook48h.length ? (
           outlook48h.map((entry) => {
             const label = `${formatHour24(entry.dt, timezone_offset)}:00`;
