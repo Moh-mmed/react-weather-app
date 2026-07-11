@@ -2,7 +2,13 @@ import clsx from "clsx";
 import { formatHour24 } from "../../helpers/timeFormat";
 
 const ClockIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3.5 h-3.5 opacity-85">
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    className="w-3.5 h-3.5 opacity-85"
+  >
     <circle cx="12" cy="12" r="9" />
     <path d="M12 7v5l3 3" />
   </svg>
@@ -24,15 +30,31 @@ const BackgroundGlyph = ({ icon }) => {
     // Clear sky — sun or moon
     return isNight ? (
       // Moon crescent
-      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="pointer-events-none select-none w-[120px] h-[120px]">
+      <svg
+        viewBox="0 0 100 100"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        className="pointer-events-none select-none w-[120px] h-[120px]"
+      >
         <path
           d="M65 15C45 15 28 32 28 52C28 72 45 89 65 89C50 89 38 76 38 62C38 42 50 27 65 15Z"
-          stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none"
+          stroke="currentColor"
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
         />
       </svg>
     ) : (
       // Sun
-      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="pointer-events-none select-none w-[120px] h-[120px]">
+      <svg
+        viewBox="0 0 100 100"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        className="pointer-events-none select-none w-[120px] h-[120px]"
+      >
         <circle cx="50" cy="50" r="20" stroke="currentColor" strokeWidth="3" />
         <g stroke="currentColor" strokeWidth="3" strokeLinecap="round">
           <line x1="50" y1="10" x2="50" y2="22" />
@@ -51,12 +73,26 @@ const BackgroundGlyph = ({ icon }) => {
   if (code === "02" || code === "03" || code === "04") {
     // Cloudy — cloud shape
     return (
-      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="pointer-events-none select-none w-[120px] h-[120px]">
+      <svg
+        viewBox="0 0 100 100"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        className="pointer-events-none select-none w-[120px] h-[120px]"
+      >
         <path
           d="M25 68C16 68 10 62 10 54C10 47 15 41 22 40C22 30 30 22 40 22C48 22 55 27 58 34C60 33 63 32 66 32C75 32 82 39 82 48C82 57 75 64 66 64"
-          stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"
+          stroke="currentColor"
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
-        <path d="M20 68H78" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+        <path
+          d="M20 68H78"
+          stroke="currentColor"
+          strokeWidth="3"
+          strokeLinecap="round"
+        />
       </svg>
     );
   }
@@ -64,10 +100,19 @@ const BackgroundGlyph = ({ icon }) => {
   if (code === "09" || code === "10") {
     // Rain — cloud + drops
     return (
-      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="pointer-events-none select-none w-[120px] h-[120px]">
+      <svg
+        viewBox="0 0 100 100"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        className="pointer-events-none select-none w-[120px] h-[120px]"
+      >
         <path
           d="M25 58C16 58 10 52 10 44C10 37 15 31 22 30C22 20 30 12 40 12C48 12 55 17 58 24C60 23 63 22 66 22C75 22 82 29 82 38C82 47 75 54 66 54H25Z"
-          stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"
+          stroke="currentColor"
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
         <g stroke="currentColor" strokeWidth="3" strokeLinecap="round">
           <line x1="30" y1="66" x2="26" y2="76" />
@@ -83,12 +128,27 @@ const BackgroundGlyph = ({ icon }) => {
   if (code === "11") {
     // Thunderstorm — lightning bolt
     return (
-      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="pointer-events-none select-none w-[120px] h-[120px]">
+      <svg
+        viewBox="0 0 100 100"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        className="pointer-events-none select-none w-[120px] h-[120px]"
+      >
         <path
           d="M25 50C16 50 10 44 10 36C10 29 15 23 22 22C22 12 30 4 40 4C48 4 55 9 58 16C60 15 63 14 66 14C75 14 82 21 82 30C82 39 75 46 66 46H25Z"
-          stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"
+          stroke="currentColor"
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         />
-        <path d="M55 50L42 68H56L43 88" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+        <path
+          d="M55 50L42 68H56L43 88"
+          stroke="currentColor"
+          strokeWidth="3"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
       </svg>
     );
   }
@@ -96,7 +156,13 @@ const BackgroundGlyph = ({ icon }) => {
   if (code === "13") {
     // Snow — snowflake
     return (
-      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="pointer-events-none select-none w-[120px] h-[120px]">
+      <svg
+        viewBox="0 0 100 100"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        className="pointer-events-none select-none w-[120px] h-[120px]"
+      >
         <g stroke="currentColor" strokeWidth="3" strokeLinecap="round">
           <line x1="50" y1="15" x2="50" y2="85" />
           <line x1="15" y1="50" x2="85" y2="50" />
@@ -117,7 +183,13 @@ const BackgroundGlyph = ({ icon }) => {
 
   // Default / mist / haze / fog — wave lines
   return (
-    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" className="pointer-events-none select-none w-[120px] h-[120px]">
+    <svg
+      viewBox="0 0 100 100"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      className="pointer-events-none select-none w-[120px] h-[120px]"
+    >
       <g stroke="currentColor" strokeWidth="3" strokeLinecap="round">
         <path d="M15 35 Q30 28 45 35 Q60 42 75 35 Q82 31 90 35" />
         <path d="M15 50 Q30 43 45 50 Q60 57 75 50 Q82 46 90 50" />
@@ -138,30 +210,35 @@ const HourlyOutlook = ({ weatherData }) => {
   const PADDING_Y = 45;
   const INNER_HEIGHT = SVG_HEIGHT - PADDING_Y * 2;
 
-  const temps = outlook48h?.map(d => d.temp) || [];
+  const temps = outlook48h?.map((d) => d.temp) || [];
   const minTemp = Math.min(...temps);
   const maxTemp = Math.max(...temps);
   const range = maxTemp - minTemp || 1;
 
-  const points = outlook48h?.map((d, i) => {
-    const x = i * COLUMN_WIDTH + (COLUMN_WIDTH / 2);
-    const normalized = (d.temp - minTemp) / range;
-    const y = PADDING_Y + (1 - normalized) * INNER_HEIGHT;
-    return { x, y };
-  }) || [];
+  const points =
+    outlook48h?.map((d, i) => {
+      const x = i * COLUMN_WIDTH + COLUMN_WIDTH / 2;
+      const normalized = (d.temp - minTemp) / range;
+      const y = PADDING_Y + (1 - normalized) * INNER_HEIGHT;
+      return { x, y };
+    }) || [];
 
-  const pathStr = points.map((p, i, arr) => {
-    if (i === 0) return `M ${p.x} ${p.y}`;
-    const prev = arr[i - 1];
-    // Smooth curve
-    const cp1x = prev.x + (p.x - prev.x) / 2.5;
-    const cp1y = prev.y;
-    const cp2x = p.x - (p.x - prev.x) / 2.5;
-    const cp2y = p.y;
-    return `C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p.x} ${p.y}`;
-  }).join(' ');
+  const pathStr = points
+    .map((p, i, arr) => {
+      if (i === 0) return `M ${p.x} ${p.y}`;
+      const prev = arr[i - 1];
+      // Smooth curve
+      const cp1x = prev.x + (p.x - prev.x) / 2.5;
+      const cp1y = prev.y;
+      const cp2x = p.x - (p.x - prev.x) / 2.5;
+      const cp2y = p.y;
+      return `C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p.x} ${p.y}`;
+    })
+    .join(" ");
 
-  const totalWidth = points.length ? points[points.length - 1].x + (COLUMN_WIDTH / 2) : 0;
+  const totalWidth = points.length
+    ? points[points.length - 1].x + COLUMN_WIDTH / 2
+    : 0;
 
   return (
     <section
@@ -176,27 +253,40 @@ const HourlyOutlook = ({ weatherData }) => {
 
       <div
         aria-hidden="true"
-        className="absolute bottom-1 right-2 pointer-events-none text-accent-sky opacity-[0.09]"
+        className="absolute top-2 right-2 pointer-events-none text-accent-sky opacity-[0.09]"
       >
         <BackgroundGlyph icon={glyphIcon} />
       </div>
 
       {/* Scrollable area */}
-      <div className="overflow-x-auto overflow-y-hidden custom-scrollbar pb-2" style={{ scrollbarWidth: "thin" }}>
+      <div
+        className="overflow-x-auto overflow-y-hidden custom-scrollbar pb-2"
+        style={{ scrollbarWidth: "thin" }}
+      >
         {outlook48h?.length ? (
-          <div className="relative min-w-max mt-2" style={{ height: SVG_HEIGHT, width: totalWidth }}>
-            
+          <div
+            className="relative min-w-max mt-2"
+            style={{ height: SVG_HEIGHT, width: totalWidth }}
+          >
             {/* ── SVG Timeline Layer ── */}
             <svg
               width={totalWidth}
               height={SVG_HEIGHT}
               className="absolute top-0 left-0 pointer-events-none"
-              style={{ overflow: 'visible' }}
+              style={{ overflow: "visible" }}
             >
               <defs>
-                <linearGradient id="temp-gradient" x1="0" y1={PADDING_Y} x2="0" y2={PADDING_Y + INNER_HEIGHT} gradientUnits="userSpaceOnUse">
-                  <stop offset="0%" stopColor="#FF7E47" />   {/* Warm Orange */}
-                  <stop offset="100%" stopColor="#93A5BE" /> {/* Cool Blue-Grey */}
+                <linearGradient
+                  id="temp-gradient"
+                  x1="0"
+                  y1={PADDING_Y}
+                  x2="0"
+                  y2={PADDING_Y + INNER_HEIGHT}
+                  gradientUnits="userSpaceOnUse"
+                >
+                  <stop offset="0%" stopColor="#FF7E47" /> {/* Warm Orange */}
+                  <stop offset="100%" stopColor="#93A5BE" />{" "}
+                  {/* Cool Blue-Grey */}
                 </linearGradient>
               </defs>
 
@@ -256,7 +346,6 @@ const HourlyOutlook = ({ weatherData }) => {
                 );
               })}
             </div>
-
           </div>
         ) : (
           <div className="flex items-center min-h-[140px] text-[12px] text-muted px-2">
