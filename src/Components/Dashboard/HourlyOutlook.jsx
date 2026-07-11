@@ -130,8 +130,38 @@ const BackgroundGlyph = ({ icon }) => {
 const HourlyOutlook = ({ weatherData }) => {
   const { outlook48h, timezone_offset } = weatherData;
 
-  // Derive icon for the background glyph from the first available hourly entry
   const glyphIcon = outlook48h?.[0]?.weather?.[0]?.icon ?? null;
+
+  // Layout constants
+  const COLUMN_WIDTH = 72;
+  const SVG_HEIGHT = 140;
+  const PADDING_Y = 45;
+  const INNER_HEIGHT = SVG_HEIGHT - PADDING_Y * 2;
+
+  const temps = outlook48h?.map(d => d.temp) || [];
+  const minTemp = Math.min(...temps);
+  const maxTemp = Math.max(...temps);
+  const range = maxTemp - minTemp || 1;
+
+  const points = outlook48h?.map((d, i) => {
+    const x = i * COLUMN_WIDTH + (COLUMN_WIDTH / 2);
+    const normalized = (d.temp - minTemp) / range;
+    const y = PADDING_Y + (1 - normalized) * INNER_HEIGHT;
+    return { x, y };
+  }) || [];
+
+  const pathStr = points.map((p, i, arr) => {
+    if (i === 0) return `M ${p.x} ${p.y}`;
+    const prev = arr[i - 1];
+    // Smooth curve
+    const cp1x = prev.x + (p.x - prev.x) / 2.5;
+    const cp1y = prev.y;
+    const cp2x = p.x - (p.x - prev.x) / 2.5;
+    const cp2y = p.y;
+    return `C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p.x} ${p.y}`;
+  }).join(' ');
+
+  const totalWidth = points.length ? points[points.length - 1].x + (COLUMN_WIDTH / 2) : 0;
 
   return (
     <section
@@ -139,13 +169,11 @@ const HourlyOutlook = ({ weatherData }) => {
       style={{ animationDelay: "0.05s" }}
     >
       {/* Panel title */}
-      <div className="text-[12px] uppercase tracking-[1.2px] text-muted font-semibold mb-1 flex items-center gap-2">
+      <div className="text-[12px] uppercase tracking-[1.2px] text-muted font-semibold mb-4 flex items-center gap-2">
         <ClockIcon />
         48-Hour Outlook
       </div>
 
-      {/* ── Decorative background glyph ──────────────────────────────────── */}
-      {/* Positioned bottom-right; opacity ~10% so it reads as texture only. */}
       <div
         aria-hidden="true"
         className="absolute bottom-1 right-2 pointer-events-none text-accent-sky opacity-[0.09]"
@@ -153,34 +181,85 @@ const HourlyOutlook = ({ weatherData }) => {
         <BackgroundGlyph icon={glyphIcon} />
       </div>
 
-      {/* Hourly scroll row */}
-      <div className="flex gap-1.5 overflow-x-auto overflow-y-hidden pt-3.5 pb-2 custom-scrollbar" style={{ scrollbarWidth: "thin" }}>
-        {outlook48h.length ? (
-          outlook48h.map((entry) => {
-            const label = `${formatHour24(entry.dt, timezone_offset)}:00`;
-            const icon = entry.weather?.[0]?.icon ?? "01d";
+      {/* Scrollable area */}
+      <div className="overflow-x-auto overflow-y-hidden custom-scrollbar pb-2" style={{ scrollbarWidth: "thin" }}>
+        {outlook48h?.length ? (
+          <div className="relative min-w-max mt-2" style={{ height: SVG_HEIGHT, width: totalWidth }}>
+            
+            {/* ── SVG Timeline Layer ── */}
+            <svg
+              width={totalWidth}
+              height={SVG_HEIGHT}
+              className="absolute top-0 left-0 pointer-events-none"
+              style={{ overflow: 'visible' }}
+            >
+              <defs>
+                <linearGradient id="temp-gradient" x1="0" y1={PADDING_Y} x2="0" y2={PADDING_Y + INNER_HEIGHT} gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stopColor="#FF7E47" />   {/* Warm Orange */}
+                  <stop offset="100%" stopColor="#93A5BE" /> {/* Cool Blue-Grey */}
+                </linearGradient>
+              </defs>
 
-            return (
-              <div
-                key={entry.dt}
-                className={clsx(
-                  "flex-none w-[74px] flex flex-col items-center gap-2 py-3 rounded-[14px] border",
-                  entry.isInterpolated ? "opacity-70" : "opacity-100",
-                  "bg-transparent border-transparent"
-                )}
-              >
-                <div className="font-mono text-[11px] text-muted">{label}</div>
-                <img
-                  src={`https://openweathermap.org/img/wn/${icon}@2x.png`}
-                  alt=""
-                  className="w-[26px] h-[26px]"
+              {/* Vertical Dashed Lines */}
+              {points.map((p, i) => (
+                <line
+                  key={`dash-${i}`}
+                  x1={p.x}
+                  y1={24}
+                  x2={p.x}
+                  y2={SVG_HEIGHT - 30}
+                  stroke="rgba(255,255,255,0.12)"
+                  strokeWidth="1"
+                  strokeDasharray="3 4"
                 />
-                <div className="font-mono text-[14px] font-medium">{Math.round(entry.temp)}°</div>
-              </div>
-            );
-          })
+              ))}
+
+              {/* Smooth Trend Line */}
+              <path
+                d={pathStr}
+                fill="none"
+                stroke="url(#temp-gradient)"
+                strokeWidth="2.5"
+                className="drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]"
+              />
+
+              {/* Data Dots */}
+              {points.map((p, i) => (
+                <circle
+                  key={`dot-${i}`}
+                  cx={p.x}
+                  cy={p.y}
+                  r="3.5"
+                  fill="url(#temp-gradient)"
+                  className="drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]"
+                />
+              ))}
+            </svg>
+
+            {/* ── HTML Text Layer ── */}
+            <div className="absolute inset-0 flex w-full h-full z-10">
+              {outlook48h.map((entry, i) => {
+                const label = `${formatHour24(entry.dt, timezone_offset)}:00`;
+                return (
+                  <div
+                    key={entry.dt}
+                    className="flex-none flex flex-col justify-between items-center py-1"
+                    style={{ width: COLUMN_WIDTH }}
+                  >
+                    <div className="font-mono text-[11px] text-muted tracking-wide mt-1">
+                      {label}
+                    </div>
+                    <div className="font-mono text-[17px] font-medium tracking-tight mb-1">
+                      {Math.round(entry.temp)}°
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+          </div>
         ) : (
-          <div className="flex items-center min-h-[116px] text-[12px] text-muted">
+          <div className="flex items-center min-h-[140px] text-[12px] text-muted px-2">
             48-hour hourly forecast requires OpenWeather One Call 3.0 access.
           </div>
         )}
