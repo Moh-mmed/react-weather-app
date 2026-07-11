@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import axios from "axios";
 
 import WeatherContext from "../contexts/WeatherContext";
@@ -78,6 +78,9 @@ const Home = () => {
   const [airQuality, setAirQuality] = useState(null);
   const [cityNotFound, setCityNotFound] = useState(false);
   const [apiError, setApiError] = useState("");
+  const [isUpdatingLocation, setIsUpdatingLocation] = useState(false);
+
+  const lastFetchedCoordsRef = useRef(null);
 
   const handleApiError = (err, fallbackMessage) => {
     const status = err?.response?.status;
@@ -90,6 +93,8 @@ const Home = () => {
 
     setApiError(fallbackMessage);
   };
+
+
 
   // Lifted to component level so it's callable from both the init useEffect
   // and from handleGeoCoords (triggered by the geolocation button in NavBarForm).
@@ -121,12 +126,13 @@ const Home = () => {
   // and kicks off reverse geocoding to update the header city name + persist location.
   const handleGeoCoords = useCallback(
     ({ lat, lon }) => {
-      const cityCoords = { lat, lon };
-      setWeatherData(null);
-      setAirQuality(null);
-      setCurrCity(null);
+      const cityCoords = { lat: Number(lat), lon: Number(lon) };
+      
+      // Update coords to trigger the existing data-fetching useEffects
       setCoords(cityCoords);
-      findCityName(cityCoords); // persists weatherme:lastLocation after reverse geocode
+      
+      // Reverse geocode to get the city name and save the new location
+      findCityName(cityCoords);
     },
     [findCityName]
   );
@@ -229,6 +235,11 @@ const Home = () => {
     let isMounted = true;
 
     if (coords !== null && OPEN_WEATHER_API_KEY) {
+      const isAlreadyLoaded =
+        lastFetchedCoordsRef.current &&
+        Math.abs(lastFetchedCoordsRef.current.lat - coords.lat) < 0.0001 &&
+        Math.abs(lastFetchedCoordsRef.current.lon - coords.lon) < 0.0001;
+
       const currentWeatherURL = `https://api.openweathermap.org/data/2.5/weather?lat=${coords.lat}&lon=${coords.lon}&units=metric&appid=${OPEN_WEATHER_API_KEY}`;
       const forecastURL = `https://api.openweathermap.org/data/2.5/forecast?lat=${coords.lat}&lon=${coords.lon}&units=metric&appid=${OPEN_WEATHER_API_KEY}`;
       const uviURL = `https://api.openweathermap.org/data/2.5/uvi?lat=${coords.lat}&lon=${coords.lon}&appid=${OPEN_WEATHER_API_KEY}`;
@@ -267,6 +278,7 @@ const Home = () => {
           );
 
           setWeatherData(payload);
+          lastFetchedCoordsRef.current = coords;
           setApiError("");
         } catch (err) {
           if (!isMounted) return;
@@ -274,7 +286,12 @@ const Home = () => {
           handleApiError(err, "Unable to load the weather forecast.");
         }
       };
-      findWeather();
+
+      if (!isAlreadyLoaded) {
+        findWeather();
+      } else {
+        lastFetchedCoordsRef.current = coords;
+      }
 
       // Poll every 10 minutes (600,000 ms)
       const intervalId = setInterval(findWeather, 10 * 60 * 1000);
@@ -290,6 +307,11 @@ const Home = () => {
     let isMounted = true;
 
     if (coords !== null && OPEN_WEATHER_API_KEY) {
+      const isAlreadyLoaded =
+        lastFetchedCoordsRef.current &&
+        Math.abs(lastFetchedCoordsRef.current.lat - coords.lat) < 0.0001 &&
+        Math.abs(lastFetchedCoordsRef.current.lon - coords.lon) < 0.0001;
+
       const airQualityURL = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${coords.lat}&lon=${coords.lon}&appid=${OPEN_WEATHER_API_KEY}`;
       const findAirQuality = async () => {
         try {
@@ -298,6 +320,7 @@ const Home = () => {
           });
           if (!isMounted) return;
           setAirQuality(response.data);
+          lastFetchedCoordsRef.current = coords;
           setApiError("");
         } catch (err) {
           if (!isMounted) return;
@@ -305,7 +328,10 @@ const Home = () => {
           handleApiError(err, "Unable to load the air quality report.");
         }
       };
-      findAirQuality();
+
+      if (!isAlreadyLoaded) {
+        findAirQuality();
+      }
 
       // Poll every 10 minutes (600,000 ms)
       const intervalId = setInterval(findAirQuality, 10 * 60 * 1000);
@@ -329,6 +355,7 @@ const Home = () => {
           airQuality={airQuality}
           currCity={currCity}
           cityNotFound={cityNotFound}
+          isUpdatingLocation={isUpdatingLocation}
           handleSearchCity={setSearchCity}
           handleWeatherData={setWeatherData}
           handleAirQuality={setAirQuality}

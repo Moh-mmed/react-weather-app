@@ -54,6 +54,7 @@ const Dashboard = ({
   airQuality,
   currCity,
   cityNotFound,
+  isUpdatingLocation,
   handleSearchCity,
   handleWeatherData,
   handleAirQuality,
@@ -88,6 +89,7 @@ const Dashboard = ({
           handleAirQuality={handleAirQuality}
           handleCurrCity={handleCurrCity}
           handleGeoCoords={handleGeoCoords}
+          isUpdatingLocation={isUpdatingLocation}
         />
 
         {/* Headline: date + city + temp */}
@@ -107,7 +109,9 @@ const Dashboard = ({
       </header>
 
       {/* Main bento grid — 2:1 columns on desktop, single column below */}
-      <main className="dashboard-main flex-1 grid gap-5 min-h-0"
+      <main
+        key={`${weatherData.coord?.lat}-${weatherData.coord?.lon}-${weatherData.dt}`}
+        className="dashboard-main flex-1 grid gap-5 min-h-0 animate-fadeIn"
         style={{ gridTemplateColumns: "2.05fr 1fr" }}
       >
         {/* Left column */}

@@ -32,15 +32,71 @@ const CrosshairIcon = ({ spinning = false }) => (
   </svg>
 );
 
-// Non-blocking error toast — reuses the animate-displayTooltip keyframe
-// already defined in tailwind.config.js (same pattern as Tooltip.jsx).
-const GeoErrorToast = () => (
+// Non-blocking geo-error toast.
+// Always present in the DOM (position:absolute, no layout impact), visibility
+// toggled via opacity + visibility so mount/unmount never causes reflow.
+// IMPORTANT: className must be a static string — Tailwind JIT does not scan
+// dynamically constructed arrays or template literals for class names.
+const GeoErrorToast = ({ isVisible }) => (
   <div
-    className="absolute opacity-0 top-[calc(100%+8px)] right-0 bg-accent-coral/92 rounded-[15px] px-[13px] py-3 text-[0.7rem] text-white animate-displayTooltip z-[2] whitespace-nowrap
-               after:content-[''] after:absolute after:-top-1.5 after:right-[10px] after:border-l-[6px] after:border-l-transparent after:border-r-[6px] after:border-r-transparent after:border-b-[6px] after:border-b-accent-coral/92"
+    role="status"
+    aria-live="polite"
+    aria-atomic="true"
+    style={{
+      // Fade in 150 ms; fade out 200 ms with a visibility delay so it's
+      // fully transparent before being hidden from pointer events.
+      transition: isVisible
+        ? 'opacity 0.15s ease'
+        : 'opacity 0.2s ease, visibility 0s linear 0.2s',
+      opacity: isVisible ? 1 : 0,
+      visibility: isVisible ? 'visible' : 'hidden',
+    }}
+    className="absolute top-[calc(100%+6px)] right-0 z-[200] whitespace-nowrap
+               bg-navy-panel border border-panel-line rounded-xl
+               px-3 py-2 text-[0.72rem] font-medium text-primary
+               shadow-[0_8px_32px_rgba(0,0,0,0.55),0_2px_8px_rgba(0,0,0,0.35)]
+               after:content-[''] after:absolute after:-top-[7px] after:right-[9px]
+               after:border-l-[7px] after:border-l-transparent
+               after:border-r-[7px] after:border-r-transparent
+               after:border-b-[7px] after:border-b-panel-line
+               before:content-[''] before:absolute before:-top-[5px] before:right-[10px]
+               before:border-l-[6px] before:border-l-transparent
+               before:border-r-[6px] before:border-r-transparent
+               before:border-b-[6px] before:border-b-navy-panel before:z-10"
   >
-    Couldn't get your location
+    <span className="flex items-center gap-2">
+      {/* Coral dot — communicates "error" without relying on bg color */}
+      <span className="w-[7px] h-[7px] rounded-full bg-accent-coral shrink-0" aria-hidden="true" />
+      Couldn't get your location
+    </span>
   </div>
+);
+
+// Small circular spinner for the geo-button loading state.
+// Uses motion-safe: so the animation is skipped under prefers-reduced-motion
+// (the icon simply stays visible at reduced opacity as a static cue).
+const SmallSpinner = () => (
+  <svg
+    className="motion-safe:animate-spin h-[15px] w-[15px] text-accent-sky"
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    aria-hidden="true"
+  >
+    <circle
+      className="opacity-20"
+      cx="12"
+      cy="12"
+      r="10"
+      stroke="currentColor"
+      strokeWidth="3.5"
+    />
+    <path
+      className="opacity-80"
+      fill="currentColor"
+      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+    />
+  </svg>
 );
 
 const NavBarForm = ({
@@ -50,6 +106,7 @@ const NavBarForm = ({
   handleCurrCity,
   handleGeoCoords,
   cityNotFound,
+  isUpdatingLocation,
 }) => {
   const [enteredCity, setEnteredCity] = useState("");
   const [suggestions, setSuggestions] = useState([]);
@@ -58,6 +115,10 @@ const NavBarForm = ({
   const [hasNoMatches, setHasNoMatches] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [geoState, setGeoState] = useState("idle"); // 'idle' | 'loading' | 'error'
+  // Separate boolean for the toast visibility so we can fade it out before
+  // removing it (geoState transitions back to 'idle' at the end of the timer).
+  const [geoErrorVisible, setGeoErrorVisible] = useState(false);
+  const geoToastTimerRef = useRef(null);
 
   const inputField = useRef(null);
   const containerRef = useRef(null);
@@ -222,35 +283,49 @@ const NavBarForm = ({
     }
   };
 
+  // Shared helper: show the geo-error toast for 3 s then fade it back out.
+  const showGeoError = () => {
+    // Clear any in-flight dismiss timer before starting a new cycle.
+    if (geoToastTimerRef.current) clearTimeout(geoToastTimerRef.current);
+    setGeoState("error");
+    setGeoErrorVisible(true);
+    geoToastTimerRef.current = setTimeout(() => {
+      if (isMountedRef.current) {
+        // Fade out first (CSS transition handles 200 ms), then reset state.
+        setGeoErrorVisible(false);
+        setTimeout(() => {
+          if (isMountedRef.current) setGeoState("idle");
+        }, 220);
+      }
+    }, 3000);
+  };
+
   // Request geolocation and feed coordinates directly into the weather-fetch flow.
   // Independent of the search input — typing in the search bar has no effect here.
   const handleGeoClick = () => {
     if (geoState === "loading") return;
     setGeoState("loading");
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      async (position) => {
         if (!isMountedRef.current) return;
         const lat = Number(position.coords.latitude);
         const lon = Number(position.coords.longitude);
-        
-        // Reset display state local properties before parent triggers unmount
-        setGeoState("idle");
-
-        // Trigger parent state updates that unmount this component
-        handleWeatherData(null);
-        handleAirQuality(null);
-        handleCurrCity(null);
-        handleGeoCoords({ lat, lon });
-      },
-      () => {
-        if (!isMountedRef.current) return;
-        // Denied, timed out, or unavailable — show toast for 3 s then auto-reset
-        setGeoState("error");
-        setTimeout(() => {
+        try {
+          // Trigger parent state updates that fetch weather in background
+          await handleGeoCoords({ lat, lon });
           if (isMountedRef.current) {
             setGeoState("idle");
           }
-        }, 3000);
+        } catch (err) {
+          console.log("error set at: handleGeoClick catch block", err);
+          if (isMountedRef.current) showGeoError();
+        }
+      },
+      (geoErr) => {
+        if (!isMountedRef.current) return;
+        console.log("error set at: geolocation error callback", geoErr);
+        // Denied, timed out, or unavailable — show toast for 3 s then fade out
+        showGeoError();
       },
       { timeout: 9000, maximumAge: 1000 * 60 * 5 }
     );
@@ -281,27 +356,34 @@ const NavBarForm = ({
         />
       </form>
 
-      {/* Geolocation button — trailing edge inside the pill, independent of search */}
+      {/* Geolocation button — fixed 24×24 px so icon swap never shifts layout */}
       <button
         type="button"
         id="geo-location-btn"
         onClick={handleGeoClick}
-        disabled={geoState === "loading"}
+        disabled={geoState === "loading" || isUpdatingLocation}
         title="Use my current location"
         aria-label="Use my current location"
         className={clsx(
-          "shrink-0 flex items-center justify-center w-6 h-6 rounded-full transition-all duration-200",
-          geoState === "idle" &&
+          // w-6 h-6 = 24×24 px fixed — CrosshairIcon (15px) and SmallSpinner (15px)
+          // are both smaller than the button, so swapping them causes no resize.
+          "relative shrink-0 flex items-center justify-center w-6 h-6 rounded-full transition-opacity duration-200",
+          geoState === "idle" && !isUpdatingLocation &&
             "text-accent-sky opacity-60 hover:opacity-100 hover:bg-white/10 cursor-pointer",
-          geoState === "loading" && "text-accent-sky opacity-40 cursor-not-allowed",
+          (geoState === "loading" || isUpdatingLocation) && "text-accent-sky opacity-40 cursor-not-allowed",
           geoState === "error" && "text-accent-coral opacity-80 cursor-pointer"
         )}
       >
-        <CrosshairIcon spinning={geoState === "loading"} />
+        {geoState === "loading" || isUpdatingLocation ? (
+          <SmallSpinner />
+        ) : (
+          <CrosshairIcon />
+        )}
       </button>
 
       {cityNotFound && <Tooltip />}
-      {geoState === "error" && <GeoErrorToast />}
+      {/* Toast is always in the DOM; visibility toggled via opacity transition */}
+      <GeoErrorToast isVisible={geoErrorVisible} />
 
       {isOpen && (
         <ul className="absolute top-[calc(100%+8px)] left-0 right-0 bg-navy-panel border border-panel-line rounded-xl list-none p-[8px_0] m-0 z-10 shadow-[0_8px_24px_rgba(0,0,0,0.4)] max-h-[250px] overflow-y-auto">

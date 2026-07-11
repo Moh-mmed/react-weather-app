@@ -72,3 +72,36 @@ body {
     min-height: unset;
   }
 }
+
+/* Smooth Fade-In animation for dashboard panels transitions */
+@keyframes fadeIn {
+  from {
+    opacity: 0.35;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ── Reduced motion ──────────────────────────────────────────────────────────
+   Disable all animations / transitions for users who request it.
+   The geo-button spinner uses Tailwind's motion-safe:animate-spin which already
+   respects this. The toast fade uses a CSS transition which we nullify here too. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fadeIn {
+    animation: none;
+    opacity: 1;
+  }
+
+  /* Flatten any remaining transition on the geo-error toast */
+  [role="status"][aria-live="polite"] {
+    transition: none !important;
+  }
+}
+
