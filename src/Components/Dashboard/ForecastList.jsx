@@ -180,7 +180,7 @@ const ForecastList = ({ weatherData }) => {
           gridTemplateColumns: `repeat(${Math.max(1, forecastDays.length)}, minmax(110px, 1fr))`,
         }}
       >
-        {forecastDays.map((day) => {
+        {forecastDays.map((day, index) => {
           const { weather, temp, dt, pop, humidity, wind_speed } = day;
           const { icon, main, description } = weather[0];
           const dayLabel = moment
@@ -190,6 +190,27 @@ const ForecastList = ({ weatherData }) => {
           const windKmh = Number.isFinite(wind_speed)
             ? Math.round(wind_speed * 3.6)
             : null;
+
+          let trendIcon = null;
+          if (index > 0) {
+            const prevHigh = forecastDays[index - 1].temp.max;
+            const diff = temp.max - prevHigh;
+            if (diff > 1) {
+              trendIcon = (
+                <svg viewBox="0 0 24 24" fill="none" stroke="#E2694A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 inline-block ml-0.5 relative -top-[1px]">
+                  <line x1="12" y1="19" x2="12" y2="5" />
+                  <polyline points="5 12 12 5 19 12" />
+                </svg>
+              );
+            } else if (diff < -1) {
+              trendIcon = (
+                <svg viewBox="0 0 24 24" fill="none" stroke="#4FA3D9" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3.5 h-3.5 inline-block ml-0.5 relative -top-[1px]">
+                  <line x1="12" y1="5" x2="12" y2="19" />
+                  <polyline points="19 12 12 19 5 12" />
+                </svg>
+              );
+            }
+          }
 
           return (
             <div
@@ -211,9 +232,9 @@ const ForecastList = ({ weatherData }) => {
               </div>
 
               {/* Temp high / low */}
-              <div className="font-mono text-[14px] font-semibold leading-[1.2] max-desktop:flex-1 max-desktop:text-center">
-                <span>{temp.max}°</span>{" "}
-                <span className="text-muted font-normal">/ {temp.min}°</span>
+              <div className="font-mono text-[14px] font-semibold leading-[1.2] max-desktop:flex-1 max-desktop:text-center flex items-center max-desktop:justify-center">
+                <span className="flex items-center">{temp.max}°{trendIcon}</span>
+                <span className="text-muted font-normal ml-1">/ {temp.min}°</span>
               </div>
 
               {/* Meta rows */}
