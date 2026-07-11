@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { fetchCityPhoto } from "../../helpers/unsplashPhoto";
 import clsx from "clsx";
 import moment from "moment";
 import NavBarForm from "../Main/NavBar/NavBarForm";
@@ -76,6 +77,35 @@ const PageSpinner = () => (
 const LocationPage = ({ page, onRemove }) => {
   const { weatherData, airQuality, isPinned } = page;
 
+  // ── Unsplash city photo ───────────────────────────────────────────────────
+  // Fetch once per city name; the helper’s cache means this is a no-op on
+  // re-renders and page switches if we’’ve already fetched it this session.
+  const [cityPhoto, setCityPhoto] = useState(null);
+
+  useEffect(() => {
+    if (!page.city) return;
+    let cancelled = false;
+    // Build the context bag for the progressive fallback chain:
+    //   • state      — from geocoding response (may be null for many countries)
+    //   • country    — always present
+    //   • weatherMain — OWM condition string for the generic tier-4 fallback
+    const weatherMain = weatherData?.current?.weather?.[0]?.main ?? null;
+    fetchCityPhoto(page.city, {
+      state:       page.state ?? null,
+      country:     page.country ?? null,
+      weatherMain,
+    }).then((result) => {
+      if (!cancelled) setCityPhoto(result);
+    });
+    return () => {
+      cancelled = true;
+    };
+  // Re-fetch only when the city changes; weatherMain fluctuates but
+  // the cached photo (keyed by city) is stable enough for 30 days.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page.city]);
+  // ─────────────────────────────────────────────────────────────────────────
+
   if (!weatherData || !airQuality) {
     return <PageSpinner />;
   }
@@ -92,6 +122,7 @@ const LocationPage = ({ page, onRemove }) => {
           weatherData={weatherData}
           isPinned={isPinned}
           onRemove={onRemove}
+          cityPhoto={cityPhoto}
         />
         <HourlyOutlook weatherData={weatherData} />
         <ForecastList weatherData={weatherData} />

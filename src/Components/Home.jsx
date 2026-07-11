@@ -18,9 +18,9 @@ const LOCATION_KEY = "weatherme:lastLocation";
  * Persist the user's most recent location so the next visit loads instantly
  * without waiting on a geolocation permission prompt.
  */
-const saveLocation = (lat, lon, city, country) => {
+const saveLocation = (lat, lon, city, country, state) => {
   try {
-    localStorage.setItem(LOCATION_KEY, JSON.stringify({ lat, lon, city, country }));
+    localStorage.setItem(LOCATION_KEY, JSON.stringify({ lat, lon, city, country, state: state ?? null }));
   } catch (_) {
     // localStorage unavailable (private browsing / quota exceeded) — fail silently
   }
@@ -43,7 +43,8 @@ const loadSavedLocation = () => {
         p.city &&
         p.country
       ) {
-        return p;
+        // `state` is optional — older persisted records won't have it
+        return { lat: p.lat, lon: p.lon, city: p.city, country: p.country, state: p.state ?? null };
       }
     }
     // Migration: read legacy separate keys so existing users don't lose their location
@@ -218,9 +219,10 @@ const Home = () => {
         const currentCity = {
           city: response.data[0].name,
           country: response.data[0].country,
+          state: response.data[0].state ?? null,
         };
         setCurrCity(currentCity);
-        saveLocation(cor.lat, cor.lon, currentCity.city, currentCity.country);
+        saveLocation(cor.lat, cor.lon, currentCity.city, currentCity.country, currentCity.state);
         setApiError("");
       })
       .catch((err) => {
@@ -315,11 +317,12 @@ const Home = () => {
             const currentCity = {
               city: response.data[0].name,
               country: response.data[0].country,
+              state: response.data[0].state ?? null,
             };
             setCoords(cityCoords);
             setCurrCity(currentCity);
             setActiveIndex(0);
-            saveLocation(cityCoords.lat, cityCoords.lon, currentCity.city, currentCity.country);
+            saveLocation(cityCoords.lat, cityCoords.lon, currentCity.city, currentCity.country, currentCity.state);
             setApiError("");
           } else {
             // City not found: restore previous location from saved data
@@ -460,6 +463,7 @@ const Home = () => {
       isPinned: true,
       city: currCity?.city || "",
       country: currCity?.country || "",
+      state: currCity?.state ?? null,
       lat: coords?.lat,
       lon: coords?.lon,
       weatherData,
@@ -472,6 +476,7 @@ const Home = () => {
         isPinned: false,
         city: loc.city,
         country: loc.country,
+        state: loc.state ?? null,
         lat: loc.lat,
         lon: loc.lon,
         weatherData: cached.weatherData || null,
