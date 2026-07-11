@@ -1,4 +1,7 @@
-const HeroPanel = ({ weatherData }) => {
+import { useState, useEffect } from "react";
+import clsx from "clsx";
+
+const HeroPanel = ({ weatherData, isPinned = true, onRemove }) => {
   const { current, daily } = weatherData;
   const { temp, feels_like, weather } = current;
   const { description, icon } = weather[0];
@@ -11,6 +14,16 @@ const HeroPanel = ({ weatherData }) => {
     : "--";
   const displayHigh = Number.isFinite(high) ? high : "--";
   const displayLow = Number.isFinite(low) ? low : "--";
+
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
+  useEffect(() => {
+    if (!confirmDelete) return;
+    const timer = setTimeout(() => {
+      setConfirmDelete(false);
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [confirmDelete]);
 
   return (
     <section
@@ -25,6 +38,42 @@ const HeroPanel = ({ weatherData }) => {
           filter: "blur(10px)",
         }}
       />
+
+      {/* Remove Button for Saved Locations */}
+      {!isPinned && (
+        <div className="absolute top-4 right-4 z-20 flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (confirmDelete) {
+                onRemove();
+              } else {
+                setConfirmDelete(true);
+              }
+            }}
+            className={clsx(
+              "px-2.5 py-1.5 rounded-full text-[11px] font-medium transition-all duration-150 flex items-center gap-1.5 shadow-md cursor-pointer",
+              confirmDelete
+                ? "bg-accent-coral text-white hover:bg-red-600 border border-transparent"
+                : "bg-white/10 hover:bg-white/20 text-muted hover:text-primary border border-white/5"
+            )}
+            onMouseLeave={() => setConfirmDelete(false)}
+          >
+            {confirmDelete ? (
+              <span>Confirm delete?</span>
+            ) : (
+              <>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="11" height="11">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+                <span>Remove</span>
+              </>
+            )}
+          </button>
+        </div>
+      )}
 
       {/* Left content */}
       <div className="flex flex-col gap-1.5 z-10">

@@ -80,6 +80,18 @@ const Home = () => {
   const [apiError, setApiError] = useState("");
   const [isUpdatingLocation, setIsUpdatingLocation] = useState(false);
 
+  // Saved locations state & data cache
+  const [savedLocations, setSavedLocations] = useState(() => {
+    try {
+      const saved = localStorage.getItem("weatherme:savedLocations");
+      return saved ? JSON.parse(saved) : [];
+    } catch (_) {
+      return [];
+    }
+  });
+  const [savedWeatherData, setSavedWeatherData] = useState({});
+  const [activeIndex, setActiveIndex] = useState(0);
+
   const lastFetchedCoordsRef = useRef(null);
 
   const handleApiError = (err, fallbackMessage) => {
@@ -94,7 +106,104 @@ const Home = () => {
     setApiError(fallbackMessage);
   };
 
+  // Persist saved locations list to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem("weatherme:savedLocations", JSON.stringify(savedLocations));
+    } catch (_) {}
+  }, [savedLocations]);
 
+  const addSavedLocation = useCallback((loc) => {
+    const isDuplicate = savedLocations.some(
+      (item) =>
+        Math.abs(item.lat - loc.lat) < 0.01 && Math.abs(item.lon - loc.lon) < 0.01
+    );
+    if (!isDuplicate) {
+      setSavedLocations((prev) => {
+        const next = [...prev, loc];
+        // Automatically scroll to the newly added location page
+        setActiveIndex(next.length);
+        return next;
+      });
+    }
+  }, [savedLocations]);
+
+  const removeSavedLocation = useCallback((lat, lon) => {
+    setSavedLocations((prev) =>
+      prev.filter((item) => !(Math.abs(item.lat - lat) < 0.01 && Math.abs(item.lon - lon) < 0.01))
+    );
+    setSavedWeatherData((prev) => {
+      const next = { ...prev };
+      const key = Object.keys(next).find(k => {
+        const [klat, klon] = k.split(",").map(Number);
+        return Math.abs(klat - lat) < 0.01 && Math.abs(klon - lon) < 0.01;
+      });
+      if (key) delete next[key];
+      return next;
+    });
+  }, []);
+
+  const fetchWeatherDataForLocation = useCallback(async (lat, lon) => {
+    const key = `${lat},${lon}`;
+    const currentWeatherURL = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${OPEN_WEATHER_API_KEY}`;
+    const forecastURL = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${OPEN_WEATHER_API_KEY}`;
+    const uviURL = `https://api.openweathermap.org/data/2.5/uvi?lat=${lat}&lon=${lon}&appid=${OPEN_WEATHER_API_KEY}`;
+    const oneCallURL = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=minutely,alerts&units=metric&appid=${OPEN_WEATHER_API_KEY}`;
+    const airQualityURL = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${OPEN_WEATHER_API_KEY}`;
+
+    try {
+      const [currentResponse, forecastResponse, uviResponse, airQualityResponse] = await Promise.all([
+        axios.get(currentWeatherURL, { headers: { Accept: "application/json" } }),
+        axios.get(forecastURL, { headers: { Accept: "application/json" } }),
+        axios.get(uviURL, { headers: { Accept: "application/json" } }),
+        axios.get(airQualityURL, { headers: { Accept: "application/json" } }),
+      ]);
+
+      let oneCallResponse = null;
+      try {
+        oneCallResponse = await axios.get(oneCallURL, {
+          headers: { Accept: "application/json" },
+        });
+      } catch (oneCallErr) {
+        // ignore or fallback
+      }
+
+      const payload = buildOpenWeatherPayload(
+        currentResponse,
+        forecastResponse,
+        uviResponse,
+        oneCallResponse
+      );
+
+      setSavedWeatherData((prev) => ({
+        ...prev,
+        [key]: {
+          weatherData: payload,
+          airQuality: airQualityResponse.data,
+        },
+      }));
+    } catch (err) {
+      console.error(`Failed to fetch weather for location ${lat}, ${lon}:`, err);
+    }
+  }, []);
+
+  // Lazy pre-fetching effect
+  useEffect(() => {
+    if (!OPEN_WEATHER_API_KEY) return;
+
+    // Fetch active index and neighbors (e.g. index-1, index+1) if they are saved locations
+    const indicesToFetch = [activeIndex, activeIndex - 1, activeIndex + 1].filter(
+      (idx) => idx > 0 && idx <= savedLocations.length
+    );
+
+    indicesToFetch.forEach((idx) => {
+      const loc = savedLocations[idx - 1];
+      const key = `${loc.lat},${loc.lon}`;
+      if (savedWeatherData[key]) return; // already cached!
+
+      fetchWeatherDataForLocation(loc.lat, loc.lon);
+    });
+  }, [activeIndex, savedLocations, savedWeatherData, fetchWeatherDataForLocation]);
 
   // Lifted to component level so it's callable from both the init useEffect
   // and from handleGeoCoords (triggered by the geolocation button in NavBarForm).
@@ -130,6 +239,7 @@ const Home = () => {
       
       // Update coords to trigger the existing data-fetching useEffects
       setCoords(cityCoords);
+      setActiveIndex(0);
       
       // Reverse geocode to get the city name and save the new location
       findCityName(cityCoords);
@@ -208,6 +318,7 @@ const Home = () => {
             };
             setCoords(cityCoords);
             setCurrCity(currentCity);
+            setActiveIndex(0);
             saveLocation(cityCoords.lat, cityCoords.lon, currentCity.city, currentCity.country);
             setApiError("");
           } else {
@@ -216,6 +327,7 @@ const Home = () => {
             if (prev) {
               setCoords({ lat: prev.lat, lon: prev.lon });
               setCurrCity({ city: prev.city, country: prev.country });
+              setActiveIndex(0);
             }
             setCityNotFound(true);
             setTimeout(() => setCityNotFound(false), 4000);
@@ -343,8 +455,38 @@ const Home = () => {
     }
   }, [coords]);
 
+  const allPages = [
+    {
+      isPinned: true,
+      city: currCity?.city || "",
+      country: currCity?.country || "",
+      lat: coords?.lat,
+      lon: coords?.lon,
+      weatherData,
+      airQuality,
+    },
+    ...savedLocations.map((loc) => {
+      const key = `${loc.lat},${loc.lon}`;
+      const cached = savedWeatherData[key] || {};
+      return {
+        isPinned: false,
+        city: loc.city,
+        country: loc.country,
+        lat: loc.lat,
+        lon: loc.lon,
+        weatherData: cached.weatherData || null,
+        airQuality: cached.airQuality || null,
+      };
+    }),
+  ];
+
+  const activePage = allPages[activeIndex] || {};
+  const activeWeatherData = activePage.weatherData || weatherData;
+  const activeAirQuality = activePage.airQuality || airQuality;
+  const activeCurrCity = activePage.city ? { city: activePage.city, country: activePage.country } : currCity;
+
   return (
-    <WeatherContext.Provider value={{ weatherData, airQuality, currCity }}>
+    <WeatherContext.Provider value={{ weatherData: activeWeatherData, airQuality: activeAirQuality, currCity: activeCurrCity }}>
       {apiError ? (
         <Error message={apiError} />
       ) : weatherData === null || airQuality === null || currCity === null ? (
@@ -361,6 +503,12 @@ const Home = () => {
           handleAirQuality={setAirQuality}
           handleCurrCity={setCurrCity}
           handleGeoCoords={handleGeoCoords}
+          allPages={allPages}
+          activeIndex={activeIndex}
+          setActiveIndex={setActiveIndex}
+          savedLocations={savedLocations}
+          handleAddSavedLocation={addSavedLocation}
+          handleRemoveLocation={removeSavedLocation}
         />
       )}
     </WeatherContext.Provider>

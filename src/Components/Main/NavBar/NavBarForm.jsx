@@ -107,6 +107,8 @@ const NavBarForm = ({
   handleGeoCoords,
   cityNotFound,
   isUpdatingLocation,
+  handleAddSavedLocation,
+  savedLocations = [],
 }) => {
   const [enteredCity, setEnteredCity] = useState("");
   const [suggestions, setSuggestions] = useState([]);
@@ -392,19 +394,61 @@ const NavBarForm = ({
               const formattedLocation = suggestion.state
                 ? `${suggestion.state}, ${suggestion.country}`
                 : suggestion.country;
+              const isSaved = savedLocations.some(
+                (loc) =>
+                  Math.abs(loc.lat - suggestion.lat) < 0.01 &&
+                  Math.abs(loc.lon - suggestion.lon) < 0.01
+              );
               return (
                 <li
                   key={`${suggestion.lat}-${suggestion.lon}-${index}`}
                   className={clsx(
-                    "px-[18px] py-2.5 cursor-pointer text-primary font-sans flex flex-col transition-colors duration-150 ease-out",
+                    "px-[18px] py-2.5 cursor-pointer text-primary font-sans flex items-center justify-between transition-colors duration-150 ease-out",
                     index === activeIndex ? "bg-white/5" : "bg-transparent",
                     "hover:bg-white/5"
                   )}
                   onClick={() => selectSuggestion(suggestion)}
                   onMouseEnter={() => setActiveIndex(index)}
                 >
-                  <span className="text-[14px] font-medium">{suggestion.name}</span>
-                  <span className="text-[12px] text-muted mt-0.5">{formattedLocation}</span>
+                  <div className="flex flex-col flex-1">
+                    <span className="text-[14px] font-medium">{suggestion.name}</span>
+                    <span className="text-[12px] text-muted mt-0.5">{formattedLocation}</span>
+                  </div>
+
+                  {handleAddSavedLocation && (
+                    <button
+                      type="button"
+                      title={isSaved ? "Saved" : "Save location"}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (!isSaved) {
+                          handleAddSavedLocation({
+                            city: suggestion.name,
+                            country: suggestion.country,
+                            lat: Number(suggestion.lat),
+                            lon: Number(suggestion.lon),
+                          });
+                        }
+                      }}
+                      className={clsx(
+                        "w-7 h-7 rounded-full flex items-center justify-center transition-all duration-150 ml-2 shrink-0",
+                        isSaved
+                          ? "text-accent-sky opacity-80 cursor-default"
+                          : "bg-white/5 border border-white/10 hover:bg-white/20 text-primary cursor-pointer"
+                      )}
+                    >
+                      {isSaved ? (
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="13" height="13">
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      ) : (
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="13" height="13">
+                          <line x1="12" y1="5" x2="12" y2="19" />
+                          <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                      )}
+                    </button>
+                  )}
                 </li>
               );
             })
