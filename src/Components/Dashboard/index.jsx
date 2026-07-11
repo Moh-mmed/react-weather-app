@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { fetchCityPhoto } from "../../helpers/unsplashPhoto";
+import { fetchHeroImage, clearHeroImageCache } from "../../helpers/heroImageFetcher";
 import clsx from "clsx";
 import moment from "moment";
 import NavBarForm from "../Main/NavBar/NavBarForm";
@@ -10,6 +10,25 @@ import SunPositionPanel from "./SunPositionPanel";
 import AirQualityPanel from "./AirQualityPanel";
 import ForecastList from "./ForecastList";
 import { formatTime24 } from "../../helpers/timeFormat";
+
+// ─── One-time cache bust & migration ──────────────────────────────────────────
+const CACHE_VERSION = "3-commons";
+const CACHE_VERSION_KEY = "weatherme:img_cache_v";
+(() => {
+  try {
+    const stored = localStorage.getItem(CACHE_VERSION_KEY);
+    if (stored !== CACHE_VERSION) {
+      clearHeroImageCache();
+      // Clean up old Unsplash caches to free space
+      Object.keys(localStorage).forEach(k => {
+        if (k.startsWith("weatherme:unsplash")) {
+          localStorage.removeItem(k);
+        }
+      });
+      localStorage.setItem(CACHE_VERSION_KEY, CACHE_VERSION);
+    }
+  } catch { /* localStorage unavailable */ }
+})();
 
 // ─── Brand icon ──────────────────────────────────────────────────────────────
 const BrandIcon = () => (
@@ -85,13 +104,14 @@ const LocationPage = ({ page, onRemove }) => {
   useEffect(() => {
     if (!page.city) return;
     let cancelled = false;
-    // Build the context bag for the progressive fallback chain:
-    //   • state      — from geocoding response (may be null for many countries)
+    // Build the context bag for the Nominatim + Commons fallback chain:
+    //   • lat, lon   — required for Nominatim reverse-geocoding
     //   • country    — always present
-    //   • weatherMain — OWM condition string for the generic tier-4 fallback
+    //   • weatherMain — OWM condition string for the generic tier fallback
     const weatherMain = weatherData?.current?.weather?.[0]?.main ?? null;
-    fetchCityPhoto(page.city, {
-      state:       page.state ?? null,
+    fetchHeroImage(page.city, {
+      lat:         page.lat ?? null,
+      lon:         page.lon ?? null,
       country:     page.country ?? null,
       weatherMain,
     }).then((result) => {
@@ -100,8 +120,7 @@ const LocationPage = ({ page, onRemove }) => {
     return () => {
       cancelled = true;
     };
-  // Re-fetch only when the city changes; weatherMain fluctuates but
-  // the cached photo (keyed by city) is stable enough for 30 days.
+  // Re-fetch only when the city changes
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page.city]);
   // ─────────────────────────────────────────────────────────────────────────
