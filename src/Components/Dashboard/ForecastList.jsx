@@ -1,4 +1,5 @@
-import moment from "moment";
+import { useTranslation } from "react-i18next";
+import { translateConditionMain, translateConditionDescription } from "../../helpers/weatherConditionTranslator";
 
 const CalendarIcon = () => (
   <svg
@@ -15,20 +16,11 @@ const CalendarIcon = () => (
   </svg>
 );
 
-/**
- * Large decorative background glyph for the 7-Day Forecast panel.
- * Uses a calendar-plus-sun motif to echo the panel's purpose without
- * competing with the data. Opacity ~8–10%, pointer-events-none.
- *
- * The glyph style is chosen by the dominant weather condition across the
- * forecast days (majority-vote on icon code prefix).
- */
 const ForecastBackgroundGlyph = ({ dominantCode, isNight }) => {
   const code = dominantCode ?? "01";
 
   if (code === "01") {
     return isNight ? (
-      // Moon + stars
       <svg
         viewBox="0 0 100 100"
         fill="none"
@@ -48,7 +40,6 @@ const ForecastBackgroundGlyph = ({ dominantCode, isNight }) => {
         <circle cx="70" cy="12" r="2" stroke="currentColor" strokeWidth="2" />
       </svg>
     ) : (
-      // Bright sun with wide rays
       <svg
         viewBox="0 0 100 100"
         fill="none"
@@ -78,7 +69,6 @@ const ForecastBackgroundGlyph = ({ dominantCode, isNight }) => {
   }
 
   if (code === "02" || code === "03" || code === "04") {
-    // Layered clouds
     return (
       <svg
         viewBox="0 0 100 100"
@@ -112,7 +102,6 @@ const ForecastBackgroundGlyph = ({ dominantCode, isNight }) => {
   }
 
   if (code === "09" || code === "10") {
-    // Rain drops falling from cloud
     return (
       <svg
         viewBox="0 0 100 100"
@@ -194,7 +183,6 @@ const ForecastBackgroundGlyph = ({ dominantCode, isNight }) => {
     );
   }
 
-  // Default / mist / haze — horizontal wave lines
   return (
     <svg
       viewBox="0 0 100 100"
@@ -214,12 +202,12 @@ const ForecastBackgroundGlyph = ({ dominantCode, isNight }) => {
 };
 
 const ForecastList = ({ weatherData }) => {
+  const { t, i18n } = useTranslation();
   const { daily, timezone_offset } = weatherData;
   const forecastDays = daily.slice(0, 7);
-  const forecastTitle =
-    forecastDays.length === 7
-      ? "7-Day Forecast"
-      : `${forecastDays.length}-Day Forecast`;
+  const forecastTitle = t("forecast.titleWithCount", { count: forecastDays.length });
+
+  const activeLocale = i18n.language?.startsWith("fr") ? "fr-FR" : "en-US";
 
   return (
     <section
@@ -232,9 +220,7 @@ const ForecastList = ({ weatherData }) => {
         {forecastTitle}
       </div>
 
-      {/* Panel-level decorative glyph removed — now rendered per-card. */}
-
-      {/* Forecast grid — horizontal scroll on desktop, wrapping below */}
+      {/* Forecast grid */}
       <div
         className="mt-3 flex-1 min-h-0 grid gap-2.5 w-full items-stretch justify-stretch overflow-x-auto overflow-y-hidden pb-4
                    [&::-webkit-scrollbar]:h-[6px] [&::-webkit-scrollbar-thumb]:bg-white/15 [&::-webkit-scrollbar-thumb]:rounded-full
@@ -245,11 +231,16 @@ const ForecastList = ({ weatherData }) => {
       >
         {forecastDays.map((day, index) => {
           const { weather, temp, dt, pop, humidity, wind_speed } = day;
-          const { icon, main, description } = weather[0];
-          const dayLabel = moment
-            .unix(dt)
-            .utcOffset(timezone_offset / 3600)
-            .format("ddd, MMM DD");
+          const { icon } = weather[0];
+          const translatedMain = translateConditionMain(weather[0], t);
+          const translatedDesc = translateConditionDescription(weather[0], t);
+
+          const localDate = new Date((dt + (timezone_offset || 0)) * 1000);
+          const dayName = new Intl.DateTimeFormat(activeLocale, { weekday: "short", timeZone: "UTC" }).format(localDate);
+          const monthName = new Intl.DateTimeFormat(activeLocale, { month: "short", timeZone: "UTC" }).format(localDate);
+          const dayNum = new Intl.DateTimeFormat(activeLocale, { day: "2-digit", timeZone: "UTC" }).format(localDate);
+          const dayLabel = `${dayName}, ${monthName} ${dayNum}`;
+
           const windKmh = Number.isFinite(wind_speed)
             ? Math.round(wind_speed * 3.6)
             : null;
@@ -297,7 +288,6 @@ const ForecastList = ({ weatherData }) => {
               className="relative overflow-hidden bg-white/[0.035] border border-panel-line rounded-card p-[10px_10px_8px] flex flex-col gap-1 min-w-0 w-full max-w-none flex-1 box-border self-stretch
                          max-desktop:flex-row max-desktop:items-center max-desktop:justify-between max-desktop:p-[8px_16px] max-desktop:gap-4"
             >
-              {/* Decorative background glyph — anchored top-right inside each card. */}
               <div
                 aria-hidden="true"
                 className="absolute top-2 right-2 pointer-events-none text-accent-sun opacity-[0.08]"
@@ -307,19 +297,20 @@ const ForecastList = ({ weatherData }) => {
                   isNight={icon?.endsWith("n")}
                 />
               </div>
+
               {/* Card top: Day text + Icon */}
               <div className="flex items-start justify-between gap-2 w-full max-desktop:w-auto max-desktop:items-center max-desktop:gap-3">
                 <div>
-                  <div className="text-[12.5px] font-semibold leading-[1.2]">
+                  <div className="text-[12.5px] font-semibold leading-[1.2] capitalize">
                     {dayLabel}
                   </div>
                   <div className="text-[11px] text-muted capitalize leading-[1.2] max-desktop:hidden">
-                    {main}
+                    {translatedMain}
                   </div>
                 </div>
                 <img
                   src={`https://openweathermap.org/img/wn/${icon}@2x.png`}
-                  alt={description}
+                  alt={translatedDesc}
                   className="w-8 h-8 shrink-0"
                 />
               </div>
@@ -338,7 +329,7 @@ const ForecastList = ({ weatherData }) => {
               <div className="grid gap-[2px] mt-auto max-desktop:mt-0 max-desktop:flex max-desktop:items-center max-desktop:gap-5 max-desktop:flex-none">
                 <div className="flex justify-between gap-1.5 text-[10px] text-muted whitespace-nowrap max-desktop:flex-col max-desktop:gap-0 max-desktop:items-end">
                   <span className="max-desktop:text-[9px] max-desktop:opacity-85">
-                    Precip
+                    {t("forecast.precip")}
                   </span>
                   <b className="text-primary font-mono font-medium">
                     {pop ?? 0}%
@@ -346,7 +337,7 @@ const ForecastList = ({ weatherData }) => {
                 </div>
                 <div className="flex justify-between gap-1.5 text-[10px] text-muted whitespace-nowrap max-desktop:flex-col max-desktop:gap-0 max-desktop:items-end">
                   <span className="max-desktop:text-[9px] max-desktop:opacity-85">
-                    Humidity
+                    {t("forecast.humidity")}
                   </span>
                   <b className="text-primary font-mono font-medium">
                     {Number.isFinite(humidity) ? `${humidity}%` : "--"}
@@ -354,10 +345,10 @@ const ForecastList = ({ weatherData }) => {
                 </div>
                 <div className="flex justify-between gap-1.5 text-[10px] text-muted whitespace-nowrap max-desktop:flex-col max-desktop:gap-0 max-desktop:items-end">
                   <span className="max-desktop:text-[9px] max-desktop:opacity-85">
-                    Wind
+                    {t("forecast.wind")}
                   </span>
                   <b className="text-primary font-mono font-medium">
-                    {Number.isFinite(windKmh) ? `${windKmh} km/h` : "--"}
+                    {Number.isFinite(windKmh) ? `${windKmh} ${t("stats.unitKmH")}` : "--"}
                   </b>
                 </div>
               </div>

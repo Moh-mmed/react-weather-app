@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import getTiming from "../../helpers/getTiming";
 import { getUviDescription } from "../../helpers/getUVI";
 import { getSunArcPoint, SUN_ARC_BASE } from "../../helpers/sunArc";
@@ -11,6 +12,7 @@ const SunIcon = () => (
 );
 
 const SunPositionPanel = ({ weatherData }) => {
+  const { t } = useTranslation();
   const { current, timezone_offset } = weatherData;
   const { dt, uvi, sunrise, sunset } = current;
   const { day, width, Sunrise, Sunset } = getTiming(
@@ -22,7 +24,7 @@ const SunPositionPanel = ({ weatherData }) => {
   const progress = day ? width / 100 : 0;
   const arcPoint = getSunArcPoint(progress);
   const UVI = Number.isFinite(uvi) ? Math.round(uvi) : "--";
-  const uviCopy = getUviDescription(Number.isFinite(uvi) ? uvi : null);
+  const uviCopy = getUviDescription(Number.isFinite(uvi) ? uvi : null, t);
 
   return (
     <section
@@ -32,7 +34,7 @@ const SunPositionPanel = ({ weatherData }) => {
       {/* Panel title */}
       <div className="text-[12px] uppercase tracking-[1.2px] text-muted font-semibold mb-1 flex items-center gap-2">
         <SunIcon />
-        Sun Position
+        {t("sun.title")}
       </div>
 
       {/* Arc and labels */}
@@ -73,11 +75,11 @@ const SunPositionPanel = ({ weatherData }) => {
         {/* Sunrise / Sunset labels */}
         <div className="flex justify-between w-full mt-0.5">
           <div className="text-left">
-            <div className="text-[11px] text-muted uppercase tracking-[0.6px]">Sunrise</div>
+            <div className="text-[11px] text-muted uppercase tracking-[0.6px]">{t("sun.sunrise")}</div>
             <div className="font-mono text-[14px] font-medium mt-0.5">{Sunrise}</div>
           </div>
           <div className="text-right">
-            <div className="text-[11px] text-muted uppercase tracking-[0.6px]">Sunset</div>
+            <div className="text-[11px] text-muted uppercase tracking-[0.6px]">{t("sun.sunset")}</div>
             <div className="font-mono text-[14px] font-medium mt-0.5">{Sunset}</div>
           </div>
         </div>

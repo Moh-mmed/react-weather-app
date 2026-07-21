@@ -31,5 +31,11 @@ const getDirection = (deg) => {
   return { abbr: match.abbr, full: match.full };
 };
 
-export const getWindDirectionAbbr = (deg) => getDirection(deg).abbr;
+export const getWindDirectionAbbr = (deg, t) => {
+  const abbr = getDirection(deg).abbr;
+  if (t && abbr !== "--") {
+    return t(`windDirections.${abbr}`, { defaultValue: abbr });
+  }
+  return abbr;
+};
 export const getWindDirectionFull = (deg) => getDirection(deg).full;

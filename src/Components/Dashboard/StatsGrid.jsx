@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import clsx from "clsx";
 import { getDewPoint } from "../../helpers/getDewPoint";
 import { getWindDirectionAbbr } from "../../helpers/getWindDirection";
@@ -16,6 +17,7 @@ const StatIcon = ({ children }) => (
 );
 
 const StatsGrid = ({ weatherData }) => {
+  const { t, i18n } = useTranslation();
   const trackRef = useRef(null);
   const dragStateRef = useRef({
     active: false,
@@ -36,20 +38,23 @@ const StatsGrid = ({ weatherData }) => {
     clouds,
   } = current;
 
+  const activeLocale = i18n.language?.startsWith("fr") ? "fr-FR" : "en-US";
+  const numFormatter = new Intl.NumberFormat(activeLocale);
+
   const dewPoint = getDewPoint(temp, humidity);
   const windKmh = Number.isFinite(wind_speed)
     ? Math.round(wind_speed * 3.6)
     : "--";
-  const windDir = getWindDirectionAbbr(wind_deg);
+  const windDir = getWindDirectionAbbr(wind_deg, t);
   const visibilityKm = Number.isFinite(visibility)
     ? (visibility / 1000).toFixed(1)
     : "--";
 
   const stats = [
     {
-      label: "Pressure",
-      value: Number.isFinite(pressure) ? pressure : "--",
-      unit: "hPa",
+      label: t("stats.pressure"),
+      value: Number.isFinite(pressure) ? numFormatter.format(pressure) : "--",
+      unit: t("stats.unitHpa"),
       icon: (
         <>
           <path d="M4 16a8 8 0 0 1 16 0" />
@@ -60,15 +65,15 @@ const StatsGrid = ({ weatherData }) => {
       ),
     },
     {
-      label: "Humidity",
+      label: t("stats.humidity"),
       value: Number.isFinite(humidity) ? humidity : "--",
       unit: "%",
       icon: <path d="M12 3s6 7 6 11a6 6 0 1 1-12 0c0-4 6-11 6-11z" />,
     },
     {
-      label: "Wind",
-      value: windKmh,
-      unit: `km/h ${windDir}`,
+      label: t("stats.wind"),
+      value: Number.isFinite(windKmh) ? numFormatter.format(windKmh) : windKmh,
+      unit: `${t("stats.unitKmH")} ${windDir}`,
       icon: (
         <>
           <path d="M3 8h11a3 3 0 1 0-3-3" />
@@ -77,9 +82,9 @@ const StatsGrid = ({ weatherData }) => {
       ),
     },
     {
-      label: "Visibility",
-      value: visibilityKm,
-      unit: "km",
+      label: t("stats.visibility"),
+      value: Number.isFinite(visibility) ? numFormatter.format((visibility / 1000).toFixed(1)) : visibilityKm,
+      unit: t("stats.unitKm"),
       icon: (
         <>
           <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" />
@@ -88,7 +93,7 @@ const StatsGrid = ({ weatherData }) => {
       ),
     },
     {
-      label: "Dew Point",
+      label: t("stats.dewPoint"),
       value: Number.isFinite(dewPoint) ? dewPoint : "--",
       unit: "°C",
       icon: (
@@ -99,7 +104,7 @@ const StatsGrid = ({ weatherData }) => {
       ),
     },
     {
-      label: "Cloud Cover",
+      label: t("stats.cloudCover"),
       value: Number.isFinite(clouds) ? clouds : "--",
       unit: "%",
       icon: (

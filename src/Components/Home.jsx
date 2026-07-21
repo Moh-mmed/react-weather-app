@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import axios from "axios";
 
 import WeatherContext from "../contexts/WeatherContext";
@@ -20,7 +21,10 @@ const LOCATION_KEY = "weatherme:lastLocation";
  */
 const saveLocation = (lat, lon, city, country, state) => {
   try {
-    localStorage.setItem(LOCATION_KEY, JSON.stringify({ lat, lon, city, country, state: state ?? null }));
+    localStorage.setItem(
+      LOCATION_KEY,
+      JSON.stringify({ lat, lon, city, country, state: state ?? null }),
+    );
   } catch (_) {
     // localStorage unavailable (private browsing / quota exceeded) — fail silently
   }
@@ -44,12 +48,18 @@ const loadSavedLocation = () => {
         p.country
       ) {
         // `state` is optional — older persisted records won't have it
-        return { lat: p.lat, lon: p.lon, city: p.city, country: p.country, state: p.state ?? null };
+        return {
+          lat: p.lat,
+          lon: p.lon,
+          city: p.city,
+          country: p.country,
+          state: p.state ?? null,
+        };
       }
     }
     // Migration: read legacy separate keys so existing users don't lose their location
     const oldCoords = JSON.parse(localStorage.getItem("coordinates"));
-    const oldCity   = JSON.parse(localStorage.getItem("currentCity"));
+    const oldCity = JSON.parse(localStorage.getItem("currentCity"));
     if (
       oldCoords &&
       typeof oldCoords.lat === "number" &&
@@ -72,6 +82,7 @@ const loadSavedLocation = () => {
 // ──────────────────────────────────────────────────────────────────────────
 
 const Home = () => {
+  const { t } = useTranslation();
   const [searchCity, setSearchCity] = useState(null);
   const [currCity, setCurrCity] = useState(null);
   const [coords, setCoords] = useState(null);
@@ -95,47 +106,55 @@ const Home = () => {
 
   const lastFetchedCoordsRef = useRef(null);
 
-  const handleApiError = (err, fallbackMessage) => {
+  const handleApiError = (err, fallbackKey) => {
     const status = err?.response?.status;
     if (status === 401) {
-      setApiError(
-        "OpenWeather rejected the request. Add a valid REACT_APP_OPENWEATHER_API_KEY to your .env file."
-      );
+      setApiError("error.rejectedKey");
       return;
     }
 
-    setApiError(fallbackMessage);
+    setApiError(fallbackKey);
   };
 
   // Persist saved locations list to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem("weatherme:savedLocations", JSON.stringify(savedLocations));
+      localStorage.setItem(
+        "weatherme:savedLocations",
+        JSON.stringify(savedLocations),
+      );
     } catch (_) {}
   }, [savedLocations]);
 
-  const addSavedLocation = useCallback((loc) => {
-    const isDuplicate = savedLocations.some(
-      (item) =>
-        Math.abs(item.lat - loc.lat) < 0.01 && Math.abs(item.lon - loc.lon) < 0.01
-    );
-    if (!isDuplicate) {
-      setSavedLocations((prev) => {
-        const next = [...prev, loc];
-        // Automatically scroll to the newly added location page
-        setActiveIndex(next.length);
-        return next;
-      });
-    }
-  }, [savedLocations]);
+  const addSavedLocation = useCallback(
+    (loc) => {
+      const isDuplicate = savedLocations.some(
+        (item) =>
+          Math.abs(item.lat - loc.lat) < 0.01 &&
+          Math.abs(item.lon - loc.lon) < 0.01,
+      );
+      if (!isDuplicate) {
+        setSavedLocations((prev) => {
+          const next = [...prev, loc];
+          // Automatically scroll to the newly added location page
+          setActiveIndex(next.length);
+          return next;
+        });
+      }
+    },
+    [savedLocations],
+  );
 
   const removeSavedLocation = useCallback((lat, lon) => {
     setSavedLocations((prev) =>
-      prev.filter((item) => !(Math.abs(item.lat - lat) < 0.01 && Math.abs(item.lon - lon) < 0.01))
+      prev.filter(
+        (item) =>
+          !(Math.abs(item.lat - lat) < 0.01 && Math.abs(item.lon - lon) < 0.01),
+      ),
     );
     setSavedWeatherData((prev) => {
       const next = { ...prev };
-      const key = Object.keys(next).find(k => {
+      const key = Object.keys(next).find((k) => {
         const [klat, klon] = k.split(",").map(Number);
         return Math.abs(klat - lat) < 0.01 && Math.abs(klon - lon) < 0.01;
       });
@@ -153,8 +172,15 @@ const Home = () => {
     const airQualityURL = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${OPEN_WEATHER_API_KEY}`;
 
     try {
-      const [currentResponse, forecastResponse, uviResponse, airQualityResponse] = await Promise.all([
-        axios.get(currentWeatherURL, { headers: { Accept: "application/json" } }),
+      const [
+        currentResponse,
+        forecastResponse,
+        uviResponse,
+        airQualityResponse,
+      ] = await Promise.all([
+        axios.get(currentWeatherURL, {
+          headers: { Accept: "application/json" },
+        }),
         axios.get(forecastURL, { headers: { Accept: "application/json" } }),
         axios.get(uviURL, { headers: { Accept: "application/json" } }),
         axios.get(airQualityURL, { headers: { Accept: "application/json" } }),
@@ -173,7 +199,7 @@ const Home = () => {
         currentResponse,
         forecastResponse,
         uviResponse,
-        oneCallResponse
+        oneCallResponse,
       );
 
       setSavedWeatherData((prev) => ({
@@ -184,7 +210,10 @@ const Home = () => {
         },
       }));
     } catch (err) {
-      console.error(`Failed to fetch weather for location ${lat}, ${lon}:`, err);
+      console.error(
+        `Failed to fetch weather for location ${lat}, ${lon}:`,
+        err,
+      );
     }
   }, []);
 
@@ -193,9 +222,11 @@ const Home = () => {
     if (!OPEN_WEATHER_API_KEY) return;
 
     // Fetch active index and neighbors (e.g. index-1, index+1) if they are saved locations
-    const indicesToFetch = [activeIndex, activeIndex - 1, activeIndex + 1].filter(
-      (idx) => idx > 0 && idx <= savedLocations.length
-    );
+    const indicesToFetch = [
+      activeIndex,
+      activeIndex - 1,
+      activeIndex + 1,
+    ].filter((idx) => idx > 0 && idx <= savedLocations.length);
 
     indicesToFetch.forEach((idx) => {
       const loc = savedLocations[idx - 1];
@@ -204,7 +235,12 @@ const Home = () => {
 
       fetchWeatherDataForLocation(loc.lat, loc.lon);
     });
-  }, [activeIndex, savedLocations, savedWeatherData, fetchWeatherDataForLocation]);
+  }, [
+    activeIndex,
+    savedLocations,
+    savedWeatherData,
+    fetchWeatherDataForLocation,
+  ]);
 
   // Lifted to component level so it's callable from both the init useEffect
   // and from handleGeoCoords (triggered by the geolocation button in NavBarForm).
@@ -222,14 +258,23 @@ const Home = () => {
           state: response.data[0].state ?? null,
         };
         setCurrCity(currentCity);
-        saveLocation(cor.lat, cor.lon, currentCity.city, currentCity.country, currentCity.state);
+        saveLocation(
+          cor.lat,
+          cor.lon,
+          currentCity.city,
+          currentCity.country,
+          currentCity.state,
+        );
         setApiError("");
       })
       .catch((err) => {
         console.error(err);
-        handleApiError(err, "Unable to resolve the current city from your location.");
+        handleApiError(
+          err,
+          "error.reverseGeoFailed",
+        );
       });
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- closes over only stable state setters and a module-level constant
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- closes over only stable state setters and a module-level constant
   }, []);
 
   // Called by the geolocation button in NavBarForm.
@@ -238,22 +283,20 @@ const Home = () => {
   const handleGeoCoords = useCallback(
     ({ lat, lon }) => {
       const cityCoords = { lat: Number(lat), lon: Number(lon) };
-      
+
       // Update coords to trigger the existing data-fetching useEffects
       setCoords(cityCoords);
       setActiveIndex(0);
-      
+
       // Reverse geocode to get the city name and save the new location
       findCityName(cityCoords);
     },
-    [findCityName]
+    [findCityName],
   );
 
   useEffect(() => {
     if (!OPEN_WEATHER_API_KEY) {
-      setApiError(
-        "Missing REACT_APP_OPENWEATHER_API_KEY. Create a .env file with a valid OpenWeather key."
-      );
+      setApiError("error.missingKey");
       return;
     }
 
@@ -322,7 +365,13 @@ const Home = () => {
             setCoords(cityCoords);
             setCurrCity(currentCity);
             setActiveIndex(0);
-            saveLocation(cityCoords.lat, cityCoords.lon, currentCity.city, currentCity.country, currentCity.state);
+            saveLocation(
+              cityCoords.lat,
+              cityCoords.lon,
+              currentCity.city,
+              currentCity.country,
+              currentCity.state,
+            );
             setApiError("");
           } else {
             // City not found: restore previous location from saved data
@@ -338,7 +387,7 @@ const Home = () => {
         })
         .catch((err) => {
           console.error(err);
-          handleApiError(err, "Unable to look up that city right now.");
+          handleApiError(err, "error.cityNotFound");
         });
     };
     if (searchCity !== null) {
@@ -362,11 +411,16 @@ const Home = () => {
 
       const findWeather = async () => {
         try {
-          const [currentResponse, forecastResponse, uviResponse] = await Promise.all([
-            axios.get(currentWeatherURL, { headers: { Accept: "application/json" } }),
-            axios.get(forecastURL, { headers: { Accept: "application/json" } }),
-            axios.get(uviURL, { headers: { Accept: "application/json" } }),
-          ]);
+          const [currentResponse, forecastResponse, uviResponse] =
+            await Promise.all([
+              axios.get(currentWeatherURL, {
+                headers: { Accept: "application/json" },
+              }),
+              axios.get(forecastURL, {
+                headers: { Accept: "application/json" },
+              }),
+              axios.get(uviURL, { headers: { Accept: "application/json" } }),
+            ]);
 
           let oneCallResponse = null;
 
@@ -377,7 +431,7 @@ const Home = () => {
           } catch (oneCallErr) {
             if (!hasLoggedOneCallFallback) {
               console.info(
-                "[weather] One Call 3.0 not available on this API plan — using fallback"
+                "[weather] One Call 3.0 not available on this API plan — using fallback",
               );
               hasLoggedOneCallFallback = true;
             }
@@ -389,7 +443,7 @@ const Home = () => {
             currentResponse,
             forecastResponse,
             uviResponse,
-            oneCallResponse
+            oneCallResponse,
           );
 
           setWeatherData(payload);
@@ -398,7 +452,7 @@ const Home = () => {
         } catch (err) {
           if (!isMounted) return;
           console.error(err);
-          handleApiError(err, "Unable to load the weather forecast.");
+          handleApiError(err, "error.weatherFailed");
         }
       };
 
@@ -440,7 +494,7 @@ const Home = () => {
         } catch (err) {
           if (!isMounted) return;
           console.error(err);
-          handleApiError(err, "Unable to load the air quality report.");
+          handleApiError(err, "error.airPollutionFailed");
         }
       };
 
@@ -488,12 +542,20 @@ const Home = () => {
   const activePage = allPages[activeIndex] || {};
   const activeWeatherData = activePage.weatherData || weatherData;
   const activeAirQuality = activePage.airQuality || airQuality;
-  const activeCurrCity = activePage.city ? { city: activePage.city, country: activePage.country } : currCity;
+  const activeCurrCity = activePage.city
+    ? { city: activePage.city, country: activePage.country }
+    : currCity;
 
   return (
-    <WeatherContext.Provider value={{ weatherData: activeWeatherData, airQuality: activeAirQuality, currCity: activeCurrCity }}>
+    <WeatherContext.Provider
+      value={{
+        weatherData: activeWeatherData,
+        airQuality: activeAirQuality,
+        currCity: activeCurrCity,
+      }}
+    >
       {apiError ? (
-        <Error message={apiError} />
+        <Error message={t(apiError)} />
       ) : weatherData === null || airQuality === null || currCity === null ? (
         <Spinner />
       ) : (

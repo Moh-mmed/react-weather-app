@@ -1,0 +1,174 @@
+{
+  "header": {
+    "searchPlaceholder": "Search a city or coordinates…",
+    "geoBtnTitle": "Use my current location",
+    "geoError": "Couldn't get your location",
+    "loading": "Loading...",
+    "noMatches": "No matches",
+    "saved": "Saved",
+    "saveLocation": "Save location",
+    "saveThisLocation": "Save this location",
+    "wrongCityTooltip": "Sorry, You have entered a wrong city name"
+  },
+  "hero": {
+    "feelsLike": "Feels like",
+    "high": "High",
+    "low": "Low",
+    "remove": "Remove",
+    "confirmDelete": "Confirm delete?",
+    "photoBy": "Photo by",
+    "onUnsplash": "on"
+  },
+  "outlook": {
+    "title": "48-Hour Outlook",
+    "fallbackMessage": "48-hour hourly forecast requires OpenWeather One Call 3.0 access."
+  },
+  "forecast": {
+    "title": "7-Day Forecast",
+    "titleWithCount": "{{count}}-Day Forecast",
+    "precip": "Precip",
+    "humidity": "Humidity",
+    "wind": "Wind"
+  },
+  "sun": {
+    "title": "Sun Position",
+    "sunrise": "Sunrise",
+    "sunset": "Sunset"
+  },
+  "uvi": {
+    "level": {
+      "low": "Low",
+      "moderate": "Moderate",
+      "high": "High",
+      "very high": "Very high",
+      "extreme": "Extreme",
+      "unknown": "Unknown"
+    },
+    "title": {
+      "low": "Low UV",
+      "moderate": "Moderate UV",
+      "high": "High UV",
+      "very high": "Very high UV",
+      "extreme": "Extreme UV",
+      "unknown": "UV unavailable"
+    },
+    "desc": {
+      "low": "Low risk from UV rays.",
+      "moderate": "Moderate risk — use sunscreen if outside for long periods.",
+      "high": "High risk — protection needed during midday hours.",
+      "very high": "Very high UV. Skin damage possible in under 20 minutes — seek shade midday.",
+      "extreme": "Extreme UV. Avoid sun exposure around midday.",
+      "unknown": "UV data unavailable."
+    }
+  },
+  "aqi": {
+    "title": "Air Quality",
+    "mainPollutant": "Main pollutant — {{pollutant}}",
+    "categories": {
+      "good": "Good",
+      "moderate": "Moderate",
+      "usg": "Unhealthy for Sensitive Groups",
+      "unhealthy": "Unhealthy",
+      "veryUnhealthy": "Very Unhealthy",
+      "hazardous": "Hazardous",
+      "unknown": "Unknown"
+    },
+    "shortCategories": {
+      "good": "Good",
+      "moderate": "Moderate",
+      "usg": "USG",
+      "unhealthy": "Unhealthy",
+      "veryUnhealthy": "Very Unhealthy",
+      "hazardous": "Hazardous",
+      "unknown": "Unknown"
+    }
+  },
+  "stats": {
+    "pressure": "Pressure",
+    "humidity": "Humidity",
+    "wind": "Wind",
+    "visibility": "Visibility",
+    "dewPoint": "Dew Point",
+    "cloudCover": "Cloud Cover",
+    "unitKmH": "km/h",
+    "unitHpa": "hPa",
+    "unitKm": "km"
+  },
+  "windDirections": {
+    "N": "N",
+    "NNE": "NNE",
+    "NE": "NE",
+    "ENE": "ENE",
+    "E": "E",
+    "ESE": "ESE",
+    "SE": "SE",
+    "SSE": "SSE",
+    "S": "S",
+    "SSW": "SSW",
+    "SW": "SW",
+    "WSW": "WSW",
+    "W": "W",
+    "WNW": "WNW",
+    "NW": "NW",
+    "NNW": "NNW"
+  },
+  "weatherConditions": {
+    "Thunderstorm": "Thunderstorm",
+    "Drizzle": "Drizzle",
+    "Rain": "Rain",
+    "Snow": "Snow",
+    "Mist": "Mist",
+    "Smoke": "Smoke",
+    "Haze": "Haze",
+    "Dust": "Dust",
+    "Fog": "Fog",
+    "Sand": "Sand",
+    "Ash": "Ash",
+    "Squall": "Squall",
+    "Tornado": "Tornado",
+    "Clear": "Clear",
+    "Clouds": "Clouds",
+
+    "clear sky": "Clear Sky",
+    "few clouds": "Few Clouds",
+    "scattered clouds": "Scattered Clouds",
+    "broken clouds": "Broken Clouds",
+    "overcast clouds": "Overcast Clouds",
+    "light rain": "Light Rain",
+    "moderate rain": "Moderate Rain",
+    "heavy intensity rain": "Heavy Rain",
+    "very heavy rain": "Very Heavy Rain",
+    "extreme rain": "Extreme Rain",
+    "freezing rain": "Freezing Rain",
+    "light intensity shower rain": "Light Rain Shower",
+    "shower rain": "Rain Shower",
+    "heavy intensity shower rain": "Heavy Rain Shower",
+    "ragged shower rain": "Ragged Rain Shower",
+    "light snow": "Light Snow",
+    "heavy snow": "Heavy Snow",
+    "sleet": "Sleet",
+    "light shower sleet": "Light Sleet Shower",
+    "shower sleet": "Sleet Shower",
+    "light rain and snow": "Light Rain and Snow",
+    "rain and snow": "Rain and Snow",
+    "light shower snow": "Light Snow Shower",
+    "shower snow": "Snow Shower",
+    "heavy shower snow": "Heavy Snow Shower",
+    "light intensity drizzle": "Light Drizzle",
+    "heavy intensity drizzle": "Heavy Drizzle",
+    "thunderstorm with light rain": "Thunderstorm with Light Rain",
+    "thunderstorm with rain": "Thunderstorm with Rain",
+    "thunderstorm with heavy rain": "Thunderstorm with Heavy Rain",
+    "light thunderstorm": "Light Thunderstorm",
+    "heavy thunderstorm": "Heavy Thunderstorm",
+    "ragged thunderstorm": "Ragged Thunderstorm"
+  },
+  "error": {
+    "rejectedKey": "OpenWeather rejected the request. Add a valid REACT_APP_OPENWEATHER_API_KEY to your .env file.",
+    "missingKey": "Missing REACT_APP_OPENWEATHER_API_KEY. Create a .env file with a valid OpenWeather key.",
+    "cityNotFound": "Unable to look up that city right now.",
+    "reverseGeoFailed": "Unable to resolve the current city from your location.",
+    "weatherFailed": "Unable to load the weather forecast.",
+    "airPollutionFailed": "Unable to load the air quality report."
+  }
+}

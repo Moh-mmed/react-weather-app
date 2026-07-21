@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { fetchHeroImage, clearHeroImageCache } from "../../helpers/heroImageFetcher";
 import clsx from "clsx";
-import moment from "moment";
 import NavBarForm from "../Main/NavBar/NavBarForm";
 import HeroPanel from "./HeroPanel";
 import HourlyOutlook from "./HourlyOutlook";
@@ -47,8 +47,46 @@ const BrandIcon = () => (
   </svg>
 );
 
+// ─── Language Switcher ────────────────────────────────────────────────────────
+const LanguageSwitcher = () => {
+  const { i18n } = useTranslation();
+  const activeLang = i18n.language?.slice(0, 2).toLowerCase() === "fr" ? "fr" : "en";
+
+  return (
+    <div className="flex items-center bg-white/5 border border-panel-line rounded-full p-0.5 text-[11px] font-mono select-none">
+      <button
+        type="button"
+        onClick={() => i18n.changeLanguage("en")}
+        aria-label="Switch to English"
+        className={clsx(
+          "px-2 py-0.5 rounded-full transition-colors duration-150 cursor-pointer",
+          activeLang === "en"
+            ? "bg-accent-sky text-navy-dark font-semibold shadow-sm"
+            : "text-muted hover:text-primary"
+        )}
+      >
+        EN
+      </button>
+      <button
+        type="button"
+        onClick={() => i18n.changeLanguage("fr")}
+        aria-label="Passer en Français"
+        className={clsx(
+          "px-2 py-0.5 rounded-full transition-colors duration-150 cursor-pointer",
+          activeLang === "fr"
+            ? "bg-accent-sky text-navy-dark font-semibold shadow-sm"
+            : "text-muted hover:text-primary"
+        )}
+      >
+        FR
+      </button>
+    </div>
+  );
+};
+
 // ─── Live clock ───────────────────────────────────────────────────────────────
 const LiveClock = ({ timezoneOffset }) => {
+  const { i18n } = useTranslation();
   const [now, setNow] = useState(Math.floor(Date.now() / 1000));
 
   useEffect(() => {
@@ -58,11 +96,14 @@ const LiveClock = ({ timezoneOffset }) => {
     return () => clearInterval(interval);
   }, []);
 
-  const dayLabel = moment
-    .unix(now)
-    .utcOffset(timezoneOffset / 3600)
-    .format("ddd DD MMM")
-    .toUpperCase();
+  const activeLocale = i18n.language?.startsWith("fr") ? "fr-FR" : "en-US";
+  const localDate = new Date((now + (timezoneOffset || 0)) * 1000);
+
+  const dayName = new Intl.DateTimeFormat(activeLocale, { weekday: "short", timeZone: "UTC" }).format(localDate);
+  const dayNum = new Intl.DateTimeFormat(activeLocale, { day: "2-digit", timeZone: "UTC" }).format(localDate);
+  const monthName = new Intl.DateTimeFormat(activeLocale, { month: "short", timeZone: "UTC" }).format(localDate);
+
+  const dayLabel = `${dayName} ${dayNum} ${monthName}`.toUpperCase();
   const clock = formatTime24(now, timezoneOffset);
 
   return (
@@ -198,6 +239,8 @@ const Dashboard = ({
   const activeTemp = activeWeatherData?.current?.temp;
   const safeTemp = Number.isFinite(activeTemp) ? Math.round(activeTemp) : "--";
   const { city, country } = activeCurrCity || {};
+
+  const { t } = useTranslation();
 
   // Is the current page already in savedLocations?
   const isCurrentPageSaved =
@@ -372,12 +415,15 @@ const Dashboard = ({
       {/* ── Fixed header — horizontal padding lives here ───────────────────── */}
       <header className="flex items-center justify-between gap-6 flex-wrap px-[clamp(20px,4vw,48px)] shrink-0">
 
-        {/* Brand */}
-        <div className="flex items-center gap-2.5">
-          <BrandIcon />
-          <div className="font-display font-semibold text-[20px] tracking-[0.2px]">
-            Weather<em className="italic text-accent-sun">Me</em>
+        {/* Brand & Language Switcher */}
+        <div className="flex items-center gap-3.5">
+          <div className="flex items-center gap-2.5">
+            <BrandIcon />
+            <div className="font-display font-semibold text-[20px] tracking-[0.2px]">
+              Weather<em className="italic text-accent-sun">Me</em>
+            </div>
           </div>
+          <LanguageSwitcher />
         </div>
 
         {/* Search form */}
@@ -409,7 +455,7 @@ const Dashboard = ({
               {showAddBtn && (
                 <button
                   type="button"
-                  title="Save this location"
+                  title={t("header.saveThisLocation")}
                   onClick={handleAddCurrentToSaved}
                   className="w-5 h-5 rounded-full bg-white/10 hover:bg-accent-sky/20 border border-white/10 hover:border-accent-sky/40 flex items-center justify-center transition-all duration-150 cursor-pointer"
                 >

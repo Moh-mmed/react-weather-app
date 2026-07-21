@@ -7,8 +7,16 @@ const getUVI = (UVI) => {
   return "extreme";
 };
 
-export const getUviDescription = (uvi) => {
+export const getUviDescription = (uvi, t) => {
   const level = getUVI(uvi);
+  if (t) {
+    return {
+      level,
+      title: t(`uvi.title.${level}`),
+      description: t(`uvi.desc.${level}`),
+    };
+  }
+
   const descriptions = {
     low: "Low risk from UV rays.",
     moderate: "Moderate risk — use sunscreen if outside for long periods.",

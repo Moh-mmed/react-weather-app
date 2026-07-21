@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { formatHour24 } from "../../helpers/timeFormat";
 
 const ClockIcon = () => (
@@ -199,6 +200,7 @@ const BackgroundGlyph = ({ icon }) => {
 };
 
 const HourlyOutlook = ({ weatherData }) => {
+  const { t } = useTranslation();
   const { outlook48h, timezone_offset } = weatherData;
 
   const glyphIcon = outlook48h?.[0]?.weather?.[0]?.icon ?? null;
@@ -247,7 +249,7 @@ const HourlyOutlook = ({ weatherData }) => {
       {/* Panel title */}
       <div className="text-[12px] uppercase tracking-[1.2px] text-muted font-semibold mb-4 flex items-center gap-2">
         <ClockIcon />
-        48-Hour Outlook
+        {t("outlook.title")}
       </div>
 
       <div
@@ -348,12 +350,13 @@ const HourlyOutlook = ({ weatherData }) => {
           </div>
         ) : (
           <div className="flex items-center min-h-[140px] text-[12px] text-muted px-2">
-            48-hour hourly forecast requires OpenWeather One Call 3.0 access.
+            {t("outlook.fallbackMessage")}
           </div>
         )}
       </div>
     </section>
   );
 };
+
 
 export default HourlyOutlook;

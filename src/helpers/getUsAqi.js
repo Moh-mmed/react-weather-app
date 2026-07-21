@@ -65,27 +65,27 @@ const calcSubIndex = (concentration, breakpoints) => {
   return null;
 };
 
-export const getUsAqiLabel = (aqi) => {
-  if (!Number.isFinite(aqi)) return "Unknown";
-  if (aqi <= 50) return "Good";
-  if (aqi <= 100) return "Moderate";
-  if (aqi <= 150) return "Unhealthy for Sensitive Groups";
-  if (aqi <= 200) return "Unhealthy";
-  if (aqi <= 300) return "Very Unhealthy";
-  return "Hazardous";
+export const getUsAqiLabel = (aqi, t) => {
+  if (!Number.isFinite(aqi)) return t ? t("aqi.categories.unknown") : "Unknown";
+  if (aqi <= 50) return t ? t("aqi.categories.good") : "Good";
+  if (aqi <= 100) return t ? t("aqi.categories.moderate") : "Moderate";
+  if (aqi <= 150) return t ? t("aqi.categories.usg") : "Unhealthy for Sensitive Groups";
+  if (aqi <= 200) return t ? t("aqi.categories.unhealthy") : "Unhealthy";
+  if (aqi <= 300) return t ? t("aqi.categories.veryUnhealthy") : "Very Unhealthy";
+  return t ? t("aqi.categories.hazardous") : "Hazardous";
 };
 
-export const getUsAqiShortLabel = (aqi) => {
-  if (!Number.isFinite(aqi)) return "Unknown";
-  if (aqi <= 50) return "Good";
-  if (aqi <= 100) return "Moderate";
-  if (aqi <= 150) return "USG";
-  if (aqi <= 200) return "Unhealthy";
-  if (aqi <= 300) return "Very Unhealthy";
-  return "Hazardous";
+export const getUsAqiShortLabel = (aqi, t) => {
+  if (!Number.isFinite(aqi)) return t ? t("aqi.shortCategories.unknown") : "Unknown";
+  if (aqi <= 50) return t ? t("aqi.shortCategories.good") : "Good";
+  if (aqi <= 100) return t ? t("aqi.shortCategories.moderate") : "Moderate";
+  if (aqi <= 150) return t ? t("aqi.shortCategories.usg") : "USG";
+  if (aqi <= 200) return t ? t("aqi.shortCategories.unhealthy") : "Unhealthy";
+  if (aqi <= 300) return t ? t("aqi.shortCategories.veryUnhealthy") : "Very Unhealthy";
+  return t ? t("aqi.shortCategories.hazardous") : "Hazardous";
 };
 
-export const getUsAqiFromComponents = (components = {}) => {
+export const getUsAqiFromComponents = (components = {}, t) => {
   let maxAqi = 0;
   let mainPollutant = "PM2.5";
 
@@ -99,8 +99,8 @@ export const getUsAqiFromComponents = (components = {}) => {
 
   return {
     aqi: maxAqi,
-    label: getUsAqiLabel(maxAqi),
-    shortLabel: getUsAqiShortLabel(maxAqi),
+    label: getUsAqiLabel(maxAqi, t),
+    shortLabel: getUsAqiShortLabel(maxAqi, t),
     mainPollutant,
     markerPercent: Math.min((maxAqi / 300) * 100, 100),
   };

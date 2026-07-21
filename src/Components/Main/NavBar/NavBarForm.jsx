@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import clsx from "clsx";
 import Tooltip from "./Tooltip";
 import axios from "axios";
@@ -37,7 +38,7 @@ const CrosshairIcon = ({ spinning = false }) => (
 // toggled via opacity + visibility so mount/unmount never causes reflow.
 // IMPORTANT: className must be a static string — Tailwind JIT does not scan
 // dynamically constructed arrays or template literals for class names.
-const GeoErrorToast = ({ isVisible }) => (
+const GeoErrorToast = ({ isVisible, message }) => (
   <div
     role="status"
     aria-live="polite"
@@ -67,7 +68,7 @@ const GeoErrorToast = ({ isVisible }) => (
     <span className="flex items-center gap-2">
       {/* Coral dot — communicates "error" without relying on bg color */}
       <span className="w-[7px] h-[7px] rounded-full bg-accent-coral shrink-0" aria-hidden="true" />
-      Couldn't get your location
+      {message}
     </span>
   </div>
 );
@@ -110,6 +111,7 @@ const NavBarForm = ({
   handleAddSavedLocation,
   savedLocations = [],
 }) => {
+  const { t } = useTranslation();
   const [enteredCity, setEnteredCity] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -350,7 +352,7 @@ const NavBarForm = ({
         <input
           ref={inputField}
           type="text"
-          placeholder="Search a city or coordinates…"
+          placeholder={t("header.searchPlaceholder")}
           className="search-bar bg-transparent border-none outline-none flex-1 text-primary text-[14px] font-sans w-full placeholder:text-muted"
           value={enteredCity}
           onChange={(e) => setEnteredCity(e.target.value)}
@@ -364,8 +366,8 @@ const NavBarForm = ({
         id="geo-location-btn"
         onClick={handleGeoClick}
         disabled={geoState === "loading" || isUpdatingLocation}
-        title="Use my current location"
-        aria-label="Use my current location"
+        title={t("header.geoBtnTitle")}
+        aria-label={t("header.geoBtnTitle")}
         className={clsx(
           // w-6 h-6 = 24×24 px fixed — CrosshairIcon (15px) and SmallSpinner (15px)
           // are both smaller than the button, so swapping them causes no resize.
@@ -385,7 +387,7 @@ const NavBarForm = ({
 
       {cityNotFound && <Tooltip />}
       {/* Toast is always in the DOM; visibility toggled via opacity transition */}
-      <GeoErrorToast isVisible={geoErrorVisible} />
+      <GeoErrorToast isVisible={geoErrorVisible} message={t("header.geoError")} />
 
       {isOpen && (
         <ul className="absolute top-[calc(100%+8px)] left-0 right-0 bg-navy-panel border border-panel-line rounded-xl list-none p-[8px_0] m-0 z-10 shadow-[0_8px_24px_rgba(0,0,0,0.4)] max-h-[250px] overflow-y-auto">
@@ -418,7 +420,7 @@ const NavBarForm = ({
                   {handleAddSavedLocation && (
                     <button
                       type="button"
-                      title={isSaved ? "Saved" : "Save location"}
+                      title={isSaved ? t("header.saved") : t("header.saveLocation")}
                       onClick={(e) => {
                         e.stopPropagation();
                         if (!isSaved) {
@@ -453,10 +455,10 @@ const NavBarForm = ({
               );
             })
           ) : isLoading ? (
-            <div className="px-[18px] py-3 text-muted font-sans text-[14px] text-center">Loading...</div>
+            <div className="px-[18px] py-3 text-muted font-sans text-[14px] text-center">{t("header.loading")}</div>
           ) : (
             hasNoMatches && (
-              <div className="px-[18px] py-3 text-muted font-sans text-[14px] text-center">No matches</div>
+              <div className="px-[18px] py-3 text-muted font-sans text-[14px] text-center">{t("header.noMatches")}</div>
             )
           )}
         </ul>

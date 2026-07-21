@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { getUsAqiFromComponents } from "../../helpers/getUsAqi";
 
 const AqiIcon = () => (
@@ -7,9 +8,18 @@ const AqiIcon = () => (
 );
 
 const AirQualityPanel = ({ airQuality }) => {
+  const { t } = useTranslation();
   const { components } = airQuality.list[0];
   const { aqi, label, mainPollutant, markerPercent } =
-    getUsAqiFromComponents(components);
+    getUsAqiFromComponents(components, t);
+
+  const scaleKeys = [
+    "good",
+    "moderate",
+    "usg",
+    "unhealthy",
+    "hazardous",
+  ];
 
   return (
     <section
@@ -19,7 +29,7 @@ const AirQualityPanel = ({ airQuality }) => {
       {/* Panel title */}
       <div className="text-[12px] uppercase tracking-[1.2px] text-muted font-semibold mb-1 flex items-center gap-2">
         <AqiIcon />
-        Air Quality
+        {t("aqi.title")}
       </div>
 
       {/* AQI number + label badge */}
@@ -31,7 +41,9 @@ const AirQualityPanel = ({ airQuality }) => {
       </div>
 
       {/* Main pollutant */}
-      <div className="text-[12px] text-muted mt-0.5">Main pollutant — {mainPollutant}</div>
+      <div className="text-[12px] text-muted mt-0.5">
+        {t("aqi.mainPollutant", { pollutant: mainPollutant })}
+      </div>
 
       {/* Gradient gauge bar */}
       <div
@@ -41,7 +53,7 @@ const AirQualityPanel = ({ airQuality }) => {
             "linear-gradient(90deg, #5FB88A, #f4d93b, #F4A93B, #E2694A, #a85fd9)",
         }}
       >
-        {/* Marker — left% is data-driven so stays as inline style */}
+        {/* Marker */}
         <div
           className="absolute -top-1 w-4 h-4 rounded-full border-[3px] border-[#f4d93b] -translate-x-1/2 shadow-[0_0_0_3px_rgba(0,0,0,0.25)]"
           style={{
@@ -53,8 +65,10 @@ const AirQualityPanel = ({ airQuality }) => {
 
       {/* Gauge scale labels */}
       <div className="flex justify-between mt-2">
-        {["Good", "Moderate", "USG", "Unhealthy", "Hazardous"].map((l) => (
-          <span key={l} className="text-[10px] text-muted">{l}</span>
+        {scaleKeys.map((k) => (
+          <span key={k} className="text-[10px] text-muted">
+            {t(`aqi.shortCategories.${k}`)}
+          </span>
         ))}
       </div>
     </section>

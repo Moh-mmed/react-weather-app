@@ -1,21 +1,17 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import clsx from "clsx";
+import { translateConditionDescription } from "../../helpers/weatherConditionTranslator";
 
 /**
  * HeroPanel — current conditions card.
- *
- * Props:
- *   weatherData  — full weather payload
- *   isPinned     — whether this is the pinned (home) location
- *   onRemove     — callback to remove a saved location
- *   cityPhoto    — optional { url, photographerName, photographerLink, unsplashLink }
- *                  fetched by the parent (LocationPage) from the Unsplash API.
- *                  When absent the panel renders exactly as before.
  */
 const HeroPanel = ({ weatherData, isPinned = true, onRemove, cityPhoto }) => {
+  const { t } = useTranslation();
   const { current, daily } = weatherData;
   const { temp, feels_like, weather } = current;
-  const { description, icon } = weather[0];
+  const { icon } = weather[0];
+  const translatedDesc = translateConditionDescription(weather[0], t);
   const today = daily[0];
   const high = today?.temp?.max;
   const low = today?.temp?.min;
@@ -27,11 +23,8 @@ const HeroPanel = ({ weatherData, isPinned = true, onRemove, cityPhoto }) => {
   const displayLow = Number.isFinite(low) ? low : "--";
 
   const [confirmDelete, setConfirmDelete] = useState(false);
-  // Track whether the background image has loaded, so we only reveal it
-  // once it's ready — avoids a jarring flash of a half-loaded image.
   const [photoLoaded, setPhotoLoaded] = useState(false);
 
-  // Reset photo-loaded state whenever the photo URL changes
   useEffect(() => {
     setPhotoLoaded(false);
   }, [cityPhoto?.url]);
@@ -52,7 +45,6 @@ const HeroPanel = ({ weatherData, isPinned = true, onRemove, cityPhoto }) => {
       {/* ── City photo background layer ───────────────────────────────────── */}
       {cityPhoto?.url && (
         <>
-          {/* Preload the image silently; reveal only after load to avoid flicker */}
           <img
             src={cityPhoto.url}
             alt=""
@@ -62,11 +54,9 @@ const HeroPanel = ({ weatherData, isPinned = true, onRemove, cityPhoto }) => {
             className={clsx(
               "absolute inset-0 w-full h-full object-cover pointer-events-none select-none",
               "transition-opacity duration-700",
-              photoLoaded ? "opacity-35" : "opacity-0"
+              photoLoaded ? "opacity-65" : "opacity-0"
             )}
           />
-          {/* Navy gradient overlay — left side is fully opaque (text legible),
-              right side fades out to let the photo show through near the icon */}
           {photoLoaded && (
             <div
               aria-hidden="true"
@@ -84,7 +74,8 @@ const HeroPanel = ({ weatherData, isPinned = true, onRemove, cityPhoto }) => {
       <div
         className="absolute -top-10 -right-7 w-64 h-64 rounded-full pointer-events-none"
         style={{
-          background: "radial-gradient(circle, rgba(244,169,59,0.3), transparent 70%)",
+          background:
+            "radial-gradient(circle, rgba(244,169,59,0.3), transparent 70%)",
           filter: "blur(10px)",
         }}
       />
@@ -111,14 +102,21 @@ const HeroPanel = ({ weatherData, isPinned = true, onRemove, cityPhoto }) => {
             onMouseLeave={() => setConfirmDelete(false)}
           >
             {confirmDelete ? (
-              <span>Confirm delete?</span>
+              <span>{t("hero.confirmDelete")}</span>
             ) : (
               <>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="11" height="11">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  width="11"
+                  height="11"
+                >
                   <line x1="18" y1="6" x2="6" y2="18" />
                   <line x1="6" y1="6" x2="18" y2="18" />
                 </svg>
-                <span>Remove</span>
+                <span>{t("hero.remove")}</span>
               </>
             )}
           </button>
@@ -128,7 +126,7 @@ const HeroPanel = ({ weatherData, isPinned = true, onRemove, cityPhoto }) => {
       {/* ── Left content ─────────────────────────────────────────────────── */}
       <div className="flex flex-col gap-1.5 z-10">
         <div className="font-display italic text-[17px] text-accent-sky capitalize">
-          {description}
+          {translatedDesc}
         </div>
         <div
           className="font-display font-semibold leading-none tracking-[-2px]"
@@ -138,11 +136,12 @@ const HeroPanel = ({ weatherData, isPinned = true, onRemove, cityPhoto }) => {
         </div>
         <div className="flex flex-wrap gap-[18px] mt-2">
           <span className="font-mono text-[13px] text-muted">
-            Feels like <b className="text-primary font-medium">{displayFeels}°</b>
+            {t("hero.feelsLike")}{" "}
+            <b className="text-primary font-medium">{displayFeels}°</b>
           </span>
           <span className="font-mono text-[13px] text-muted">
-            High <b className="text-primary font-medium">{displayHigh}°</b> · Low{" "}
-            <b className="text-primary font-medium">{displayLow}°</b>
+            {t("hero.high")} <b className="text-primary font-medium">{displayHigh}°</b> ·{" "}
+            {t("hero.low")} <b className="text-primary font-medium">{displayLow}°</b>
           </span>
         </div>
       </div>
@@ -150,15 +149,15 @@ const HeroPanel = ({ weatherData, isPinned = true, onRemove, cityPhoto }) => {
       {/* ── Weather icon (foreground, always visible) ─────────────────────── */}
       <img
         src={`https://openweathermap.org/img/wn/${icon}@4x.png`}
-        alt={description}
+        alt={translatedDesc}
         className="w-[150px] h-[150px] opacity-95 z-10 shrink-0"
       />
 
-      {/* ── Unsplash attribution (required per API guidelines) ────────────── */}
+      {/* ── Unsplash attribution ───────────────────────────────────────────── */}
       {cityPhoto?.url && photoLoaded && (
         <div className="absolute bottom-2 right-3 z-20 pointer-events-auto">
           <p className="font-mono text-[9px] text-white/30 leading-none">
-            Photo by{" "}
+            {t("hero.photoBy")}{" "}
             <a
               href={cityPhoto.photographerLink}
               target="_blank"
@@ -167,7 +166,7 @@ const HeroPanel = ({ weatherData, isPinned = true, onRemove, cityPhoto }) => {
             >
               {cityPhoto.photographerName}
             </a>{" "}
-            on{" "}
+            {t("hero.onUnsplash")}{" "}
             <a
               href={cityPhoto.unsplashLink}
               target="_blank"
