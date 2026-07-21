@@ -1,4 +1,3 @@
-import clsx from "clsx";
 import { formatHour24 } from "../../helpers/timeFormat";
 
 const ClockIcon = () => (

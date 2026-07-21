@@ -79,7 +79,7 @@ const Home = () => {
   const [airQuality, setAirQuality] = useState(null);
   const [cityNotFound, setCityNotFound] = useState(false);
   const [apiError, setApiError] = useState("");
-  const [isUpdatingLocation, setIsUpdatingLocation] = useState(false);
+  const [isUpdatingLocation] = useState(false);
 
   // Saved locations state & data cache
   const [savedLocations, setSavedLocations] = useState(() => {

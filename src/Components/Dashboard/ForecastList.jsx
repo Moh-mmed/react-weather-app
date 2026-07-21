@@ -221,22 +221,6 @@ const ForecastList = ({ weatherData }) => {
       ? "7-Day Forecast"
       : `${forecastDays.length}-Day Forecast`;
 
-  // Determine dominant weather condition across the forecast days for the glyph
-  const dominantCode = (() => {
-    if (!forecastDays.length) return "01";
-    const codeCounts = {};
-    forecastDays.forEach((day) => {
-      const c = day.weather?.[0]?.icon?.slice(0, 2) ?? "01";
-      codeCounts[c] = (codeCounts[c] ?? 0) + 1;
-    });
-    return (
-      Object.entries(codeCounts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "01"
-    );
-  })();
-  const isNightDominant = forecastDays.every((d) =>
-    d.weather?.[0]?.icon?.endsWith("n"),
-  );
-
   return (
     <section
       className="relative overflow-hidden desktop:overflow-hidden rounded-panel border border-panel-line bg-navy-panel bg-panel-pattern p-[22px_24px] min-h-0 flex flex-col motion-safe:animate-rise"
