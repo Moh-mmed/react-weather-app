@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { fetchHeroImage, clearHeroImageCache } from "../../helpers/heroImageFetcher";
+import {
+  fetchHeroImage,
+  clearHeroImageCache,
+} from "../../helpers/heroImageFetcher";
 import clsx from "clsx";
 import NavBarForm from "../Main/NavBar/NavBarForm";
 import HeroPanel from "./HeroPanel";
@@ -20,19 +23,27 @@ const CACHE_VERSION_KEY = "weatherme:img_cache_v";
     if (stored !== CACHE_VERSION) {
       clearHeroImageCache();
       // Clean up old Unsplash caches to free space
-      Object.keys(localStorage).forEach(k => {
+      Object.keys(localStorage).forEach((k) => {
         if (k.startsWith("weatherme:unsplash")) {
           localStorage.removeItem(k);
         }
       });
       localStorage.setItem(CACHE_VERSION_KEY, CACHE_VERSION);
     }
-  } catch { /* localStorage unavailable */ }
+  } catch {
+    /* localStorage unavailable */
+  }
 })();
 
 // ─── Brand icon ──────────────────────────────────────────────────────────────
 const BrandIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" width="30" height="30" aria-hidden="true">
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    width="30"
+    height="30"
+    aria-hidden="true"
+  >
     <circle cx="12" cy="12" r="4" stroke="#F4A93B" strokeWidth="1.6" />
     <g stroke="#4FA3D9" strokeWidth="1.6" strokeLinecap="round">
       <line x1="12" y1="1.5" x2="12" y2="4" />
@@ -50,7 +61,8 @@ const BrandIcon = () => (
 // ─── Language Switcher ────────────────────────────────────────────────────────
 const LanguageSwitcher = () => {
   const { i18n } = useTranslation();
-  const activeLang = i18n.language?.slice(0, 2).toLowerCase() === "fr" ? "fr" : "en";
+  const activeLang =
+    i18n.language?.slice(0, 2).toLowerCase() === "fr" ? "fr" : "en";
 
   return (
     <div className="flex items-center bg-white/5 border border-panel-line rounded-full p-0.5 text-[11px] font-mono select-none">
@@ -62,7 +74,7 @@ const LanguageSwitcher = () => {
           "px-2 py-0.5 rounded-full transition-colors duration-150 cursor-pointer",
           activeLang === "en"
             ? "bg-accent-sky text-navy-dark font-semibold shadow-sm"
-            : "text-muted hover:text-primary"
+            : "text-muted hover:text-primary",
         )}
       >
         EN
@@ -75,7 +87,7 @@ const LanguageSwitcher = () => {
           "px-2 py-0.5 rounded-full transition-colors duration-150 cursor-pointer",
           activeLang === "fr"
             ? "bg-accent-sky text-navy-dark font-semibold shadow-sm"
-            : "text-muted hover:text-primary"
+            : "text-muted hover:text-primary",
         )}
       >
         FR
@@ -83,6 +95,47 @@ const LanguageSwitcher = () => {
     </div>
   );
 };
+
+// ─── Ko-fi donation button ────────────────────────────────────────────────────
+const KofiButton = () => (
+  <a
+    href="https://ko-fi.com/mohammedbenomr"
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="Support on Ko-fi"
+    className={clsx(
+      "flex items-center gap-1.5",
+      "bg-white/5 border border-panel-line rounded-full",
+      "px-2.5 py-1 text-[11px] font-mono text-muted select-none",
+      "transition-all duration-150",
+      "hover:bg-white/10 hover:border-white/15 hover:text-primary hover:brightness-110 hover:scale-[1.04]",
+      "focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-sky/60 focus-visible:outline-offset-2",
+    )}
+  >
+    {/* Thin-stroke coffee-cup icon — matches the line-art style used across the app */}
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      width="14"
+      height="14"
+      aria-hidden="true"
+    >
+      {/* Cup body */}
+      <path d="M5 7h11a1 1 0 0 1 1 1v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8a1 1 0 0 1 1-1z" />
+      {/* Handle */}
+      <path d="M17 9h1.5a2.5 2.5 0 0 1 0 5H17" />
+      {/* Steam wisps */}
+      <path d="M9 4c0-1 .6-1.5 1-2" />
+      <path d="M13 4c0-1 .6-1.5 1-2" />
+    </svg>
+    {/* Label hidden on mobile, visible on tablet+ */}
+    <span className="hidden tablet:inline">Support</span>
+  </a>
+);
 
 // ─── Live clock ───────────────────────────────────────────────────────────────
 const LiveClock = ({ timezoneOffset }) => {
@@ -99,9 +152,18 @@ const LiveClock = ({ timezoneOffset }) => {
   const activeLocale = i18n.language?.startsWith("fr") ? "fr-FR" : "en-US";
   const localDate = new Date((now + (timezoneOffset || 0)) * 1000);
 
-  const dayName = new Intl.DateTimeFormat(activeLocale, { weekday: "short", timeZone: "UTC" }).format(localDate);
-  const dayNum = new Intl.DateTimeFormat(activeLocale, { day: "2-digit", timeZone: "UTC" }).format(localDate);
-  const monthName = new Intl.DateTimeFormat(activeLocale, { month: "short", timeZone: "UTC" }).format(localDate);
+  const dayName = new Intl.DateTimeFormat(activeLocale, {
+    weekday: "short",
+    timeZone: "UTC",
+  }).format(localDate);
+  const dayNum = new Intl.DateTimeFormat(activeLocale, {
+    day: "2-digit",
+    timeZone: "UTC",
+  }).format(localDate);
+  const monthName = new Intl.DateTimeFormat(activeLocale, {
+    month: "short",
+    timeZone: "UTC",
+  }).format(localDate);
 
   const dayLabel = `${dayName} ${dayNum} ${monthName}`.toUpperCase();
   const clock = formatTime24(now, timezoneOffset);
@@ -123,7 +185,14 @@ const PageSpinner = () => (
       viewBox="0 0 24 24"
       aria-label="Loading weather data"
     >
-      <circle className="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
+      <circle
+        className="opacity-20"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="3"
+      />
       <path
         className="opacity-75"
         fill="currentColor"
@@ -151,9 +220,9 @@ const LocationPage = ({ page, onRemove }) => {
     //   • weatherMain — OWM condition string for the generic tier fallback
     const weatherMain = weatherData?.current?.weather?.[0]?.main ?? null;
     fetchHeroImage(page.city, {
-      lat:         page.lat ?? null,
-      lon:         page.lon ?? null,
-      country:     page.country ?? null,
+      lat: page.lat ?? null,
+      lon: page.lon ?? null,
+      country: page.country ?? null,
       weatherMain,
     }).then((result) => {
       if (!cancelled) setCityPhoto(result);
@@ -161,8 +230,8 @@ const LocationPage = ({ page, onRemove }) => {
     return () => {
       cancelled = true;
     };
-  // Re-fetch only when the city changes
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Re-fetch only when the city changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page.city]);
   // ─────────────────────────────────────────────────────────────────────────
 
@@ -177,7 +246,10 @@ const LocationPage = ({ page, onRemove }) => {
       style={{ gridTemplateColumns: "2.05fr 1fr" }}
     >
       {/* Left column */}
-      <div className="dashboard-column grid gap-5 min-h-0" style={{ gridTemplateRows: "auto auto 1fr" }}>
+      <div
+        className="dashboard-column grid gap-5 min-h-0"
+        style={{ gridTemplateRows: "auto auto 1fr" }}
+      >
         <HeroPanel
           weatherData={weatherData}
           isPinned={isPinned}
@@ -189,7 +261,10 @@ const LocationPage = ({ page, onRemove }) => {
       </div>
 
       {/* Right column */}
-      <div className="dashboard-column grid gap-5 min-h-0" style={{ gridTemplateRows: "auto auto 1fr" }}>
+      <div
+        className="dashboard-column grid gap-5 min-h-0"
+        style={{ gridTemplateRows: "auto auto 1fr" }}
+      >
         <SunPositionPanel weatherData={weatherData} />
         <AirQualityPanel airQuality={airQuality} />
         <StatsGrid weatherData={weatherData} />
@@ -248,7 +323,7 @@ const Dashboard = ({
     savedLocations.some(
       (loc) =>
         Math.abs(loc.lat - (allPages[0]?.lat ?? 0)) < 0.01 &&
-        Math.abs(loc.lon - (allPages[0]?.lon ?? 0)) < 0.01
+        Math.abs(loc.lon - (allPages[0]?.lon ?? 0)) < 0.01,
     );
 
   // ── Imperatively scroll to activeIndex when it changes programmatically ──────
@@ -394,28 +469,35 @@ const Dashboard = ({
         }, 500);
       }
     },
-    [setActiveIndex]
+    [setActiveIndex],
   );
 
   // ── Header: add-to-saved button (only visible on page 0, when unsaved) ───────
   const handleAddCurrentToSaved = () => {
     if (!allPages[0] || !handleAddSavedLocation) return;
     const p = allPages[0];
-    handleAddSavedLocation({ city: p.city, country: p.country, lat: p.lat, lon: p.lon });
+    handleAddSavedLocation({
+      city: p.city,
+      country: p.country,
+      lat: p.lat,
+      lon: p.lon,
+    });
   };
 
-  const showAddBtn = activeIndex === 0 && !isCurrentPageSaved && handleAddSavedLocation;
+  const showAddBtn =
+    activeIndex === 0 && !isCurrentPageSaved && handleAddSavedLocation;
 
   // ── Render ──────────────────────────────────────────────────────────────────
   return (
     /* Root: full-height flex column, strictly contained — no vertical overflow anywhere.
        On small screens each page scrolls vertically inside the pager via overflow-y-auto. */
-    <div className="flex flex-col text-primary bg-dashboard-radial pt-7 pb-5 gap-5" style={{ height: '100dvh', overflow: 'hidden' }}>
-
+    <div
+      className="flex flex-col text-primary bg-dashboard-radial pt-7 pb-5 gap-5"
+      style={{ height: "100dvh", overflow: "hidden" }}
+    >
       {/* ── Fixed header — horizontal padding lives here ───────────────────── */}
       <header className="flex items-center justify-between gap-6 flex-wrap px-[clamp(20px,4vw,48px)] shrink-0">
-
-        {/* Brand & Language Switcher */}
+        {/* Brand + secondary header actions cluster */}
         <div className="flex items-center gap-3.5">
           <div className="flex items-center gap-2.5">
             <BrandIcon />
@@ -423,7 +505,11 @@ const Dashboard = ({
               Weather<em className="italic text-accent-sun">Me</em>
             </div>
           </div>
-          <LanguageSwitcher />
+          {/* Language toggle + Ko-fi grouped together as secondary header actions */}
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher />
+            <KofiButton />
+          </div>
         </div>
 
         {/* Search form */}
@@ -459,7 +545,15 @@ const Dashboard = ({
                   onClick={handleAddCurrentToSaved}
                   className="w-5 h-5 rounded-full bg-white/10 hover:bg-accent-sky/20 border border-white/10 hover:border-accent-sky/40 flex items-center justify-center transition-all duration-150 cursor-pointer"
                 >
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="10" height="10" className="text-accent-sky">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    width="10"
+                    height="10"
+                    className="text-accent-sky"
+                  >
                     <line x1="12" y1="5" x2="12" y2="19" />
                     <line x1="5" y1="12" x2="19" y2="12" />
                   </svg>
@@ -478,7 +572,10 @@ const Dashboard = ({
         ref={pagerRef}
         onScroll={handleScroll}
         aria-label="Weather locations"
-        style={{ overscrollBehaviorX: 'contain', WebkitOverflowScrolling: 'touch' }}
+        style={{
+          overscrollBehaviorX: "contain",
+          WebkitOverflowScrolling: "touch",
+        }}
         className="flex flex-1 min-h-0 overflow-x-auto no-scrollbar snap-x snap-mandatory touch-pan-x cursor-grab"
       >
         {allPages.map((page, idx) => (
@@ -522,7 +619,7 @@ const Dashboard = ({
                   "hover:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-sky/70 focus-visible:outline-offset-[3px]",
                   activeIndex === idx
                     ? "w-5 h-[7px] bg-accent-sky opacity-100"
-                    : "w-[7px] h-[7px] bg-white/50 opacity-60 hover:bg-white/70"
+                    : "w-[7px] h-[7px] bg-white/50 opacity-60 hover:bg-white/70",
                 )}
               />
             ))}
