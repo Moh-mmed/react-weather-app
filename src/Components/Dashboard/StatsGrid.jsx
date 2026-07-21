@@ -19,14 +19,8 @@ const StatIcon = ({ children }) => (
 const StatsGrid = ({ weatherData }) => {
   const { t, i18n } = useTranslation();
   const trackRef = useRef(null);
-  const dragStateRef = useRef({
-    active: false,
-    startX: 0,
-    startScrollLeft: 0,
-  });
   const scrollRafRef = useRef(0);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
   const { current } = weatherData;
   const {
     pressure,
@@ -38,8 +32,9 @@ const StatsGrid = ({ weatherData }) => {
     clouds,
   } = current;
 
-  const activeLocale = i18n.language?.startsWith("fr") ? "fr-FR" : "en-US";
-  const numFormatter = new Intl.NumberFormat(activeLocale);
+  const rawLang = i18n.language?.slice(0, 2).toLowerCase();
+  const activeLocale = rawLang === "fr" ? "fr-FR" : rawLang === "ar" ? "ar-EG" : "en-US";
+  const numFormatter = new Intl.NumberFormat(activeLocale, { numberingSystem: "latn" });
 
   const dewPoint = getDewPoint(temp, humidity);
   const windKmh = Number.isFinite(wind_speed)
@@ -117,8 +112,10 @@ const StatsGrid = ({ weatherData }) => {
     const track = trackRef.current;
     if (!track) return;
     const nextIndex = Math.max(0, Math.min(index, stats.length - 1));
+    const isRtl = document.documentElement.dir === "rtl";
+    const targetScrollLeft = isRtl ? -nextIndex * track.clientWidth : nextIndex * track.clientWidth;
     track.scrollTo({
-      left: nextIndex * track.clientWidth,
+      left: targetScrollLeft,
       behavior,
     });
     setActiveIndex(nextIndex);
@@ -129,87 +126,19 @@ const StatsGrid = ({ weatherData }) => {
     if (!track) return;
     window.cancelAnimationFrame(scrollRafRef.current);
     scrollRafRef.current = window.requestAnimationFrame(() => {
-      const nextIndex = Math.round(track.scrollLeft / track.clientWidth);
-      setActiveIndex(Math.max(0, Math.min(nextIndex, stats.length - 1)));
+      const nextIndex = Math.round(Math.abs(track.scrollLeft) / track.clientWidth);
+      const clamped = Math.max(0, Math.min(nextIndex, stats.length - 1));
+      setActiveIndex((prev) => (prev !== clamped ? clamped : prev));
     });
   };
 
   useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
-
-    const handleNativeMouseDown = (e) => {
-      if (e.button !== 0) return;
-      setIsDragging(true);
-      dragStateRef.current = {
-        active: true,
-        startX: e.clientX,
-        startScrollLeft: track.scrollLeft,
-      };
-    };
-
-    const handleNativeMouseMove = (e) => {
-      const { active, startX, startScrollLeft } = dragStateRef.current;
-      if (!active) return;
-      e.preventDefault();
-      const walk = e.clientX - startX;
-      track.scrollLeft = startScrollLeft - walk;
-    };
-
-    const handleNativeMouseUpOrLeave = () => {
-      if (dragStateRef.current.active) {
-        dragStateRef.current.active = false;
-        setIsDragging(false);
-      }
-    };
-
-    const handleNativeTouchStart = (e) => {
-      const touch = e.touches[0];
-      setIsDragging(true);
-      dragStateRef.current = {
-        active: true,
-        startX: touch.clientX,
-        startScrollLeft: track.scrollLeft,
-      };
-    };
-
-    const handleNativeTouchMove = (e) => {
-      const { active, startX, startScrollLeft } = dragStateRef.current;
-      if (!active) return;
-      const touch = e.touches[0];
-      const walk = touch.clientX - startX;
-      track.scrollLeft = startScrollLeft - walk;
-    };
-
-    const handleNativeTouchEnd = () => {
-      if (dragStateRef.current.active) {
-        dragStateRef.current.active = false;
-        setIsDragging(false);
-      }
-    };
-
-    track.addEventListener("mousedown", handleNativeMouseDown, { passive: true });
-    track.addEventListener("mousemove", handleNativeMouseMove, { passive: false });
-    track.addEventListener("mouseup", handleNativeMouseUpOrLeave, { passive: true });
-    track.addEventListener("mouseleave", handleNativeMouseUpOrLeave, { passive: true });
-
-    track.addEventListener("touchstart", handleNativeTouchStart, { passive: true });
-    track.addEventListener("touchmove", handleNativeTouchMove, { passive: true });
-    track.addEventListener("touchend", handleNativeTouchEnd, { passive: true });
-
     return () => {
-      track.removeEventListener("mousedown", handleNativeMouseDown);
-      track.removeEventListener("mousemove", handleNativeMouseMove);
-      track.removeEventListener("mouseup", handleNativeMouseUpOrLeave);
-      track.removeEventListener("mouseleave", handleNativeMouseUpOrLeave);
-
-      track.removeEventListener("touchstart", handleNativeTouchStart);
-      track.removeEventListener("touchmove", handleNativeTouchMove);
-      track.removeEventListener("touchend", handleNativeTouchEnd);
-
       window.cancelAnimationFrame(scrollRafRef.current);
     };
-  }, []);
+  }, [stats.length]);
 
   return (
     <section
@@ -224,8 +153,7 @@ const StatsGrid = ({ weatherData }) => {
         className={clsx(
           "flex-1 min-h-0 flex overflow-x-auto scroll-smooth no-scrollbar touch-pan-x rounded-[18px]",
           "snap-x snap-mandatory",
-          "max-desktop:flex-none max-desktop:min-h-[120px]",
-          isDragging ? "cursor-grabbing" : "cursor-grab"
+          "max-desktop:flex-none max-desktop:min-h-[120px]"
         )}
       >
         {stats.map((stat) => (

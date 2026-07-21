@@ -207,7 +207,8 @@ const ForecastList = ({ weatherData }) => {
   const forecastDays = daily.slice(0, 7);
   const forecastTitle = t("forecast.titleWithCount", { count: forecastDays.length });
 
-  const activeLocale = i18n.language?.startsWith("fr") ? "fr-FR" : "en-US";
+  const rawLang = i18n.language?.slice(0, 2).toLowerCase();
+  const activeLocale = rawLang === "fr" ? "fr-FR" : rawLang === "ar" ? "ar-EG" : "en-US";
 
   return (
     <section
@@ -238,7 +239,7 @@ const ForecastList = ({ weatherData }) => {
           const localDate = new Date((dt + (timezone_offset || 0)) * 1000);
           const dayName = new Intl.DateTimeFormat(activeLocale, { weekday: "short", timeZone: "UTC" }).format(localDate);
           const monthName = new Intl.DateTimeFormat(activeLocale, { month: "short", timeZone: "UTC" }).format(localDate);
-          const dayNum = new Intl.DateTimeFormat(activeLocale, { day: "2-digit", timeZone: "UTC" }).format(localDate);
+          const dayNum = new Intl.DateTimeFormat(activeLocale, { day: "2-digit", timeZone: "UTC", numberingSystem: "latn" }).format(localDate);
           const dayLabel = `${dayName}, ${monthName} ${dayNum}`;
 
           const windKmh = Number.isFinite(wind_speed)

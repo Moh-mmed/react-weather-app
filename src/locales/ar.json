@@ -1,0 +1,174 @@
+{
+  "header": {
+    "searchPlaceholder": "ابحث عن مدينة أو إحداثيات…",
+    "geoBtnTitle": "استخدم موقعي الحالي",
+    "geoError": "تعذر تحديد موقعك",
+    "loading": "جاري التحميل...",
+    "noMatches": "لا توجد نتائج",
+    "saved": "محفوظة",
+    "saveLocation": "حفظ الموقع",
+    "saveThisLocation": "حفظ هذا الموقع",
+    "wrongCityTooltip": "عذراً، لقد أدخلت اسم مدينة غير صحيح"
+  },
+  "hero": {
+    "feelsLike": "الشعور الحراري",
+    "high": "العظمى",
+    "low": "الصغرى",
+    "remove": "حذف",
+    "confirmDelete": "تأكيد الحذف؟",
+    "photoBy": "الصورة بواسطة",
+    "onUnsplash": "على"
+  },
+  "outlook": {
+    "title": "توقعات 48 ساعة",
+    "fallbackMessage": "تتطلب التوقعات الساعية لـ 48 ساعة اشتراك OpenWeather One Call 3.0."
+  },
+  "forecast": {
+    "title": "توقعات 7 أيام",
+    "titleWithCount": "توقعات {{count}} أيام",
+    "precip": "الهطول",
+    "humidity": "الرطوبة",
+    "wind": "الرياح"
+  },
+  "sun": {
+    "title": "موقع الشمس",
+    "sunrise": "الشروق",
+    "sunset": "الغروب"
+  },
+  "uvi": {
+    "level": {
+      "low": "منخفض",
+      "moderate": "معتدل",
+      "high": "مرتفع",
+      "very high": "مرتفع جداً",
+      "extreme": "أقصى",
+      "unknown": "غير معروف"
+    },
+    "title": {
+      "low": "أشعة فوق بنفسجية منخفضة",
+      "moderate": "أشعة فوق بنفسجية معتدلة",
+      "high": "أشعة فوق بنفسجية مرتفعة",
+      "very high": "أشعة فوق بنفسجية مرتفعة جداً",
+      "extreme": "أشعة فوق بنفسجية قصوى",
+      "unknown": "بيانات الأشعة غير متوفرة"
+    },
+    "desc": {
+      "low": "خطر منخفض من الأشعة فوق البنفسجية.",
+      "moderate": "خطر معتدل — استخدم واقي الشمس عند البقاء بالخارج لفترات طويلة.",
+      "high": "خطر مرتفع — يلزم استخدام الحماية خلال ساعات الظهيرة.",
+      "very high": "مرتفع جداً. احتمال تضرر البشرة خلال أقل من 20 دقيقة — ابحث عن الظل في الظهيرة.",
+      "extreme": "خطر أقصى. تجنب التعرض للشمس في ساعات الظهيرة.",
+      "unknown": "بيانات مؤشر الأشعة فوق البنفسجية غير متوفرة."
+    }
+  },
+  "aqi": {
+    "title": "جودة الهواء",
+    "mainPollutant": "الملوث الرئيسي — {{pollutant}}",
+    "categories": {
+      "good": "ممتاز",
+      "moderate": "مقبول",
+      "usg": "غير صحي للفئات الحساسة",
+      "unhealthy": "غير صحي",
+      "veryUnhealthy": "غير صحي جداً",
+      "hazardous": "خطير",
+      "unknown": "غير معروف"
+    },
+    "shortCategories": {
+      "good": "ممتاز",
+      "moderate": "مقبول",
+      "usg": "حساسة",
+      "unhealthy": "غير صحي",
+      "veryUnhealthy": "ضار جداً",
+      "hazardous": "خطير",
+      "unknown": "غير معروف"
+    }
+  },
+  "stats": {
+    "pressure": "الضغط الجوي",
+    "humidity": "الرطوبة",
+    "wind": "سرعة الرياح",
+    "visibility": "مدى الرؤية",
+    "dewPoint": "نقطة الندى",
+    "cloudCover": "الغطاء السحابي",
+    "unitKmH": "كم/س",
+    "unitHpa": "هكتوباسكال",
+    "unitKm": "كم"
+  },
+  "windDirections": {
+    "N": "شمال",
+    "NNE": "شمال شمال شرق",
+    "NE": "شمال شرق",
+    "ENE": "شرق شمال شرق",
+    "E": "شرق",
+    "ESE": "شرق جنوب شرق",
+    "SE": "جنوب شرق",
+    "SSE": "جنوب جنوب شرق",
+    "S": "جنوب",
+    "SSW": "جنوب جنوب غرب",
+    "SW": "جنوب غرب",
+    "WSW": "غرب جنوب غرب",
+    "W": "غرب",
+    "WNW": "غرب شمال غرب",
+    "NW": "شمال غرب",
+    "NNW": "شمال شمال غرب"
+  },
+  "weatherConditions": {
+    "Thunderstorm": "عاصفة رعدية",
+    "Drizzle": "رذاذ",
+    "Rain": "مطر",
+    "Snow": "ثلج",
+    "Mist": "ضباب خفيف",
+    "Smoke": "دخان",
+    "Haze": "ضباب دخاني",
+    "Dust": "غبار",
+    "Fog": "ضباب كثيف",
+    "Sand": "رمال",
+    "Ash": "رماء رمادي",
+    "Squall": "زوبعة",
+    "Tornado": "إعصار",
+    "Clear": "صافٍ",
+    "Clouds": "غائم",
+
+    "clear sky": "سماء صافية",
+    "few clouds": "غيوم قليلة",
+    "scattered clouds": "غيوم متفرقة",
+    "broken clouds": "غيوم متقطعة",
+    "overcast clouds": "غيوم ملبدة",
+    "light rain": "مطر خفيف",
+    "moderate rain": "مطر معتدل",
+    "heavy intensity rain": "مطر غزير",
+    "very heavy rain": "مطر غزير جداً",
+    "extreme rain": "مطر شديد الغزارة",
+    "freezing rain": "مطر متجمد",
+    "light intensity shower rain": "زخات مطر خفيفة",
+    "shower rain": "زخات مطر",
+    "heavy intensity shower rain": "زخات مطر غزيرة",
+    "ragged shower rain": "زخات مطر متفرقة",
+    "light snow": "ثلج خفيف",
+    "heavy snow": "ثلج كثيف",
+    "sleet": "مطر ثلجي",
+    "light shower sleet": "زخات مطر ثلجي خفيفة",
+    "shower sleet": "زخات مطر ثلجي",
+    "light rain and snow": "مطر وثلج خفيف",
+    "rain and snow": "مطر وثلج",
+    "light shower snow": "زخات ثلج خفيفة",
+    "shower snow": "زخات ثلج",
+    "heavy shower snow": "زخات ثلج كثيفة",
+    "light intensity drizzle": "رذاذ خفيف",
+    "heavy intensity drizzle": "رذاذ كثيف",
+    "thunderstorm with light rain": "عاصفة رعدية مع مطر خفيف",
+    "thunderstorm with rain": "عاصفة رعدية مع مطر",
+    "thunderstorm with heavy rain": "عاصفة رعدية مع مطر غزير",
+    "light thunderstorm": "عاصفة رعدية خفيفة",
+    "heavy thunderstorm": "عاصفة رعدية شديدة",
+    "ragged thunderstorm": "عاصفة رعدية متفرقة"
+  },
+  "error": {
+    "rejectedKey": "رفض OpenWeather الطلب. يرجى إضافة مفتاح REACT_APP_OPENWEATHER_API_KEY صحيح إلى ملف .env الخاص بك.",
+    "missingKey": "مفتاح REACT_APP_OPENWEATHER_API_KEY مفقود. أنشئ ملف .env يحتوي على مفتاح OpenWeather صحيح.",
+    "cityNotFound": "تعذر العثور على هذه المدينة حالياً.",
+    "reverseGeoFailed": "تعذر تحديد المدينة الحالية من موقعك.",
+    "weatherFailed": "تعذر تحميل توقعات الطقس.",
+    "airPollutionFailed": "تعذر تحميل تقرير جودة الهواء."
+  }
+}

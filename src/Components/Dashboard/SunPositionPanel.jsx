@@ -39,7 +39,7 @@ const SunPositionPanel = ({ weatherData }) => {
 
       {/* Arc and labels */}
       <div className="flex flex-col items-center">
-        <svg viewBox="0 0 350 175" width="100%" style={{ marginTop: 8 }}>
+        <svg viewBox="0 0 350 175" width="100%" style={{ marginTop: 8 }} dir="ltr">
           {/* Dashed base arc */}
           <path
             d={SUN_ARC_BASE}
@@ -72,8 +72,8 @@ const SunPositionPanel = ({ weatherData }) => {
           <circle cx="325" cy="170" r="4" fill="#8CA1B4" />
         </svg>
 
-        {/* Sunrise / Sunset labels */}
-        <div className="flex justify-between w-full mt-0.5">
+        {/* Sunrise / Sunset labels — explicitly kept LTR position to match arc endpoints */}
+        <div className="flex justify-between w-full mt-0.5" dir="ltr">
           <div className="text-left">
             <div className="text-[11px] text-muted uppercase tracking-[0.6px]">{t("sun.sunrise")}</div>
             <div className="font-mono text-[14px] font-medium mt-0.5">{Sunrise}</div>
