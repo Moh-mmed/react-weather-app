@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import clsx from "clsx";
 import { getDewPoint } from "../../helpers/getDewPoint";
 import { getWindDirectionAbbr } from "../../helpers/getWindDirection";
+import { useUnit } from "../../contexts/UnitContext";
 
 const StatIcon = ({ children }) => (
   <svg
@@ -37,14 +38,22 @@ const StatsGrid = ({ weatherData }) => {
     useGrouping: false,
   });
 
-  const dewPoint = getDewPoint(temp, humidity);
-  const windKmh = Number.isFinite(wind_speed)
-    ? Math.round(wind_speed * 3.6)
-    : 0;
+  const {
+    unitSystem,
+    convertTemp,
+    convertWind,
+    convertVisibility,
+    convertPressure,
+  } = useUnit();
+
+  const dewPointC = getDewPoint(temp, humidity);
+  const dewPointDisplay = Number.isFinite(dewPointC) ? convertTemp(dewPointC) : "--";
+
+  const windObj = convertWind(wind_speed);
   const windDir = getWindDirectionAbbr(wind_deg, t);
-  const visibilityKm = Number.isFinite(visibility)
-    ? (visibility / 1000).toFixed(1)
-    : "0";
+
+  const visObj = convertVisibility(visibility);
+  const presObj = convertPressure(pressure);
 
   // ── 1. PRESSURE TREND ──
   const hourlyData = hourly || [];
@@ -67,22 +76,30 @@ const StatsGrid = ({ weatherData }) => {
           currentPressure,
           currentPressure + 2,
         ];
-  const diff24h =
-    pressureSamples[pressureSamples.length - 1] - pressureSamples[0];
+  // Convert samples for trend calculation if imperial (hPa -> inHg)
+  const convertedSamples = pressureSamples.map((p) => {
+    if (unitSystem === "imperial") {
+      return Number((p * 0.02953).toFixed(2));
+    }
+    return p;
+  });
+
+  const diff24h = convertedSamples[convertedSamples.length - 1] - convertedSamples[0];
   const absDiff = Math.abs(diff24h);
-  const formattedDiff = numFormatter.format(absDiff);
+  const formattedDiff = unitSystem === "imperial" ? absDiff.toFixed(2) : Math.round(absDiff);
 
   let trendSymbol = "→";
   let trendLabelKey = "stable";
-  if (diff24h > 0.5) {
+  if (diff24h > (unitSystem === "imperial" ? 0.02 : 0.5)) {
     trendSymbol = "↗";
     trendLabelKey = "rising";
-  } else if (diff24h < -0.5) {
+  } else if (diff24h < (unitSystem === "imperial" ? -0.02 : -0.5)) {
     trendSymbol = "↘";
     trendLabelKey = "falling";
   }
   const trendText = `${trendSymbol} ${t(`stats.${trendLabelKey}`)}`;
-  const pressureDesc = t("stats.pressureTrendDesc", {
+  const pressureDescKey = unitSystem === "imperial" ? "stats.pressureTrendDescImperial" : "stats.pressureTrendDesc";
+  const pressureDesc = t(pressureDescKey, {
     change: `${diff24h >= 0 ? "+" : "-"}${formattedDiff}`,
   });
 
@@ -95,26 +112,27 @@ const StatsGrid = ({ weatherData }) => {
   }
 
   // ── 3. WIND INSIGHT ──
+  const windKmhValue = Math.round(wind_speed * 3.6);
   let windInsight = t("stats.windCalm");
-  if (windKmh > 28) {
+  if (windKmhValue > 28) {
     windInsight = t("stats.windStrong");
-  } else if (windKmh > 10) {
+  } else if (windKmhValue > 10) {
     windInsight = t("stats.windModerate");
-  } else if (windKmh > 1) {
+  } else if (windKmhValue > 1) {
     windInsight = t("stats.windLight");
   }
 
   // ── 4. VISIBILITY INSIGHT ──
-  const visValue = Number(visibilityKm);
+  const visKmValue = Number((visibility / 1000).toFixed(1));
   let visibilityInsight = t("stats.visibilityExcellent");
-  if (visValue < 3) {
+  if (visKmValue < 3) {
     visibilityInsight = t("stats.visibilityPoor");
-  } else if (visValue < 8) {
+  } else if (visKmValue < 8) {
     visibilityInsight = t("stats.visibilityModerate");
   }
 
   // ── 5. DEW POINT INSIGHT ──
-  const dpValue = Number.isFinite(dewPoint) ? dewPoint : 12;
+  const dpValue = Number.isFinite(dewPointC) ? dewPointC : 12;
   let dewPointInsight = t("stats.dewPointComfortable");
   let comfortCategoryKey = "comfortComfortable";
   if (dpValue > 20) {
@@ -136,10 +154,8 @@ const StatsGrid = ({ weatherData }) => {
   const stats = [
     {
       label: t("stats.pressure"),
-      value: Number.isFinite(pressure)
-        ? noGroupFormatter.format(pressure)
-        : "--",
-      unit: t("stats.unitHpa"),
+      value: presObj.value,
+      unit: t(presObj.unitKey),
       type: "pressure",
       insight: pressureDesc,
       icon: (
@@ -163,8 +179,8 @@ const StatsGrid = ({ weatherData }) => {
     },
     {
       label: t("stats.wind"),
-      value: Number.isFinite(windKmh) ? numFormatter.format(windKmh) : "--",
-      unit: `${t("stats.unitKmH")} ${windDir}`,
+      value: windObj.value,
+      unit: `${t(windObj.unitKey)} ${windDir}`,
       type: "wind",
       insight: windInsight,
       icon: (
@@ -176,10 +192,8 @@ const StatsGrid = ({ weatherData }) => {
     },
     {
       label: t("stats.visibility"),
-      value: Number.isFinite(visibility)
-        ? numFormatter.format(visibilityKm)
-        : "--",
-      unit: t("stats.unitKm"),
+      value: visObj.value,
+      unit: t(visObj.unitKey),
       type: "visibility",
       insight: visibilityInsight,
       icon: (
@@ -191,8 +205,8 @@ const StatsGrid = ({ weatherData }) => {
     },
     {
       label: t("stats.dewPoint"),
-      value: Number.isFinite(dewPoint) ? dewPoint : "--",
-      unit: "°C",
+      value: dewPointDisplay,
+      unit: unitSystem === "imperial" ? "°F" : "°C",
       type: "dewPoint",
       insight: dewPointInsight,
       icon: (
@@ -316,7 +330,7 @@ const StatsGrid = ({ weatherData }) => {
                       {t(`stats.${comfortCategoryKey}`)}
                     </span>
                   )}
-                  {stat.type === "wind" && windKmh > 0 && (
+                  {stat.type === "wind" && windKmhValue > 0 && (
                     <span className="text-[11px] font-semibold text-accent-sky mt-1.5">
                       {windDir}
                     </span>
@@ -329,14 +343,14 @@ const StatsGrid = ({ weatherData }) => {
                   {/* PRESSURE VISUALIZATION */}
                   {stat.type === "pressure" &&
                     (() => {
-                      const minP = Math.min(...pressureSamples);
-                      const maxP = Math.max(...pressureSamples);
-                      const pRange = maxP - minP || 2;
+                      const minP = Math.min(...convertedSamples);
+                      const maxP = Math.max(...convertedSamples);
+                      const pRange = maxP - minP || 0.05;
                       const w = 150;
                       const h = 55;
-                      const pts = pressureSamples.map((val, idx) => {
+                      const pts = convertedSamples.map((val, idx) => {
                         const x =
-                          (idx / (pressureSamples.length - 1)) * (w - 8) + 4;
+                          (idx / (convertedSamples.length - 1)) * (w - 8) + 4;
                         const y = h - 6 - ((val - minP) / pRange) * (h - 12);
                         return { x, y };
                       });
@@ -505,7 +519,7 @@ const StatsGrid = ({ weatherData }) => {
                             </svg>
                           </div>
                           {/* Dynamic speed particle dot floating round the circle */}
-                          {windKmh > 0 && (
+                          {windKmhValue > 0 && (
                             <div
                               className="absolute top-1/2 left-1/2 w-1.5 h-1.5 bg-accent-sky rounded-full"
                               style={{
@@ -521,8 +535,10 @@ const StatsGrid = ({ weatherData }) => {
                   {/* VISIBILITY VISUALIZATION (Horizon Gradient Scale) */}
                   {stat.type === "visibility" &&
                     (() => {
-                      const value = Math.min(10, Math.max(0, visValue));
-                      const percentage = (value / 10) * 100;
+                      const maxVal = unitSystem === "imperial" ? 6 : 10;
+                      const numVal = Number(visObj.value);
+                      const value = Math.min(maxVal, Math.max(0, Number.isFinite(numVal) ? numVal : 0));
+                      const percentage = (value / maxVal) * 100;
                       return (
                         <div className="w-[85%] flex flex-col justify-center items-stretch h-full gap-3 pt-3">
                           {/* Background scale representing a foggy horizon */}
@@ -534,8 +550,8 @@ const StatsGrid = ({ weatherData }) => {
                             />
                           </div>
                           <div className="flex justify-between text-[8px] text-muted font-mono leading-none">
-                            <span>0 km (Fog)</span>
-                            <span>10+ km (Clear)</span>
+                            <span>0 {unitSystem === "imperial" ? "mi" : "km"} (Fog)</span>
+                            <span>{maxVal}+ {unitSystem === "imperial" ? "mi" : "km"} (Clear)</span>
                           </div>
                         </div>
                       );

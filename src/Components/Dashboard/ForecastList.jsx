@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { translateConditionMain, translateConditionDescription } from "../../helpers/weatherConditionTranslator";
+import { useUnit } from "../../contexts/UnitContext";
 
 const CalendarIcon = () => (
   <svg
@@ -203,6 +204,7 @@ const ForecastBackgroundGlyph = ({ dominantCode, isNight }) => {
 
 const ForecastList = ({ weatherData }) => {
   const { t, i18n } = useTranslation();
+  const { convertTemp, convertWind } = useUnit();
   const { daily, timezone_offset } = weatherData;
   const forecastDays = daily.slice(0, 7);
   const forecastTitle = t("forecast.titleWithCount", { count: forecastDays.length });
@@ -242,9 +244,10 @@ const ForecastList = ({ weatherData }) => {
           const dayNum = new Intl.DateTimeFormat(activeLocale, { day: "2-digit", timeZone: "UTC", numberingSystem: "latn" }).format(localDate);
           const dayLabel = `${dayName}, ${monthName} ${dayNum}`;
 
-          const windKmh = Number.isFinite(wind_speed)
-            ? Math.round(wind_speed * 3.6)
-            : null;
+          const maxTemp = convertTemp(temp.max);
+          const minTemp = convertTemp(temp.min);
+
+          const windObj = convertWind(wind_speed);
 
           let trendIcon = null;
           if (index > 0) {
@@ -319,10 +322,10 @@ const ForecastList = ({ weatherData }) => {
               {/* Temp high / low */}
               <div className="font-mono text-[14px] font-semibold leading-[1.2] max-desktop:flex-1 max-desktop:text-center flex items-center max-desktop:justify-center">
                 <span className="flex items-center">
-                  {temp.max}°{trendIcon}
+                  {maxTemp}°{trendIcon}
                 </span>
                 <span className="text-muted font-normal ml-1">
-                  / {temp.min}°
+                  / {minTemp}°
                 </span>
               </div>
 
@@ -349,7 +352,7 @@ const ForecastList = ({ weatherData }) => {
                     {t("forecast.wind")}
                   </span>
                   <b className="text-primary font-mono font-medium">
-                    {Number.isFinite(windKmh) ? `${windKmh} ${t("stats.unitKmH")}` : "--"}
+                    {Number.isFinite(wind_speed) ? `${windObj.value} ${t(windObj.unitKey)}` : "--"}
                   </b>
                 </div>
               </div>

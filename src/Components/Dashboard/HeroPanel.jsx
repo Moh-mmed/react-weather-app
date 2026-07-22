@@ -2,12 +2,14 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import clsx from "clsx";
 import { translateConditionDescription } from "../../helpers/weatherConditionTranslator";
+import { useUnit } from "../../contexts/UnitContext";
 
 /**
  * HeroPanel — current conditions card.
  */
 const HeroPanel = ({ weatherData, isPinned = true, onRemove, cityPhoto }) => {
   const { t } = useTranslation();
+  const { convertTemp } = useUnit();
   const { current, daily } = weatherData;
   const { temp, feels_like, weather } = current;
   const { icon } = weather[0];
@@ -15,12 +17,12 @@ const HeroPanel = ({ weatherData, isPinned = true, onRemove, cityPhoto }) => {
   const today = daily[0];
   const high = today?.temp?.max;
   const low = today?.temp?.min;
-  const displayTemp = Number.isFinite(temp) ? Math.round(temp) : "--";
+  const displayTemp = Number.isFinite(temp) ? convertTemp(temp) : "--";
   const displayFeels = Number.isFinite(feels_like)
-    ? Math.round(feels_like)
+    ? convertTemp(feels_like)
     : "--";
-  const displayHigh = Number.isFinite(high) ? high : "--";
-  const displayLow = Number.isFinite(low) ? low : "--";
+  const displayHigh = Number.isFinite(high) ? convertTemp(high) : "--";
+  const displayLow = Number.isFinite(low) ? convertTemp(low) : "--";
 
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [photoLoaded, setPhotoLoaded] = useState(false);

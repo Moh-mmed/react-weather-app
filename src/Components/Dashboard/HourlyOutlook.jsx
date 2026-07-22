@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { formatHour24 } from "../../helpers/timeFormat";
+import { useUnit } from "../../contexts/UnitContext";
 
 const ClockIcon = () => (
   <svg
@@ -201,6 +202,7 @@ const BackgroundGlyph = ({ icon }) => {
 
 const HourlyOutlook = ({ weatherData }) => {
   const { t } = useTranslation();
+  const { convertTemp } = useUnit();
   const { outlook48h, timezone_offset } = weatherData;
 
   const glyphIcon = outlook48h?.[0]?.weather?.[0]?.icon ?? null;
@@ -211,15 +213,16 @@ const HourlyOutlook = ({ weatherData }) => {
   const PADDING_Y = 45;
   const INNER_HEIGHT = SVG_HEIGHT - PADDING_Y * 2;
 
-  const temps = outlook48h?.map((d) => d.temp) || [];
+  const temps = outlook48h?.map((d) => convertTemp(d.temp)) || [];
   const minTemp = Math.min(...temps);
   const maxTemp = Math.max(...temps);
   const range = maxTemp - minTemp || 1;
 
   const points =
     outlook48h?.map((d, i) => {
+      const displayVal = convertTemp(d.temp);
       const x = i * COLUMN_WIDTH + COLUMN_WIDTH / 2;
-      const normalized = (d.temp - minTemp) / range;
+      const normalized = (displayVal - minTemp) / range;
       const y = PADDING_Y + (1 - normalized) * INNER_HEIGHT;
       return { x, y };
     }) || [];
@@ -342,7 +345,7 @@ const HourlyOutlook = ({ weatherData }) => {
                       {label}
                     </div>
                     <div className="font-mono text-[17px] font-medium tracking-tight mb-1">
-                      {Math.round(entry.temp)}°
+                      {convertTemp(entry.temp)}°
                     </div>
                   </div>
                 );

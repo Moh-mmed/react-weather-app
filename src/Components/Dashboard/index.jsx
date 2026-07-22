@@ -13,6 +13,7 @@ import SunPositionPanel from "./SunPositionPanel";
 import AirQualityPanel from "./AirQualityPanel";
 import ForecastList from "./ForecastList";
 import { formatTime24 } from "../../helpers/timeFormat";
+import { useUnit } from "../../contexts/UnitContext";
 
 // ─── One-time cache bust & migration ──────────────────────────────────────────
 const CACHE_VERSION = "3-commons";
@@ -57,7 +58,41 @@ const BrandIcon = () => (
     </g>
   </svg>
 );
+// ─── Unit Switcher ────────────────────────────────────────────────────────────
+const UnitSwitcher = () => {
+  const { unitSystem, setUnitSystem } = useUnit();
 
+  return (
+    <div className="flex items-center bg-white/5 border border-panel-line rounded-full p-0.5 text-[11px] font-mono select-none" dir="ltr">
+      <button
+        type="button"
+        onClick={() => setUnitSystem("metric")}
+        aria-label="Switch to Celsius"
+        className={clsx(
+          "px-2 py-0.5 rounded-full transition-colors duration-150 cursor-pointer",
+          unitSystem === "metric"
+            ? "bg-accent-sky text-navy-dark font-semibold shadow-sm"
+            : "text-muted hover:text-primary",
+        )}
+      >
+        °C
+      </button>
+      <button
+        type="button"
+        onClick={() => setUnitSystem("imperial")}
+        aria-label="Switch to Fahrenheit"
+        className={clsx(
+          "px-2 py-0.5 rounded-full transition-colors duration-150 cursor-pointer",
+          unitSystem === "imperial"
+            ? "bg-accent-sky text-navy-dark font-semibold shadow-sm"
+            : "text-muted hover:text-primary",
+        )}
+      >
+        °F
+      </button>
+    </div>
+  );
+};
 // ─── Language Switcher ────────────────────────────────────────────────────────
 const LanguageSwitcher = () => {
   const { i18n } = useTranslation();
@@ -321,9 +356,10 @@ const Dashboard = ({
     ? { city: activePage.city, country: activePage.country }
     : currCity;
 
+  const { convertTemp, unitSystem } = useUnit();
   const timezone_offset = activeWeatherData?.timezone_offset ?? 0;
   const activeTemp = activeWeatherData?.current?.temp;
-  const safeTemp = Number.isFinite(activeTemp) ? Math.round(activeTemp) : "--";
+  const safeTemp = Number.isFinite(activeTemp) ? convertTemp(activeTemp) : "--";
   const { city, country } = activeCurrCity || {};
 
   const { t } = useTranslation();
@@ -420,8 +456,9 @@ const Dashboard = ({
               Weather<em className="italic text-accent-sun">Me</em>
             </div>
           </div>
-          {/* Language toggle + Ko-fi grouped together as secondary header actions */}
+          {/* Unit toggle + Language toggle + Ko-fi grouped together as secondary header actions */}
           <div className="flex items-center gap-2">
+            <UnitSwitcher />
             <LanguageSwitcher />
             <KofiButton />
           </div>
@@ -477,7 +514,7 @@ const Dashboard = ({
             </div>
           </div>
           <div className="flex items-center font-display font-semibold text-[32px] leading-none text-accent-sky">
-            {safeTemp}°C
+            {safeTemp}°{unitSystem === "imperial" ? "F" : "C"}
           </div>
         </div>
       </header>
