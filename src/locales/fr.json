@@ -23,9 +23,7 @@
     "high": "Max.",
     "low": "Min.",
     "remove": "Supprimer",
-    "confirmDelete": "Confirmer ?",
-    "photoBy": "Photo par",
-    "onUnsplash": "sur"
+    "confirmDelete": "Confirmer ?"
   },
   "outlook": {
     "title": "Aperçu 48h",

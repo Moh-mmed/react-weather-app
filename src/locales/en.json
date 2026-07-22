@@ -23,9 +23,7 @@
     "high": "High",
     "low": "Low",
     "remove": "Remove",
-    "confirmDelete": "Confirm delete?",
-    "photoBy": "Photo by",
-    "onUnsplash": "on"
+    "confirmDelete": "Confirm delete?"
   },
   "outlook": {
     "title": "48-Hour Outlook",

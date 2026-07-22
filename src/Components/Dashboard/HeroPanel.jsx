@@ -4,10 +4,151 @@ import clsx from "clsx";
 import { translateConditionDescription } from "../../helpers/weatherConditionTranslator";
 import { useUnit } from "../../contexts/UnitContext";
 
+const cloudPath =
+  "M25 68C16 68 10 62 10 54C10 47 15 41 22 40C22 30 30 22 40 22C48 22 55 27 58 34C60 33 63 32 66 32C75 32 82 39 82 48C82 57 75 64 66 64H25Z";
+
+const range = (count) => Array.from({ length: count }, (_, i) => i);
+const starPositions = [
+  [8, 18], [18, 62], [29, 28], [39, 72], [51, 16], [61, 48],
+  [72, 25], [84, 66], [12, 42], [46, 54], [76, 11], [91, 39],
+];
+
+const getHeroCondition = (current) => {
+  const weather = current?.weather?.[0] || {};
+  const code = weather.icon?.slice(0, 2);
+  const main = weather.main?.toLowerCase() || "";
+  const description = weather.description?.toLowerCase() || "";
+  const isDay =
+    Number.isFinite(current?.dt) &&
+    Number.isFinite(current?.sunrise) &&
+    Number.isFinite(current?.sunset)
+      ? current.dt >= current.sunrise && current.dt < current.sunset
+      : !weather.icon?.endsWith("n");
+
+  if (code === "01" || main === "clear") return isDay ? "clear-day" : "clear-night";
+  if (code === "02" || code === "03" || code === "04" || main === "clouds") return "clouds";
+  if (code === "09" || code === "10" || main.includes("rain") || main.includes("drizzle")) return "rain";
+  if (code === "11" || main.includes("thunderstorm")) return "thunderstorm";
+  if (code === "13" || main.includes("snow")) return "snow";
+  if (
+    code === "50" ||
+    ["mist", "fog", "haze", "smoke", "dust", "sand", "ash", "squall", "tornado"].some(
+      (term) => main.includes(term) || description.includes(term),
+    )
+  ) {
+    return "fog";
+  }
+
+  return isDay ? "clear-day" : "clear-night";
+};
+
+const CloudShape = ({ className }) => (
+  <svg
+    viewBox="0 0 100 100"
+    fill="none"
+    aria-hidden="true"
+    className={clsx("hero-cloud-shape", className)}
+  >
+    <path d={cloudPath} />
+    <path d="M20 68H78" />
+  </svg>
+);
+
+const HeroWeatherBackground = ({ current }) => {
+  const condition = getHeroCondition(current);
+
+  return (
+    <div
+      aria-hidden="true"
+      className={clsx("hero-weather-bg", `hero-weather-bg--${condition}`)}
+    >
+      {(condition === "clear-day" || condition === "clear-night") && (
+        <div className="hero-celestial">
+          {condition === "clear-day" ? (
+            <>
+              <div className="hero-sun-glow" />
+              <div className="hero-sun-rays" />
+              <div className="hero-sun-core" />
+            </>
+          ) : (
+            <>
+              {range(12).map((i) => (
+                <span
+                  key={i}
+                  className="hero-star"
+                  style={{
+                    "--i": i,
+                    "--x": `${starPositions[i][0]}%`,
+                    "--y": `${starPositions[i][1]}%`,
+                    "--size": `${2 + (i % 3)}px`,
+                  }}
+                />
+              ))}
+              <div className="hero-moon" />
+            </>
+          )}
+        </div>
+      )}
+
+      {["clouds", "rain", "thunderstorm"].includes(condition) && (
+        <div className="hero-clouds">
+          <CloudShape className="hero-cloud-shape--one" />
+          <CloudShape className="hero-cloud-shape--two" />
+          <CloudShape className="hero-cloud-shape--three" />
+        </div>
+      )}
+
+      {["rain", "thunderstorm"].includes(condition) && (
+        <div className="hero-rain">
+          {range(24).map((i) => (
+            <span
+              key={i}
+              className="hero-rain-drop"
+              style={{
+                "--i": i,
+                "--x": `${(i * 41) % 100}%`,
+                "--height": `${22 + (i % 4) * 6}px`,
+                "--duration": `${0.82 + (i % 5) * 0.12}s`,
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      {condition === "thunderstorm" && <div className="hero-lightning-flash" />}
+
+      {condition === "snow" && (
+        <div className="hero-snow">
+          {range(24).map((i) => (
+            <span
+              key={i}
+              className="hero-snowflake"
+              style={{
+                "--i": i,
+                "--x": `${(i * 37) % 100}%`,
+                "--size": `${4 + (i % 3) * 2}px`,
+                "--duration": `${6 + (i % 6) * 0.55}s`,
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      {condition === "fog" && (
+        <div className="hero-fog">
+          {range(6).map((i) => (
+            <span key={i} className="hero-fog-band" style={{ "--i": i }} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 /**
  * HeroPanel — current conditions card.
  */
-const HeroPanel = ({ weatherData, isPinned = true, onRemove, cityPhoto }) => {
+const HeroPanel = ({ weatherData, isPinned = true, onRemove }) => {
   const { t } = useTranslation();
   const { convertTemp } = useUnit();
   const { current, daily } = weatherData;
@@ -25,12 +166,6 @@ const HeroPanel = ({ weatherData, isPinned = true, onRemove, cityPhoto }) => {
   const displayLow = Number.isFinite(low) ? convertTemp(low) : "--";
 
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [photoLoaded, setPhotoLoaded] = useState(false);
-
-  useEffect(() => {
-    setPhotoLoaded(false);
-  }, [cityPhoto?.url]);
-
   useEffect(() => {
     if (!confirmDelete) return;
     const timer = setTimeout(() => {
@@ -44,35 +179,17 @@ const HeroPanel = ({ weatherData, isPinned = true, onRemove, cityPhoto }) => {
       className="relative overflow-hidden rounded-panel border border-panel-line bg-navy-panel bg-panel-pattern p-[22px_24px] flex items-center justify-between gap-5 min-h-[190px] motion-safe:animate-rise"
       style={{ animationDelay: "0s" }}
     >
-      {/* ── City photo background layer ───────────────────────────────────── */}
-      {cityPhoto?.url && (
-        <>
-          <img
-            src={cityPhoto.url}
-            alt=""
-            aria-hidden="true"
-            onLoad={() => setPhotoLoaded(true)}
-            onError={() => setPhotoLoaded(false)}
-            className={clsx(
-              "absolute inset-0 w-full h-full object-cover pointer-events-none select-none",
-              "transition-opacity duration-700",
-              photoLoaded ? "opacity-65" : "opacity-0"
-            )}
-          />
-          {photoLoaded && (
-            <div
-              aria-hidden="true"
-              className="absolute inset-0 pointer-events-none"
-              style={{
-                background:
-                  "linear-gradient(to right, #13273D 0%, #13273Dcc 45%, #13273D88 70%, transparent 100%)",
-              }}
-            />
-          )}
-        </>
-      )}
+      <HeroWeatherBackground current={current} />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "linear-gradient(to right, #13273D 0%, #13273De6 45%, #13273Daa 72%, rgba(19,39,61,0.42) 100%)",
+        }}
+      />
 
-      {/* ── Glow orb (always present, on top of photo) ───────────────────── */}
+      {/* ── Glow orb (always present, on top of animation) ───────────────── */}
       <div
         className="absolute -top-10 -right-7 w-64 h-64 rounded-full pointer-events-none"
         style={{
@@ -155,31 +272,6 @@ const HeroPanel = ({ weatherData, isPinned = true, onRemove, cityPhoto }) => {
         className="w-[150px] h-[150px] opacity-95 z-10 shrink-0"
       />
 
-      {/* ── Unsplash attribution ───────────────────────────────────────────── */}
-      {cityPhoto?.url && photoLoaded && (
-        <div className="absolute bottom-2 right-3 z-20 pointer-events-auto">
-          <p className="font-mono text-[9px] text-white/30 leading-none">
-            {t("hero.photoBy")}{" "}
-            <a
-              href={cityPhoto.photographerLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline underline-offset-1 hover:text-white/55 transition-colors duration-150"
-            >
-              {cityPhoto.photographerName}
-            </a>{" "}
-            {t("hero.onUnsplash")}{" "}
-            <a
-              href={cityPhoto.unsplashLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline underline-offset-1 hover:text-white/55 transition-colors duration-150"
-            >
-              Unsplash
-            </a>
-          </p>
-        </div>
-      )}
     </section>
   );
 };

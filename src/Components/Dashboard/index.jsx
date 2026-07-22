@@ -1,9 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  fetchHeroImage,
-  clearHeroImageCache,
-} from "../../helpers/heroImageFetcher";
 import clsx from "clsx";
 import NavBarForm from "../Main/NavBar/NavBarForm";
 import HeroPanel from "./HeroPanel";
@@ -23,27 +19,6 @@ const SECONDARY_ACTION_CLASS = clsx(
   "hover:bg-white/10 hover:border-white/15 hover:text-primary hover:brightness-110 hover:scale-[1.04]",
   "focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-sky/60 focus-visible:outline-offset-2",
 );
-
-// ─── One-time cache bust & migration ──────────────────────────────────────────
-const CACHE_VERSION = "3-commons";
-const CACHE_VERSION_KEY = "weatherme:img_cache_v";
-(() => {
-  try {
-    const stored = localStorage.getItem(CACHE_VERSION_KEY);
-    if (stored !== CACHE_VERSION) {
-      clearHeroImageCache();
-      // Clean up old Unsplash caches to free space
-      Object.keys(localStorage).forEach((k) => {
-        if (k.startsWith("weatherme:unsplash")) {
-          localStorage.removeItem(k);
-        }
-      });
-      localStorage.setItem(CACHE_VERSION_KEY, CACHE_VERSION);
-    }
-  } catch {
-    /* localStorage unavailable */
-  }
-})();
 
 // ─── Brand icon ──────────────────────────────────────────────────────────────
 const BrandIcon = () => (
@@ -378,35 +353,6 @@ const PageSpinner = () => (
 const LocationPage = ({ page, onRemove }) => {
   const { weatherData, airQuality, isPinned } = page;
 
-  // ── Unsplash city photo ───────────────────────────────────────────────────
-  // Fetch once per city name; the helper’s cache means this is a no-op on
-  // re-renders and page switches if we’’ve already fetched it this session.
-  const [cityPhoto, setCityPhoto] = useState(null);
-
-  useEffect(() => {
-    if (!page.city) return;
-    let cancelled = false;
-    // Build the context bag for the Nominatim + Commons fallback chain:
-    //   • lat, lon   — required for Nominatim reverse-geocoding
-    //   • country    — always present
-    //   • weatherMain — OWM condition string for the generic tier fallback
-    const weatherMain = weatherData?.current?.weather?.[0]?.main ?? null;
-    fetchHeroImage(page.city, {
-      lat: page.lat ?? null,
-      lon: page.lon ?? null,
-      country: page.country ?? null,
-      weatherMain,
-    }).then((result) => {
-      if (!cancelled) setCityPhoto(result);
-    });
-    return () => {
-      cancelled = true;
-    };
-    // Re-fetch only when the city changes
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page.city]);
-  // ─────────────────────────────────────────────────────────────────────────
-
   if (!weatherData || !airQuality) {
     return <PageSpinner />;
   }
@@ -426,7 +372,6 @@ const LocationPage = ({ page, onRemove }) => {
           weatherData={weatherData}
           isPinned={isPinned}
           onRemove={onRemove}
-          cityPhoto={cityPhoto}
         />
         <HourlyOutlook weatherData={weatherData} />
         <ForecastList weatherData={weatherData} />
