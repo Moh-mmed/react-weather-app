@@ -9,6 +9,7 @@ const formatLocalDate = (dt, timezoneOffset) =>
 const mapForecastEntry = (entry) => ({
   dt: entry.dt,
   temp: entry.main.temp,
+  pressure: entry.main.pressure ?? null,
   weather: entry.weather,
   pop: entry.pop ?? 0,
 });
@@ -108,6 +109,7 @@ const buildHourlyForToday = (forecastList, current, timezoneOffset) => {
   const currentEntry = {
     dt: current.dt,
     temp: current.temp,
+    pressure: current.pressure ?? null,
     weather: current.weather,
     pop: 0,
   };
