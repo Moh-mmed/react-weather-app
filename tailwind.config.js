@@ -18,9 +18,9 @@ module.exports = {
         'primary': '#EEF3F7',
       },
       fontFamily: {
-        display: ['Fraunces', 'serif'],
-        sans: ['Inter', 'sans-serif'],
-        mono: ['"IBM Plex Mono"', 'monospace'],
+        display: ['var(--font-display)', 'Fraunces', 'serif'],
+        sans: ['var(--font-sans)', 'Inter', 'sans-serif'],
+        mono: ['var(--font-mono)', '"IBM Plex Mono"', 'monospace'],
       },
       screens: {
         'mobile': '480px',

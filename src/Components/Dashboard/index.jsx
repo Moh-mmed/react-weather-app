@@ -61,11 +61,11 @@ const BrandIcon = () => (
 // ─── Language Switcher ────────────────────────────────────────────────────────
 const LanguageSwitcher = () => {
   const { i18n } = useTranslation();
-  const activeLang =
-    i18n.language?.slice(0, 2).toLowerCase() === "fr" ? "fr" : "en";
+  const rawLang = i18n.language?.slice(0, 2).toLowerCase();
+  const activeLang = rawLang === "fr" ? "fr" : rawLang === "ar" ? "ar" : "en";
 
   return (
-    <div className="flex items-center bg-white/5 border border-panel-line rounded-full p-0.5 text-[11px] font-mono select-none">
+    <div className="flex items-center bg-white/5 border border-panel-line rounded-full p-0.5 text-[11px] font-mono select-none" dir="ltr">
       <button
         type="button"
         onClick={() => i18n.changeLanguage("en")}
@@ -91,6 +91,19 @@ const LanguageSwitcher = () => {
         )}
       >
         FR
+      </button>
+      <button
+        type="button"
+        onClick={() => i18n.changeLanguage("ar")}
+        aria-label="التحويل إلى العربية"
+        className={clsx(
+          "px-2 py-0.5 rounded-full transition-colors duration-150 cursor-pointer",
+          activeLang === "ar"
+            ? "bg-accent-sky text-navy-dark font-semibold shadow-sm"
+            : "text-muted hover:text-primary",
+        )}
+      >
+        AR
       </button>
     </div>
   );
@@ -149,7 +162,8 @@ const LiveClock = ({ timezoneOffset }) => {
     return () => clearInterval(interval);
   }, []);
 
-  const activeLocale = i18n.language?.startsWith("fr") ? "fr-FR" : "en-US";
+  const rawLang = i18n.language?.slice(0, 2).toLowerCase();
+  const activeLocale = rawLang === "fr" ? "fr-FR" : rawLang === "ar" ? "ar-EG" : "en-US";
   const localDate = new Date((now + (timezoneOffset || 0)) * 1000);
 
   const dayName = new Intl.DateTimeFormat(activeLocale, {
@@ -159,6 +173,7 @@ const LiveClock = ({ timezoneOffset }) => {
   const dayNum = new Intl.DateTimeFormat(activeLocale, {
     day: "2-digit",
     timeZone: "UTC",
+    numberingSystem: "latn",
   }).format(localDate);
   const monthName = new Intl.DateTimeFormat(activeLocale, {
     month: "short",
@@ -295,11 +310,7 @@ const Dashboard = ({
 }) => {
   // ── Paging scroll container ref ─────────────────────────────────────────────
   const pagerRef = useRef(null);
-  const dragStateRef = useRef({ active: false, startX: 0, startScrollLeft: 0 });
   const scrollRafRef = useRef(0);
-  // Use a ref (not state) for dragging so we never trigger a re-render mid-drag.
-  // Instead we directly toggle the cursor class on the DOM element.
-  const isDraggingRef = useRef(false);
   // Prevent a programmatic scroll from re-triggering setActiveIndex
   const isProgrammaticScrollRef = useRef(false);
 
@@ -330,8 +341,9 @@ const Dashboard = ({
   useEffect(() => {
     const pager = pagerRef.current;
     if (!pager) return;
-    const targetScrollLeft = activeIndex * pager.clientWidth;
-    if (Math.abs(pager.scrollLeft - targetScrollLeft) < 2) return;
+    const isRtl = document.documentElement.dir === "rtl";
+    const targetScrollLeft = isRtl ? -activeIndex * pager.clientWidth : activeIndex * pager.clientWidth;
+    if (Math.abs(Math.abs(pager.scrollLeft) - activeIndex * pager.clientWidth) < 2) return;
     isProgrammaticScrollRef.current = true;
     pager.scrollTo({ left: targetScrollLeft, behavior: "smooth" });
     // Clear the flag after the animation would have finished (~450 ms)
@@ -348,112 +360,13 @@ const Dashboard = ({
     if (isProgrammaticScrollRef.current) return;
     window.cancelAnimationFrame(scrollRafRef.current);
     scrollRafRef.current = window.requestAnimationFrame(() => {
-      const idx = Math.round(pager.scrollLeft / pager.clientWidth);
+      const idx = Math.round(Math.abs(pager.scrollLeft) / pager.clientWidth);
       const clamped = Math.max(0, Math.min(idx, allPages.length - 1));
-      setActiveIndex(clamped);
+      setActiveIndex((prev) => (prev !== clamped ? clamped : prev));
     });
   }, [allPages.length, setActiveIndex]);
 
-  // ── Drag-to-scroll (mirrors StatsGrid pattern) ──────────────────────────────
-  useEffect(() => {
-    const pager = pagerRef.current;
-    if (!pager) return;
 
-    // Returns true if the pointer is inside a horizontally scrollable child
-    // (e.g. hourly outlook row, stats grid) so we don't hijack those gestures.
-    const isInsideHorizScroll = (target) => {
-      let el = target;
-      while (el && el !== pager) {
-        if (
-          el !== pager &&
-          el.scrollWidth > el.clientWidth + 4 &&
-          window.getComputedStyle(el).overflowX !== "hidden" &&
-          window.getComputedStyle(el).overflowX !== "visible"
-        ) {
-          return true;
-        }
-        el = el.parentElement;
-      }
-      return false;
-    };
-
-    const setCursorDragging = (dragging) => {
-      isDraggingRef.current = dragging;
-      // Directly mutate the class list — zero re-renders
-      pager.classList.toggle("cursor-grabbing", dragging);
-      pager.classList.toggle("cursor-grab", !dragging);
-      // Prevent text selection while dragging
-      document.body.style.userSelect = dragging ? "none" : "";
-    };
-
-    const onMouseDown = (e) => {
-      if (e.button !== 0) return;
-      if (isInsideHorizScroll(e.target)) return;
-      setCursorDragging(true);
-      dragStateRef.current = {
-        active: true,
-        startX: e.clientX,
-        startScrollLeft: pager.scrollLeft,
-      };
-    };
-
-    const onMouseMove = (e) => {
-      const { active, startX, startScrollLeft } = dragStateRef.current;
-      if (!active) return;
-      // No preventDefault — let the browser's compositor handle it natively
-      isProgrammaticScrollRef.current = false; // user took over
-      const walk = e.clientX - startX;
-      pager.scrollLeft = startScrollLeft - walk;
-    };
-
-    const onMouseUpOrLeave = () => {
-      if (dragStateRef.current.active) {
-        dragStateRef.current.active = false;
-        setCursorDragging(false);
-      }
-    };
-
-    const onTouchStart = (e) => {
-      if (isInsideHorizScroll(e.target)) return;
-      const touch = e.touches[0];
-      dragStateRef.current = {
-        active: true,
-        startX: touch.clientX,
-        startScrollLeft: pager.scrollLeft,
-      };
-    };
-
-    const onTouchMove = (e) => {
-      const { active, startX, startScrollLeft } = dragStateRef.current;
-      if (!active) return;
-      const touch = e.touches[0];
-      const walk = touch.clientX - startX;
-      pager.scrollLeft = startScrollLeft - walk;
-    };
-
-    const onTouchEnd = () => {
-      dragStateRef.current.active = false;
-    };
-
-    pager.addEventListener("mousedown", onMouseDown, { passive: true });
-    pager.addEventListener("mousemove", onMouseMove, { passive: false });
-    pager.addEventListener("mouseup", onMouseUpOrLeave, { passive: true });
-    pager.addEventListener("mouseleave", onMouseUpOrLeave, { passive: true });
-    pager.addEventListener("touchstart", onTouchStart, { passive: true });
-    pager.addEventListener("touchmove", onTouchMove, { passive: true });
-    pager.addEventListener("touchend", onTouchEnd, { passive: true });
-
-    return () => {
-      pager.removeEventListener("mousedown", onMouseDown);
-      pager.removeEventListener("mousemove", onMouseMove);
-      pager.removeEventListener("mouseup", onMouseUpOrLeave);
-      pager.removeEventListener("mouseleave", onMouseUpOrLeave);
-      pager.removeEventListener("touchstart", onTouchStart);
-      pager.removeEventListener("touchmove", onTouchMove);
-      pager.removeEventListener("touchend", onTouchEnd);
-      window.cancelAnimationFrame(scrollRafRef.current);
-    };
-  }, []);
 
   // ── Page dot click: scroll to page ──────────────────────────────────────────
   const scrollToPage = useCallback(
@@ -463,7 +376,9 @@ const Dashboard = ({
       const pager = pagerRef.current;
       if (pager) {
         isProgrammaticScrollRef.current = true;
-        pager.scrollTo({ left: idx * pager.clientWidth, behavior: "smooth" });
+        const isRtl = document.documentElement.dir === "rtl";
+        const targetScrollLeft = isRtl ? -idx * pager.clientWidth : idx * pager.clientWidth;
+        pager.scrollTo({ left: targetScrollLeft, behavior: "smooth" });
         setTimeout(() => {
           isProgrammaticScrollRef.current = false;
         }, 500);
@@ -496,7 +411,7 @@ const Dashboard = ({
       style={{ height: "100dvh", overflow: "hidden" }}
     >
       {/* ── Fixed header — horizontal padding lives here ───────────────────── */}
-      <header className="flex items-center justify-between gap-6 flex-wrap px-[clamp(20px,4vw,48px)] shrink-0">
+      <header className="flex items-center justify-between gap-4 flex-wrap px-[clamp(20px,4vw,48px)] shrink-0">
         {/* Brand + secondary header actions cluster */}
         <div className="flex items-center gap-3.5">
           <div className="flex items-center gap-2.5">
@@ -512,7 +427,7 @@ const Dashboard = ({
           </div>
         </div>
 
-        {/* Search form */}
+        {/* Search form — grows to fill available space, min-w prevents it collapsing to icon-only */}
         <NavBarForm
           cityNotFound={cityNotFound}
           handleSearchCity={handleSearchCity}
@@ -576,7 +491,7 @@ const Dashboard = ({
           overscrollBehaviorX: "contain",
           WebkitOverflowScrolling: "touch",
         }}
-        className="flex flex-1 min-h-0 overflow-x-auto no-scrollbar snap-x snap-mandatory touch-pan-x cursor-grab"
+        className="flex flex-1 min-h-0 overflow-x-auto no-scrollbar snap-x snap-mandatory touch-pan-x"
       >
         {allPages.map((page, idx) => (
           <div

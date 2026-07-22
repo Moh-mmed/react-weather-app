@@ -19,8 +19,20 @@ body {
   overflow-x: hidden;
 }
 
+:root {
+  --font-display: 'Fraunces', serif;
+  --font-sans: 'Inter', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+}
+
+[dir="rtl"], [lang="ar"] {
+  --font-display: 'Cairo', sans-serif;
+  --font-sans: 'Cairo', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+}
+
 body {
-  font-family: "Inter", sans-serif;
+  font-family: var(--font-sans);
   color: #EEF3F7;
   background: #0A1826;
 }

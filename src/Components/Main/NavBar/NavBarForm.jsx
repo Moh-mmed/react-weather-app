@@ -344,8 +344,7 @@ const NavBarForm = ({
   return (
     <div
       ref={containerRef}
-      className="flex-1 max-w-[420px] min-w-[180px] relative flex items-center gap-2.5 bg-white/5 border border-panel-line rounded-full px-[18px] py-[11px] text-muted text-[14px]
-                 tablet:max-w-none tablet:w-full tablet:min-w-0"
+      className="flex-1 min-w-[220px] max-w-[420px] relative flex items-center gap-2.5 bg-white/5 border border-panel-line rounded-full px-[18px] py-[11px] text-muted text-[14px]"
     >
       <SearchIcon />
       <form onSubmit={handleFormSubmit} className="flex flex-1">

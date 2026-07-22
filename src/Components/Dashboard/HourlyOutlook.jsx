@@ -259,8 +259,9 @@ const HourlyOutlook = ({ weatherData }) => {
         <BackgroundGlyph icon={glyphIcon} />
       </div>
 
-      {/* Scrollable area */}
+      {/* Scrollable area — force LTR for chronological timeline progression */}
       <div
+        dir="ltr"
         className="overflow-x-auto overflow-y-hidden custom-scrollbar pb-2"
         style={{ scrollbarWidth: "thin" }}
       >
