@@ -8,6 +8,14 @@
     "saved": "Saved",
     "saveLocation": "Save location",
     "saveThisLocation": "Save this location",
+    "sourceOnGitHub": "View source on GitHub",
+    "settings": "Settings",
+    "language": "Language",
+    "units": "Units",
+    "hourFormat": "Hour",
+    "appearance": "Mode",
+    "night": "Night",
+    "day": "Day",
     "wrongCityTooltip": "Sorry, You have entered a wrong city name"
   },
   "hero": {

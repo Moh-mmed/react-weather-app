@@ -8,6 +8,14 @@
     "saved": "Enregistré",
     "saveLocation": "Enregistrer la ville",
     "saveThisLocation": "Enregistrer cette ville",
+    "sourceOnGitHub": "Voir la source sur GitHub",
+    "settings": "Réglages",
+    "language": "Langue",
+    "units": "Unités",
+    "hourFormat": "Heure",
+    "appearance": "Mode",
+    "night": "Nuit",
+    "day": "Jour",
     "wrongCityTooltip": "Désolé, vous avez saisi un nom de ville incorrect"
   },
   "hero": {

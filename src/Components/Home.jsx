@@ -126,6 +126,10 @@ const Home = () => {
     } catch (_) {}
   }, [savedLocations]);
 
+  useEffect(() => {
+    setActiveIndex((index) => Math.min(index, savedLocations.length));
+  }, [savedLocations.length]);
+
   const addSavedLocation = useCallback(
     (loc) => {
       const isDuplicate = savedLocations.some(
@@ -134,12 +138,8 @@ const Home = () => {
           Math.abs(item.lon - loc.lon) < 0.01,
       );
       if (!isDuplicate) {
-        setSavedLocations((prev) => {
-          const next = [...prev, loc];
-          // Automatically scroll to the newly added location page
-          setActiveIndex(next.length);
-          return next;
-        });
+        setSavedLocations((prev) => [...prev, loc]);
+        setActiveIndex(0);
       }
     },
     [savedLocations],

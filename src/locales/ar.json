@@ -8,6 +8,14 @@
     "saved": "محفوظة",
     "saveLocation": "حفظ الموقع",
     "saveThisLocation": "حفظ هذا الموقع",
+    "sourceOnGitHub": "عرض المصدر على GitHub",
+    "settings": "الإعدادات",
+    "language": "اللغة",
+    "units": "الوحدات",
+    "hourFormat": "الساعة",
+    "appearance": "الوضع",
+    "night": "ليلي",
+    "day": "نهاري",
     "wrongCityTooltip": "عذراً، لقد أدخلت اسم مدينة غير صحيح"
   },
   "hero": {

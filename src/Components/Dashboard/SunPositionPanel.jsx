@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import getTiming from "../../helpers/getTiming";
 import { getUviDescription } from "../../helpers/getUVI";
 import { getSunArcPoint, SUN_ARC_BASE } from "../../helpers/sunArc";
+import { useTimeFormat } from "../../contexts/TimeFormatContext";
 
 const SunIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3.5 h-3.5 opacity-85">
@@ -13,13 +14,15 @@ const SunIcon = () => (
 
 const SunPositionPanel = ({ weatherData }) => {
   const { t } = useTranslation();
+  const { hourFormat } = useTimeFormat();
   const { current, timezone_offset } = weatherData;
   const { dt, uvi, sunrise, sunset } = current;
   const { day, width, Sunrise, Sunset } = getTiming(
     sunrise,
     sunset,
     dt,
-    timezone_offset
+    timezone_offset,
+    hourFormat
   );
   const progress = day ? width / 100 : 0;
   const arcPoint = getSunArcPoint(progress);

@@ -6,12 +6,15 @@ import "./i18n";
 import "./index.css";
 
 import { UnitProvider } from "./contexts/UnitContext";
+import { TimeFormatProvider } from "./contexts/TimeFormatContext";
 
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
       <UnitProvider>
-        <App />
+        <TimeFormatProvider>
+          <App />
+        </TimeFormatProvider>
       </UnitProvider>
     </BrowserRouter>
   </React.StrictMode>,

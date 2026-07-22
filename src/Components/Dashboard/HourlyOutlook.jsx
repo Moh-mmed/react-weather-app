@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
-import { formatHour24 } from "../../helpers/timeFormat";
+import { formatHour } from "../../helpers/timeFormat";
 import { useUnit } from "../../contexts/UnitContext";
+import { useTimeFormat } from "../../contexts/TimeFormatContext";
 
 const ClockIcon = () => (
   <svg
@@ -203,6 +204,7 @@ const BackgroundGlyph = ({ icon }) => {
 const HourlyOutlook = ({ weatherData }) => {
   const { t } = useTranslation();
   const { convertTemp } = useUnit();
+  const { hourFormat } = useTimeFormat();
   const { outlook48h, timezone_offset } = weatherData;
 
   const glyphIcon = outlook48h?.[0]?.weather?.[0]?.icon ?? null;
@@ -334,7 +336,10 @@ const HourlyOutlook = ({ weatherData }) => {
             {/* ── HTML Text Layer ── */}
             <div className="absolute inset-0 flex w-full h-full z-10">
               {outlook48h.map((entry, i) => {
-                const label = `${formatHour24(entry.dt, timezone_offset)}:00`;
+                const label =
+                  hourFormat === "12h"
+                    ? formatHour(entry.dt, timezone_offset, hourFormat)
+                    : `${formatHour(entry.dt, timezone_offset, hourFormat)}:00`;
                 return (
                   <div
                     key={entry.dt}
