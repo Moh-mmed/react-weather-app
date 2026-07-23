@@ -1,80 +1,304 @@
-# Getting Started with Create React App
+# 🌦️ React Weather App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A modern and responsive weather application built with **React** that provides real-time weather information for cities worldwide using the **OpenWeather API**.
 
-## Available Scripts
+The application follows a component-based architecture and focuses on clean UI, reusable components, state management with React Context API, and multilingual support using internationalization.
 
-In the project directory, you can run:
+Users can search for cities and view detailed weather information including temperature, humidity, wind speed, weather conditions, sunrise, and sunset times.
 
-### `npm start`
+---
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## 📸 Preview
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+<p align="center">
+  <img src="./assets/screenshots/screenshot-1.png" alt="Weather App Dashboard" width="900"/>
+</p>
 
-### `npm test`
+<p align="center">
+  <img src="./assets/screenshots/screenshot-2.png" alt="Weather App Weather Details" width="900"/>
+</p>
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+---
 
-### `npm run build`
+## ✨ Features
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- 🔍 Search weather information by city
+- 🌡️ Display current temperature and weather conditions
+- 💧 Show humidity levels
+- 💨 Display wind speed information
+- 🌅 Sunrise and sunset time details
+- 🌍 Multi-language support with i18n
+- ⚛️ Component-based React architecture
+- 🔄 Global state management using React Context API
+- 📱 Fully responsive design
+- ⚡ Fast and lightweight application
+- 🎨 Clean and intuitive user interface
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+---
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## 🛠️ Built With
 
-### `npm run eject`
+### Frontend
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+- React 18
+- JavaScript (ES6+)
+- CSS3
+- React Context API
+- Internationalization (i18n)
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### API
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+- OpenWeather API
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Development Tools
 
-## Environment Setup
+- npm
+- Git
+- GitHub
 
-Create a `.env` file in the project root and add your OpenWeather API key:
+---
 
-```bash
-REACT_APP_OPENWEATHER_API_KEY=your_openweather_api_key_here
+## 🏗️ Architecture
+
+The application follows a modular React architecture:
+
+```
+User Interface
+      |
+      ↓
+React Components
+      |
+      ↓
+Context API (Global State)
+      |
+      ↓
+Weather Services / Helpers
+      |
+      ↓
+OpenWeather API
 ```
 
-You can copy `.env.example` as a starting point.
+### Main responsibilities:
 
-## Learn More
+- **Components**
+  - Handle reusable UI elements and page sections.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- **Context API**
+  - Manages shared weather-related state across components.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+- **Helpers**
+  - Handles utility functions such as formatting and data transformation.
 
-### Code Splitting
+- **i18n**
+  - Provides localization and language support.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+- **OpenWeather API**
+  - Provides real-time weather information.
 
-### Analyzing the Bundle Size
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## 📁 Project Structure
 
-### Making a Progressive Web App
+```
+react-weather-app/
+│
+├── assets/
+│   └── screenshots/
+│       ├── screenshot-1.png
+│       └── screenshot-2.png
+│
+├── public/
+│
+├── src/
+│   │
+│   ├── components/
+│   │   ├── WeatherCard/
+│   │   ├── SearchBar/
+│   │   └── ...
+│   │
+│   ├── contexts/
+│   │   └── WeatherContext.jsx
+│   │
+│   ├── helpers/
+│   │
+│   ├── locales/
+│   │   ├── en/
+│   │   └── ...
+│   │
+│   ├── styles/
+│   │
+│   ├── imgs/
+│   │
+│   ├── App.jsx
+│   ├── constants.js
+│   ├── i18n.js
+│   └── index.js
+│
+├── .env.example
+├── package.json
+└── README.md
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+---
 
-### Advanced Configuration
+# 🚀 Getting Started
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## Prerequisites
 
-### Deployment
+Make sure you have installed:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+- Node.js
+- npm
 
-### `npm run build` fails to minify
+Check versions:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```bash
+node -v
+npm -v
+```
+
+---
+
+## 📦 Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/Moh-mmed/react-weather-app.git
+```
+
+Navigate into the project:
+
+```bash
+cd react-weather-app
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+---
+
+# 🔑 Environment Variables
+
+This project requires an OpenWeather API key.
+
+Create a `.env` file in the project root:
+
+```env
+REACT_APP_OPENWEATHER_API_KEY=your_api_key_here
+```
+
+You can create a free API key from:
+
+https://openweathermap.org/api
+
+---
+
+# ▶️ Running the Application
+
+## Development mode
+
+Start the development server:
+
+```bash
+npm start
+```
+
+The application will run locally:
+
+```
+http://localhost:3000
+```
+
+---
+
+## Production build
+
+Create an optimized production build:
+
+```bash
+npm run build
+```
+
+---
+
+## Run Tests
+
+```bash
+npm test
+```
+
+---
+
+# 🌐 API Integration
+
+The application uses the OpenWeather API to retrieve:
+
+- Current weather information
+- Temperature data
+- Humidity
+- Wind speed
+- Sunrise and sunset times
+- Weather conditions
+
+API responses are processed and displayed through reusable React components.
+
+---
+
+# 🔮 Future Improvements
+
+Planned improvements:
+
+- [ ] Weather map integration
+- [ ] Weather history
+- [ ] Improved animations
+- [ ] TypeScript migration
+- [ ] Unit and integration testing
+
+---
+
+# 🤝 Contributing
+
+Contributions are welcome.
+
+To contribute:
+
+1. Fork the repository
+
+2. Create a new branch:
+
+```bash
+git checkout -b feature/new-feature
+```
+
+3. Commit your changes:
+
+```bash
+git commit -m "Add new feature"
+```
+
+4. Push the branch:
+
+```bash
+git push origin feature/new-feature
+```
+
+5. Open a Pull Request
+
+---
+
+# 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+# 👨‍💻 Author
+
+**Mohmmed Ben Aoumeur**
+
+GitHub:
+https://github.com/Moh-mmed

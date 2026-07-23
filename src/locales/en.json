@@ -8,6 +8,14 @@
     "saved": "Saved",
     "saveLocation": "Save location",
     "saveThisLocation": "Save this location",
+    "sourceOnGitHub": "View source on GitHub",
+    "settings": "Settings",
+    "language": "Language",
+    "units": "Units",
+    "hourFormat": "Hour",
+    "appearance": "Mode",
+    "night": "Night",
+    "day": "Day",
     "wrongCityTooltip": "Sorry, You have entered a wrong city name"
   },
   "hero": {
@@ -15,9 +23,7 @@
     "high": "High",
     "low": "Low",
     "remove": "Remove",
-    "confirmDelete": "Confirm delete?",
-    "photoBy": "Photo by",
-    "onUnsplash": "on"
+    "confirmDelete": "Confirm delete?"
   },
   "outlook": {
     "title": "48-Hour Outlook",
@@ -93,10 +99,14 @@
     "unitKmH": "km/h",
     "unitHpa": "hPa",
     "unitKm": "km",
+    "unitMph": "mph",
+    "unitInHg": "inHg",
+    "unitMi": "mi",
     "stable": "Stable",
     "rising": "Rising",
     "falling": "Falling",
     "pressureTrendDesc": "{{change}} hPa in the last 24 hours",
+    "pressureTrendDescImperial": "{{change}} inHg in the last 24 hours",
     "humidityComfortable": "Comfortable indoor environment.",
     "humiditySticky": "Sticky and damp atmosphere.",
     "humidityDry": "Dry indoor/outdoor conditions.",

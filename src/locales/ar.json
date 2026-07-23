@@ -8,6 +8,14 @@
     "saved": "محفوظة",
     "saveLocation": "حفظ الموقع",
     "saveThisLocation": "حفظ هذا الموقع",
+    "sourceOnGitHub": "عرض المصدر على GitHub",
+    "settings": "الإعدادات",
+    "language": "اللغة",
+    "units": "الوحدات",
+    "hourFormat": "الساعة",
+    "appearance": "الوضع",
+    "night": "ليلي",
+    "day": "نهاري",
     "wrongCityTooltip": "عذراً، لقد أدخلت اسم مدينة غير صحيح"
   },
   "hero": {
@@ -15,9 +23,7 @@
     "high": "العظمى",
     "low": "الصغرى",
     "remove": "حذف",
-    "confirmDelete": "تأكيد الحذف؟",
-    "photoBy": "الصورة بواسطة",
-    "onUnsplash": "على"
+    "confirmDelete": "تأكيد الحذف؟"
   },
   "outlook": {
     "title": "توقعات 48 ساعة",
@@ -93,10 +99,14 @@
     "unitKmH": "كم/س",
     "unitHpa": "هكتوباسكال",
     "unitKm": "كم",
+    "unitMph": "ميل/س",
+    "unitInHg": "إنش زئبقي",
+    "unitMi": "ميل",
     "stable": "مستقر",
     "rising": "مرتفع",
     "falling": "منخفض",
     "pressureTrendDesc": "{{change}} هكتوباسكال في الـ 24 ساعة الماضية",
+    "pressureTrendDescImperial": "{{change}} إنش زئبقي في الـ 24 ساعة الماضية",
     "humidityComfortable": "بيئة داخلية مريحة.",
     "humiditySticky": "أجواء رطبة وكاتمة.",
     "humidityDry": "أجواء جافة ومريحة.",

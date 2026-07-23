@@ -58,7 +58,7 @@ const AirQualityPanel = ({ airQuality }) => {
           className="absolute -top-1 w-4 h-4 rounded-full border-[3px] border-[#f4d93b] -translate-x-1/2 shadow-[0_0_0_3px_rgba(0,0,0,0.25)]"
           style={{
             left: `${markerPercent}%`,
-            backgroundColor: "#0F2338",
+            backgroundColor: "var(--bg-main-2)",
           }}
         />
       </div>

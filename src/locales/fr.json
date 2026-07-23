@@ -8,6 +8,14 @@
     "saved": "Enregistré",
     "saveLocation": "Enregistrer la ville",
     "saveThisLocation": "Enregistrer cette ville",
+    "sourceOnGitHub": "Voir la source sur GitHub",
+    "settings": "Réglages",
+    "language": "Langue",
+    "units": "Unités",
+    "hourFormat": "Heure",
+    "appearance": "Mode",
+    "night": "Nuit",
+    "day": "Jour",
     "wrongCityTooltip": "Désolé, vous avez saisi un nom de ville incorrect"
   },
   "hero": {
@@ -15,9 +23,7 @@
     "high": "Max.",
     "low": "Min.",
     "remove": "Supprimer",
-    "confirmDelete": "Confirmer ?",
-    "photoBy": "Photo par",
-    "onUnsplash": "sur"
+    "confirmDelete": "Confirmer ?"
   },
   "outlook": {
     "title": "Aperçu 48h",
@@ -93,10 +99,14 @@
     "unitKmH": "km/h",
     "unitHpa": "hPa",
     "unitKm": "km",
+    "unitMph": "mph",
+    "unitInHg": "inHg",
+    "unitMi": "mi",
     "stable": "Stable",
     "rising": "En hausse",
     "falling": "En baisse",
     "pressureTrendDesc": "{{change}} hPa ces dernières 24 heures",
+    "pressureTrendDescImperial": "{{change}} inHg ces dernières 24 heures",
     "humidityComfortable": "Ambiance intérieure confortable.",
     "humiditySticky": "Atmosphère lourde et humide.",
     "humidityDry": "Conditions intérieures sèches.",

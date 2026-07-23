@@ -1,5 +1,7 @@
 import { useTranslation } from "react-i18next";
-import { formatHour24 } from "../../helpers/timeFormat";
+import { formatHour } from "../../helpers/timeFormat";
+import { useUnit } from "../../contexts/UnitContext";
+import { useTimeFormat } from "../../contexts/TimeFormatContext";
 
 const ClockIcon = () => (
   <svg
@@ -201,6 +203,8 @@ const BackgroundGlyph = ({ icon }) => {
 
 const HourlyOutlook = ({ weatherData }) => {
   const { t } = useTranslation();
+  const { convertTemp } = useUnit();
+  const { hourFormat } = useTimeFormat();
   const { outlook48h, timezone_offset } = weatherData;
 
   const glyphIcon = outlook48h?.[0]?.weather?.[0]?.icon ?? null;
@@ -211,15 +215,16 @@ const HourlyOutlook = ({ weatherData }) => {
   const PADDING_Y = 45;
   const INNER_HEIGHT = SVG_HEIGHT - PADDING_Y * 2;
 
-  const temps = outlook48h?.map((d) => d.temp) || [];
+  const temps = outlook48h?.map((d) => convertTemp(d.temp)) || [];
   const minTemp = Math.min(...temps);
   const maxTemp = Math.max(...temps);
   const range = maxTemp - minTemp || 1;
 
   const points =
     outlook48h?.map((d, i) => {
+      const displayVal = convertTemp(d.temp);
       const x = i * COLUMN_WIDTH + COLUMN_WIDTH / 2;
-      const normalized = (d.temp - minTemp) / range;
+      const normalized = (displayVal - minTemp) / range;
       const y = PADDING_Y + (1 - normalized) * INNER_HEIGHT;
       return { x, y };
     }) || [];
@@ -300,7 +305,7 @@ const HourlyOutlook = ({ weatherData }) => {
                   y1={24}
                   x2={p.x}
                   y2={SVG_HEIGHT - 30}
-                  stroke="rgba(255,255,255,0.12)"
+                  stroke="var(--timeline-dash)"
                   strokeWidth="1"
                   strokeDasharray="3 4"
                 />
@@ -331,7 +336,10 @@ const HourlyOutlook = ({ weatherData }) => {
             {/* ── HTML Text Layer ── */}
             <div className="absolute inset-0 flex w-full h-full z-10">
               {outlook48h.map((entry, i) => {
-                const label = `${formatHour24(entry.dt, timezone_offset)}:00`;
+                const label =
+                  hourFormat === "12h"
+                    ? formatHour(entry.dt, timezone_offset, hourFormat)
+                    : `${formatHour(entry.dt, timezone_offset, hourFormat)}:00`;
                 return (
                   <div
                     key={entry.dt}
@@ -342,7 +350,7 @@ const HourlyOutlook = ({ weatherData }) => {
                       {label}
                     </div>
                     <div className="font-mono text-[17px] font-medium tracking-tight mb-1">
-                      {Math.round(entry.temp)}°
+                      {convertTemp(entry.temp)}°
                     </div>
                   </div>
                 );
