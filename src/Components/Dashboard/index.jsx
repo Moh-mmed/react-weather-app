@@ -11,6 +11,7 @@ import ForecastList from "./ForecastList";
 import { formatTime } from "../../helpers/timeFormat";
 import { useUnit } from "../../contexts/UnitContext";
 import { useTimeFormat } from "../../contexts/TimeFormatContext";
+import { useTheme } from "../../contexts/ThemeContext";
 
 const SECONDARY_ACTION_CLASS = clsx(
   "flex h-[30px] items-center rounded-full",
@@ -88,7 +89,10 @@ const SettingsSegment = ({ label, children }) => (
     <span className="text-[11px] font-semibold uppercase tracking-[0.7px] text-muted">
       {label}
     </span>
-    <div className="flex items-center rounded-full border border-panel-line bg-white/5 p-0.5 text-[11px] font-mono" dir="ltr">
+    <div
+      className="flex items-center rounded-full border border-panel-line bg-white/5 p-0.5 text-[11px] font-mono"
+      dir="ltr"
+    >
       {children}
     </div>
   </div>
@@ -101,9 +105,7 @@ const SettingsOption = ({ active, disabled = false, onClick, children }) => (
     onClick={onClick}
     className={clsx(
       "px-2.5 py-1 rounded-full transition-colors duration-150",
-      disabled
-        ? "cursor-not-allowed text-muted/35"
-        : "cursor-pointer",
+      disabled ? "cursor-not-allowed text-muted/35" : "cursor-pointer",
       active
         ? "bg-accent-sky text-navy-dark font-semibold shadow-sm"
         : "text-muted hover:text-primary",
@@ -118,24 +120,10 @@ const SettingsMenu = () => {
   const { t, i18n } = useTranslation();
   const { unitSystem, setUnitSystem } = useUnit();
   const { hourFormat, setHourFormat } = useTimeFormat();
+  const { theme, setTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
-  const [themeMode, setThemeModeState] = useState(() => {
-    try {
-      return localStorage.getItem("weatherme:themeMode") || "night";
-    } catch (_) {
-      return "night";
-    }
-  });
   const menuRef = useRef(null);
   const activeLang = i18n.language?.slice(0, 2).toLowerCase() || "en";
-
-  useEffect(() => {
-    const root = document.documentElement;
-    root.dataset.weatherTheme = themeMode;
-    try {
-      localStorage.setItem("weatherme:themeMode", themeMode);
-    } catch (_) {}
-  }, [themeMode]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -156,10 +144,6 @@ const SettingsMenu = () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [isOpen]);
-
-  const setThemeMode = (mode) => {
-    setThemeModeState(mode);
-  };
 
   return (
     <div className="relative" ref={menuRef}>
@@ -186,27 +170,96 @@ const SettingsMenu = () => {
           </div>
           <div className="flex flex-col gap-3">
             <SettingsSegment label={t("header.language")}>
-              <SettingsOption active={activeLang === "en"} onClick={() => i18n.changeLanguage("en")}>EN</SettingsOption>
-              <SettingsOption active={activeLang === "fr"} onClick={() => i18n.changeLanguage("fr")}>FR</SettingsOption>
-              <SettingsOption active={activeLang === "ar"} onClick={() => i18n.changeLanguage("ar")}>AR</SettingsOption>
+              <SettingsOption
+                active={activeLang === "en"}
+                onClick={() => i18n.changeLanguage("en")}
+              >
+                EN
+              </SettingsOption>
+              <SettingsOption
+                active={activeLang === "fr"}
+                onClick={() => i18n.changeLanguage("fr")}
+              >
+                FR
+              </SettingsOption>
+              <SettingsOption
+                active={activeLang === "ar"}
+                onClick={() => i18n.changeLanguage("ar")}
+              >
+                AR
+              </SettingsOption>
             </SettingsSegment>
 
             <SettingsSegment label={t("header.units")}>
-              <SettingsOption active={unitSystem === "metric"} onClick={() => setUnitSystem("metric")}>°C</SettingsOption>
-              <SettingsOption active={unitSystem === "imperial"} onClick={() => setUnitSystem("imperial")}>°F</SettingsOption>
+              <SettingsOption
+                active={unitSystem === "metric"}
+                onClick={() => setUnitSystem("metric")}
+              >
+                °C
+              </SettingsOption>
+              <SettingsOption
+                active={unitSystem === "imperial"}
+                onClick={() => setUnitSystem("imperial")}
+              >
+                °F
+              </SettingsOption>
             </SettingsSegment>
 
             <SettingsSegment label={t("header.hourFormat")}>
-              <SettingsOption active={hourFormat === "24h"} onClick={() => setHourFormat("24h")}>24H</SettingsOption>
-              <SettingsOption active={hourFormat === "12h"} onClick={() => setHourFormat("12h")}>12H</SettingsOption>
+              <SettingsOption
+                active={hourFormat === "24h"}
+                onClick={() => setHourFormat("24h")}
+              >
+                24H
+              </SettingsOption>
+              <SettingsOption
+                active={hourFormat === "12h"}
+                onClick={() => setHourFormat("12h")}
+              >
+                12H
+              </SettingsOption>
             </SettingsSegment>
 
             <SettingsSegment label={t("header.appearance")}>
-              <SettingsOption active={themeMode === "night"} onClick={() => setThemeMode("night")}>
-                {t("header.night")}
+              <SettingsOption
+                active={theme === "dark"}
+                onClick={() => setTheme("dark")}
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  width="14"
+                  height="14"
+                  aria-hidden="true"
+                >
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
               </SettingsOption>
-              <SettingsOption active={themeMode === "day"} onClick={() => setThemeMode("day")}>
-                {t("header.day")}
+              <SettingsOption
+                active={theme === "light"}
+                onClick={() => setTheme("light")}
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  width="14"
+                  height="14"
+                  aria-hidden="true"
+                >
+                  <circle cx="12" cy="12" r="5" />
+                  <line x1="12" y1="1" x2="12" y2="3" />
+                  <line x1="12" y1="21" x2="12" y2="23" />
+                  <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                  <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                  <line x1="1" y1="12" x2="3" y2="12" />
+                  <line x1="21" y1="12" x2="23" y2="12" />
+                  <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                  <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                </svg>
               </SettingsOption>
             </SettingsSegment>
           </div>
@@ -263,10 +316,7 @@ const GitHubButton = () => {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={t("header.sourceOnGitHub")}
-      className={clsx(
-        SECONDARY_ACTION_CLASS,
-        "justify-center px-3",
-      )}
+      className={clsx(SECONDARY_ACTION_CLASS, "justify-center px-3")}
     >
       <svg
         viewBox="0 0 24 24"
@@ -295,7 +345,8 @@ const LiveClock = ({ timezoneOffset }) => {
   }, []);
 
   const rawLang = i18n.language?.slice(0, 2).toLowerCase();
-  const activeLocale = rawLang === "fr" ? "fr-FR" : rawLang === "ar" ? "ar-EG" : "en-US";
+  const activeLocale =
+    rawLang === "fr" ? "fr-FR" : rawLang === "ar" ? "ar-EG" : "en-US";
   const localDate = new Date((now + (timezoneOffset || 0)) * 1000);
 
   const dayName = new Intl.DateTimeFormat(activeLocale, {
@@ -445,8 +496,13 @@ const Dashboard = ({
     const pager = pagerRef.current;
     if (!pager) return;
     const isRtl = document.documentElement.dir === "rtl";
-    const targetScrollLeft = isRtl ? -activeIndex * pager.clientWidth : activeIndex * pager.clientWidth;
-    if (Math.abs(Math.abs(pager.scrollLeft) - activeIndex * pager.clientWidth) < 2) return;
+    const targetScrollLeft = isRtl
+      ? -activeIndex * pager.clientWidth
+      : activeIndex * pager.clientWidth;
+    if (
+      Math.abs(Math.abs(pager.scrollLeft) - activeIndex * pager.clientWidth) < 2
+    )
+      return;
     isProgrammaticScrollRef.current = true;
     pager.scrollTo({ left: targetScrollLeft, behavior: "smooth" });
     // Clear the flag after the animation would have finished (~450 ms)
@@ -469,8 +525,6 @@ const Dashboard = ({
     });
   }, [allPages.length, setActiveIndex]);
 
-
-
   // ── Page dot click: scroll to page ──────────────────────────────────────────
   const scrollToPage = useCallback(
     (idx) => {
@@ -480,7 +534,9 @@ const Dashboard = ({
       if (pager) {
         isProgrammaticScrollRef.current = true;
         const isRtl = document.documentElement.dir === "rtl";
-        const targetScrollLeft = isRtl ? -idx * pager.clientWidth : idx * pager.clientWidth;
+        const targetScrollLeft = isRtl
+          ? -idx * pager.clientWidth
+          : idx * pager.clientWidth;
         pager.scrollTo({ left: targetScrollLeft, behavior: "smooth" });
         setTimeout(() => {
           isProgrammaticScrollRef.current = false;
@@ -630,7 +686,9 @@ const Dashboard = ({
               <button
                 key={`dot-${idx}`}
                 type="button"
-                title={idx === 0 ? "Current location" : page.city || "Saved location"}
+                title={
+                  idx === 0 ? "Current location" : page.city || "Saved location"
+                }
                 aria-label={
                   idx === 0
                     ? "Go to current location"
@@ -644,10 +702,10 @@ const Dashboard = ({
                   idx === 0 && activeIndex === idx
                     ? "w-8 h-6 bg-accent-sky text-navy-dark opacity-100 shadow-[0_0_14px_rgba(79,163,217,0.35)]"
                     : idx === 0
-                    ? "w-6 h-6 bg-white/10 text-white/60 opacity-75 hover:bg-white/15 hover:text-white/80"
-                    : activeIndex === idx
-                    ? "w-5 h-[7px] bg-accent-sky opacity-100"
-                    : "w-[7px] h-[7px] bg-white/50 opacity-60 hover:bg-white/70",
+                      ? "w-6 h-6 bg-white/10 text-white/60 opacity-75 hover:bg-white/15 hover:text-white/80"
+                      : activeIndex === idx
+                        ? "w-5 h-[7px] bg-accent-sky opacity-100"
+                        : "w-[7px] h-[7px] bg-white/50 opacity-60 hover:bg-white/70",
                 )}
               >
                 {idx === 0 && <LocationPinIcon />}

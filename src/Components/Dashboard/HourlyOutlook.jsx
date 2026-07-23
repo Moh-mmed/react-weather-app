@@ -305,7 +305,7 @@ const HourlyOutlook = ({ weatherData }) => {
                   y1={24}
                   x2={p.x}
                   y2={SVG_HEIGHT - 30}
-                  stroke="rgba(255,255,255,0.12)"
+                  stroke="var(--timeline-dash)"
                   strokeWidth="1"
                   strokeDasharray="3 4"
                 />

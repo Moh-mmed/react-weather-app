@@ -9,8 +9,18 @@ const cloudPath =
 
 const range = (count) => Array.from({ length: count }, (_, i) => i);
 const starPositions = [
-  [8, 18], [18, 62], [29, 28], [39, 72], [51, 16], [61, 48],
-  [72, 25], [84, 66], [12, 42], [46, 54], [76, 11], [91, 39],
+  [8, 18],
+  [18, 62],
+  [29, 28],
+  [39, 72],
+  [51, 16],
+  [61, 48],
+  [72, 25],
+  [84, 66],
+  [12, 42],
+  [46, 54],
+  [76, 11],
+  [91, 39],
 ];
 
 const getHeroCondition = (current) => {
@@ -25,16 +35,32 @@ const getHeroCondition = (current) => {
       ? current.dt >= current.sunrise && current.dt < current.sunset
       : !weather.icon?.endsWith("n");
 
-  if (code === "01" || main === "clear") return isDay ? "clear-day" : "clear-night";
-  if (code === "02" || code === "03" || code === "04" || main === "clouds") return "clouds";
-  if (code === "09" || code === "10" || main.includes("rain") || main.includes("drizzle")) return "rain";
+  if (code === "01" || main === "clear")
+    return isDay ? "clear-day" : "clear-night";
+  if (code === "02" || code === "03" || code === "04" || main === "clouds")
+    return "clouds";
+  if (
+    code === "09" ||
+    code === "10" ||
+    main.includes("rain") ||
+    main.includes("drizzle")
+  )
+    return "rain";
   if (code === "11" || main.includes("thunderstorm")) return "thunderstorm";
   if (code === "13" || main.includes("snow")) return "snow";
   if (
     code === "50" ||
-    ["mist", "fog", "haze", "smoke", "dust", "sand", "ash", "squall", "tornado"].some(
-      (term) => main.includes(term) || description.includes(term),
-    )
+    [
+      "mist",
+      "fog",
+      "haze",
+      "smoke",
+      "dust",
+      "sand",
+      "ash",
+      "squall",
+      "tornado",
+    ].some((term) => main.includes(term) || description.includes(term))
   ) {
     return "fog";
   }
@@ -184,8 +210,7 @@ const HeroPanel = ({ weatherData, isPinned = true, onRemove }) => {
         aria-hidden="true"
         className="absolute inset-0 pointer-events-none"
         style={{
-          background:
-            "linear-gradient(to right, #13273D 0%, #13273De6 45%, #13273Daa 72%, rgba(19,39,61,0.42) 100%)",
+          background: "var(--hero-overlay)",
         }}
       />
 
@@ -216,7 +241,7 @@ const HeroPanel = ({ weatherData, isPinned = true, onRemove }) => {
               "px-2.5 py-1.5 rounded-full text-[11px] font-medium transition-all duration-150 flex items-center gap-1.5 shadow-md cursor-pointer",
               confirmDelete
                 ? "bg-accent-coral text-white hover:bg-red-600 border border-transparent"
-                : "bg-white/10 hover:bg-white/20 text-muted hover:text-primary border border-white/5"
+                : "bg-white/10 hover:bg-white/20 text-muted hover:text-primary border border-white/5",
             )}
             onMouseLeave={() => setConfirmDelete(false)}
           >
@@ -259,19 +284,20 @@ const HeroPanel = ({ weatherData, isPinned = true, onRemove }) => {
             <b className="text-primary font-medium">{displayFeels}°</b>
           </span>
           <span className="font-mono text-[13px] text-muted">
-            {t("hero.high")} <b className="text-primary font-medium">{displayHigh}°</b> ·{" "}
-            {t("hero.low")} <b className="text-primary font-medium">{displayLow}°</b>
+            {t("hero.high")}{" "}
+            <b className="text-primary font-medium">{displayHigh}°</b> ·{" "}
+            {t("hero.low")}{" "}
+            <b className="text-primary font-medium">{displayLow}°</b>
           </span>
         </div>
       </div>
 
       {/* ── Weather icon (foreground, always visible) ─────────────────────── */}
-      <img
+      {/* <img
         src={`https://openweathermap.org/img/wn/${icon}@4x.png`}
         alt={translatedDesc}
         className="w-[150px] h-[150px] opacity-95 z-10 shrink-0"
-      />
-
+      /> */}
     </section>
   );
 };

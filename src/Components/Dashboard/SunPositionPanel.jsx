@@ -46,7 +46,7 @@ const SunPositionPanel = ({ weatherData }) => {
           {/* Dashed base arc */}
           <path
             d={SUN_ARC_BASE}
-            stroke="rgba(255,255,255,0.15)"
+            stroke="var(--sun-arc-track)"
             strokeWidth="2"
             fill="none"
             strokeDasharray="2 7"
@@ -71,8 +71,8 @@ const SunPositionPanel = ({ weatherData }) => {
               className="motion-safe:animate-pulseSun"
             />
           )}
-          <circle cx="25" cy="170" r="4" fill="#8CA1B4" />
-          <circle cx="325" cy="170" r="4" fill="#8CA1B4" />
+          <circle cx="25" cy="170" r="4" className="fill-muted" />
+          <circle cx="325" cy="170" r="4" className="fill-muted" />
         </svg>
 
         {/* Sunrise / Sunset labels — explicitly kept LTR position to match arc endpoints */}

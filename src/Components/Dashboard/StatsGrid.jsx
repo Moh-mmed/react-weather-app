@@ -545,7 +545,7 @@ const StatsGrid = ({ weatherData }) => {
                           <div className="h-4 w-full rounded-full relative overflow-hidden bg-gradient-to-r from-white/10 via-[#38bdf8]/30 to-[#38bdf8] border border-white/5">
                             {/* Indicator pin representing current sight range */}
                             <div
-                              className="absolute top-0 bottom-0 w-1.5 bg-white border border-[#0A1826] rounded-full transition-all duration-700 shadow-lg"
+                              className="absolute top-0 bottom-0 w-1.5 bg-white border border-navy-deep-start rounded-full transition-all duration-700 shadow-lg"
                               style={{ left: `calc(${percentage}% - 3px)` }}
                             />
                           </div>
@@ -574,7 +574,7 @@ const StatsGrid = ({ weatherData }) => {
                           <div className="h-4 w-full rounded-full relative bg-gradient-to-r from-[#38bdf8] via-emerald-400 to-amber-500 border border-white/5 overflow-hidden">
                             {/* Comfort sliding pointer */}
                             <div
-                              className="absolute top-0 bottom-0 w-1.5 bg-white border border-[#0A1826] rounded-full transition-all duration-700 shadow-md"
+                              className="absolute top-0 bottom-0 w-1.5 bg-white border border-navy-deep-start rounded-full transition-all duration-700 shadow-md"
                               style={{ left: `calc(${percent}% - 3px)` }}
                             />
                           </div>

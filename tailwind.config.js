@@ -1,21 +1,23 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: 'class',
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
     extend: {
       colors: {
-        'navy-deep-start': '#0A1826',
-        'navy-deep-end': '#0F2338',
-        'navy-panel': '#13273D',
-        'panel-line': 'rgba(255, 255, 255, 0.07)',
+        'navy-deep-start': 'var(--bg-main-1)',
+        'navy-deep-end': 'var(--bg-main-2)',
+        'navy-panel': 'var(--bg-panel)',
+        'navy-dark': 'var(--text-primary-dark)',
+        'panel-line': 'var(--border-panel)',
         'accent-sun': '#F4A93B',
         'accent-sky': '#4FA3D9',
         'accent-coral': '#E2694A',
         'accent-good': '#5FB88A',
-        'muted': '#8CA1B4',
-        'primary': '#EEF3F7',
+        'muted': 'var(--text-muted)',
+        'primary': 'var(--text-primary)',
       },
       fontFamily: {
         display: ['var(--font-display)', 'Fraunces', 'serif'],

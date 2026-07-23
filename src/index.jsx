@@ -7,15 +7,18 @@ import "./index.css";
 
 import { UnitProvider } from "./contexts/UnitContext";
 import { TimeFormatProvider } from "./contexts/TimeFormatContext";
+import { ThemeProvider } from "./contexts/ThemeContext";
 
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
-      <UnitProvider>
-        <TimeFormatProvider>
-          <App />
-        </TimeFormatProvider>
-      </UnitProvider>
+      <ThemeProvider>
+        <UnitProvider>
+          <TimeFormatProvider>
+            <App />
+          </TimeFormatProvider>
+        </UnitProvider>
+      </ThemeProvider>
     </BrowserRouter>
   </React.StrictMode>,
   document.getElementById("root")
