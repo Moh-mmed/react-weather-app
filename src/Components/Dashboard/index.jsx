@@ -332,22 +332,14 @@ const GitHubButton = () => {
 };
 
 // ─── Live clock ───────────────────────────────────────────────────────────────
-const LiveClock = ({ timezoneOffset }) => {
+const LiveClock = ({ timezoneOffset, currentTime }) => {
   const { i18n } = useTranslation();
   const { hourFormat } = useTimeFormat();
-  const [now, setNow] = useState(Math.floor(Date.now() / 1000));
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setNow(Math.floor(Date.now() / 1000));
-    }, 10000);
-    return () => clearInterval(interval);
-  }, []);
 
   const rawLang = i18n.language?.slice(0, 2).toLowerCase();
   const activeLocale =
     rawLang === "fr" ? "fr-FR" : rawLang === "ar" ? "ar-EG" : "en-US";
-  const localDate = new Date((now + (timezoneOffset || 0)) * 1000);
+  const localDate = new Date((currentTime + (timezoneOffset || 0)) * 1000);
 
   const dayName = new Intl.DateTimeFormat(activeLocale, {
     weekday: "short",
@@ -364,7 +356,7 @@ const LiveClock = ({ timezoneOffset }) => {
   }).format(localDate);
 
   const dayLabel = `${dayName} ${dayNum} ${monthName}`.toUpperCase();
-  const clock = formatTime(now, timezoneOffset, hourFormat);
+  const clock = formatTime(currentTime, timezoneOffset, hourFormat);
 
   return (
     <>
@@ -401,7 +393,7 @@ const PageSpinner = () => (
 );
 
 // ─── Dashboard grid for one location ─────────────────────────────────────────
-const LocationPage = ({ page, onRemove }) => {
+const LocationPage = ({ page, onRemove, currentTime }) => {
   const { weatherData, airQuality, isPinned } = page;
 
   if (!weatherData || !airQuality) {
@@ -412,28 +404,25 @@ const LocationPage = ({ page, onRemove }) => {
     <main
       key={`${weatherData.coord?.lat}-${weatherData.coord?.lon}-${weatherData.dt}`}
       className="dashboard-main flex-1 grid gap-5 min-h-0 animate-fadeIn"
-      style={{ gridTemplateColumns: "2.05fr 1fr" }}
+      style={{
+        gridTemplateColumns: "2.05fr 1fr",
+        gridTemplateRows: "auto minmax(0, 1fr)",
+      }}
     >
-      {/* Left column */}
-      <div
-        className="dashboard-column grid gap-5 min-h-0"
-        style={{ gridTemplateRows: "auto auto 1fr" }}
-      >
+      <div className="dashboard-stack grid gap-5 min-h-0" style={{ gridTemplateRows: "auto minmax(0, 1fr)" }}>
         <HeroPanel
           weatherData={weatherData}
           isPinned={isPinned}
           onRemove={onRemove}
         />
         <HourlyOutlook weatherData={weatherData} />
-        <ForecastList weatherData={weatherData} />
       </div>
 
-      {/* Right column */}
-      <div
-        className="dashboard-column grid gap-5 min-h-0"
-        style={{ gridTemplateRows: "auto auto 1fr" }}
-      >
-        <SunPositionPanel weatherData={weatherData} />
+      <SunPositionPanel weatherData={weatherData} currentTime={currentTime} />
+
+      <ForecastList weatherData={weatherData} />
+
+      <div className="dashboard-stack grid gap-5 min-h-0" style={{ gridTemplateRows: "auto minmax(0, 1fr)" }}>
         <AirQualityPanel airQuality={airQuality} />
         <StatsGrid weatherData={weatherData} />
       </div>
@@ -461,6 +450,17 @@ const Dashboard = ({
   handleAddSavedLocation,
   handleRemoveLocation,
 }) => {
+  const [currentTime, setCurrentTime] = useState(() =>
+    Math.floor(Date.now() / 1000),
+  );
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(Math.floor(Date.now() / 1000));
+    }, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
   // ── Paging scroll container ref ─────────────────────────────────────────────
   const pagerRef = useRef(null);
   const scrollRafRef = useRef(0);
@@ -605,7 +605,10 @@ const Dashboard = ({
           <div className="flex flex-col justify-center text-left">
             <div className="text-[13px] leading-[1.25] text-muted font-mono tracking-[0.4px] uppercase">
               {activeWeatherData ? (
-                <LiveClock timezoneOffset={timezone_offset} />
+                <LiveClock
+                  timezoneOffset={timezone_offset}
+                  currentTime={currentTime}
+                />
               ) : (
                 <span className="opacity-40">-- : --</span>
               )}
@@ -660,6 +663,7 @@ const Dashboard = ({
           >
             <LocationPage
               page={page}
+              currentTime={currentTime}
               onRemove={
                 !page.isPinned && handleRemoveLocation
                   ? () => {

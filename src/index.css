@@ -381,7 +381,8 @@ body {
     padding-right: 0;
   }
 
-  .dashboard-column {
+  .dashboard-column,
+  .dashboard-stack {
     grid-template-rows: auto !important;
     min-height: unset;
   }
@@ -422,5 +423,19 @@ body {
   /* Flatten any remaining transition on the geo-error toast */
   [role="status"][aria-live="polite"] {
     transition: none !important;
+  }
+
+  /* Sky visualization reduced-motion: disable twinkling and gradient transitions */
+  .star-field circle {
+    animation: none !important;
+  }
+
+  .sky-gradient stop {
+    transition: none !important;
+  }
+
+  /* Sun Position panel SVG: keep simple opacity fades only */
+  svg g[style*="opacity"] {
+    transition: opacity 0.3s ease !important;
   }
 }

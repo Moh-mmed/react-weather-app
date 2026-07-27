@@ -41,6 +41,21 @@
     "sunrise": "الشروق",
     "sunset": "الغروب"
   },
+  "night": {
+    "moonPhase": "طور القمر",
+    "nextSunrise": "الشروق القادم",
+    "sunriseIn": "الشروق في"
+  },
+  "moonPhases": {
+    "newMoon": "محاق",
+    "waxingCrescent": "هلال متزايد",
+    "firstQuarter": "التربيع الأول",
+    "waxingGibbous": "أحدب متزايد",
+    "fullMoon": "بدر",
+    "waningGibbous": "أحدب متناقص",
+    "lastQuarter": "التربيع الأخير",
+    "waningCrescent": "هلال متناقص"
+  },
   "uvi": {
     "level": {
       "low": "منخفض",
