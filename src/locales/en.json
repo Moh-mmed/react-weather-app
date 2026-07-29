@@ -41,6 +41,21 @@
     "sunrise": "Sunrise",
     "sunset": "Sunset"
   },
+  "night": {
+    "moonPhase": "Moon Phase",
+    "nextSunrise": "Next Sunrise",
+    "sunriseIn": "Sunrise in"
+  },
+  "moonPhases": {
+    "newMoon": "New Moon",
+    "waxingCrescent": "Waxing Crescent",
+    "firstQuarter": "First Quarter",
+    "waxingGibbous": "Waxing Gibbous",
+    "fullMoon": "Full Moon",
+    "waningGibbous": "Waning Gibbous",
+    "lastQuarter": "Last Quarter",
+    "waningCrescent": "Waning Crescent"
+  },
   "uvi": {
     "level": {
       "low": "Low",

@@ -41,6 +41,21 @@
     "sunrise": "Lever du soleil",
     "sunset": "Coucher du soleil"
   },
+  "night": {
+    "moonPhase": "Phase lunaire",
+    "nextSunrise": "Prochain lever",
+    "sunriseIn": "Lever dans"
+  },
+  "moonPhases": {
+    "newMoon": "Nouvelle lune",
+    "waxingCrescent": "Premier croissant",
+    "firstQuarter": "Premier quartier",
+    "waxingGibbous": "Gibbeuse croissante",
+    "fullMoon": "Pleine lune",
+    "waningGibbous": "Gibbeuse décroissante",
+    "lastQuarter": "Dernier quartier",
+    "waningCrescent": "Dernier croissant"
+  },
   "uvi": {
     "level": {
       "low": "Faible",

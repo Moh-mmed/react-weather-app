@@ -48,12 +48,22 @@ module.exports = {
           '20%': { opacity: '1' },
           '80%': { opacity: '1' },
           '100%': { opacity: '0' },
-        }
+        },
+        starTwinkle: {
+          '0%, 100%': { opacity: '0.2', transform: 'scale(0.85)' },
+          '50%':       { opacity: '0.65', transform: 'scale(1.18)' },
+        },
+        atmosphericDrift: {
+          '0%, 100%': { opacity: '0.03', transform: 'translateY(0px)' },
+          '50%':       { opacity: '0.07', transform: 'translateY(-5px)' },
+        },
       },
       animation: {
         rise: 'rise 0.5s ease both',
         pulseSun: 'pulseSun 2.6s ease-in-out infinite',
         displayTooltip: 'displayTooltip 3s ease-in',
+        starTwinkle: 'starTwinkle 4s ease-in-out infinite',
+        atmosphericDrift: 'atmosphericDrift 18s ease-in-out infinite',
       }
     },
   },
