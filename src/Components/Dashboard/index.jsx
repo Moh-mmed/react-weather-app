@@ -394,10 +394,37 @@ const PageSpinner = () => (
 
 // ─── Dashboard grid for one location ─────────────────────────────────────────
 const LocationPage = ({ page, onRemove, currentTime }) => {
-  const { weatherData, airQuality, isPinned } = page;
+  const { weatherData, airQuality, isPinned, city } = page;
 
   if (!weatherData || !airQuality) {
-    return <PageSpinner />;
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center min-h-[300px] gap-4 text-center">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          width="36"
+          height="36"
+          className="text-muted opacity-40"
+        >
+          <line x1="1" y1="1" x2="23" y2="23" />
+          <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55" />
+          <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39" />
+          <path d="M10.71 5.05A16 16 0 0 1 22.56 9" />
+          <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88" />
+          <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
+          <line x1="12" y1="20" x2="12.01" y2="20" />
+        </svg>
+        <p className="text-muted text-sm opacity-60 max-w-[220px] leading-relaxed">
+          {city
+            ? `Unable to load weather for ${city}`
+            : "Unable to load weather data"}
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -449,10 +476,14 @@ const Dashboard = ({
   savedLocations = [],
   handleAddSavedLocation,
   handleRemoveLocation,
+  // Stale / offline data
+  usingCachedData = false,
+  lastUpdatedAt = null,
 }) => {
   const [currentTime, setCurrentTime] = useState(() =>
     Math.floor(Date.now() / 1000),
   );
+  const [showBanner, setShowBanner] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -460,6 +491,18 @@ const Dashboard = ({
     }, 10000);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (usingCachedData) {
+      setShowBanner(true);
+      const timer = setTimeout(() => {
+        setShowBanner(false);
+      }, 4000);
+      return () => clearTimeout(timer);
+    } else {
+      setShowBanner(false);
+    }
+  }, [usingCachedData, lastUpdatedAt]);
 
   // ── Paging scroll container ref ─────────────────────────────────────────────
   const pagerRef = useRef(null);
@@ -561,6 +604,16 @@ const Dashboard = ({
   const showAddBtn =
     activeIndex === 0 && !isCurrentPageSaved && handleAddSavedLocation;
 
+  // ── Format the last-updated timestamp for the stale-data banner ─────────────
+  const lastUpdatedLabel = lastUpdatedAt
+    ? new Date(lastUpdatedAt).toLocaleString(undefined, {
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : null;
+
   // ── Render ──────────────────────────────────────────────────────────────────
   return (
     /* Root: full-height flex column, strictly contained — no vertical overflow anywhere.
@@ -569,6 +622,65 @@ const Dashboard = ({
       className="flex flex-col text-primary bg-dashboard-radial pt-7 pb-5 gap-5"
       style={{ height: "100dvh", overflow: "hidden" }}
     >
+      {/* ── Stale data banner ────────────────────────────────────────────────── */}
+      {lastUpdatedLabel && (
+        <div
+          role="status"
+          aria-live="polite"
+          style={{
+            position: "fixed",
+            top: "14px",
+            left: "50%",
+            transform: showBanner ? "translateX(-50%) translateY(0)" : "translateX(-50%) translateY(-10px)",
+            opacity: showBanner ? 1 : 0,
+            transition: "opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+            pointerEvents: "none",
+            zIndex: 9999,
+            display: "flex",
+            alignItems: "center",
+            gap: "7px",
+            padding: "5px 14px 5px 10px",
+            borderRadius: "999px",
+            background: "rgba(255,183,77,0.10)",
+            border: "1px solid rgba(255,183,77,0.28)",
+            backdropFilter: "blur(8px)",
+            boxShadow: "0 2px 16px rgba(0,0,0,0.25)",
+            whiteSpace: "nowrap",
+          }}
+        >
+          {/* Wifi-off icon */}
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#FFB74D"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            width="14"
+            height="14"
+            aria-hidden="true"
+            style={{ flexShrink: 0 }}
+          >
+            <line x1="1" y1="1" x2="23" y2="23" />
+            <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55" />
+            <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39" />
+            <path d="M10.71 5.05A16 16 0 0 1 22.56 9" />
+            <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88" />
+            <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
+            <line x1="12" y1="20" x2="12.01" y2="20" />
+          </svg>
+          <span
+            style={{
+              fontSize: "11.5px",
+              fontWeight: 500,
+              color: "#FFB74D",
+              letterSpacing: "0.2px",
+            }}
+          >
+            Last updated {lastUpdatedLabel}
+          </span>
+        </div>
+      )}
       {/* ── Fixed header — horizontal padding lives here ───────────────────── */}
       <header className="flex items-center justify-between gap-4 flex-wrap px-[clamp(20px,4vw,48px)] shrink-0">
         {/* Brand + secondary header actions cluster */}

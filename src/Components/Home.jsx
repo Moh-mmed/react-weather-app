@@ -14,6 +14,7 @@ let hasLoggedOneCallFallback = false;
 
 // ─── Location persistence ──────────────────────────────────────────────────
 const LOCATION_KEY = "weatherme:lastLocation";
+const WEATHER_CACHE_MAP_KEY = "weatherme:weatherCacheMap";
 
 /**
  * Persist the user's most recent location so the next visit loads instantly
@@ -27,6 +28,46 @@ const saveLocation = (lat, lon, city, country, state) => {
     );
   } catch (_) {
     // localStorage unavailable (private browsing / quota exceeded) — fail silently
+  }
+};
+
+const getCacheKey = (lat, lon) => {
+  if (typeof lat !== "number" || typeof lon !== "number") return null;
+  return `${lat.toFixed(2)},${lon.toFixed(2)}`;
+};
+
+/** Persist weather + air quality data with a timestamp for offline/error fallback. */
+const saveWeatherCache = (lat, lon, weatherData, airQuality) => {
+  const key = getCacheKey(lat, lon);
+  if (!key) return;
+  try {
+    const raw = localStorage.getItem(WEATHER_CACHE_MAP_KEY);
+    const cacheMap = raw ? JSON.parse(raw) : {};
+    const existing = cacheMap[key] || {};
+    cacheMap[key] = {
+      weatherData: weatherData !== undefined ? weatherData : existing.weatherData,
+      airQuality: airQuality !== undefined ? airQuality : existing.airQuality,
+      savedAt: Date.now(),
+    };
+    localStorage.setItem(WEATHER_CACHE_MAP_KEY, JSON.stringify(cacheMap));
+  } catch (_) {}
+};
+
+/** Load the cached weather snapshot. Returns null if nothing is stored. */
+const loadWeatherCache = (lat, lon) => {
+  const key = getCacheKey(lat, lon);
+  if (!key) return null;
+  try {
+    const raw = localStorage.getItem(WEATHER_CACHE_MAP_KEY);
+    if (!raw) return null;
+    const cacheMap = JSON.parse(raw);
+    const cached = cacheMap[key];
+    if (cached?.weatherData && cached?.savedAt) {
+      return cached;
+    }
+    return null;
+  } catch {
+    return null;
   }
 };
 
@@ -84,13 +125,42 @@ const loadSavedLocation = () => {
 const Home = () => {
   const { t } = useTranslation();
   const [searchCity, setSearchCity] = useState(null);
-  const [currCity, setCurrCity] = useState(null);
-  const [coords, setCoords] = useState(null);
-  const [weatherData, setWeatherData] = useState(null);
-  const [airQuality, setAirQuality] = useState(null);
+  const [currCity, setCurrCity] = useState(() => {
+    const saved = loadSavedLocation();
+    return saved ? { city: saved.city, country: saved.country } : null;
+  });
+  const [coords, setCoords] = useState(() => {
+    const saved = loadSavedLocation();
+    return saved ? { lat: saved.lat, lon: saved.lon } : null;
+  });
+  const [weatherData, setWeatherData] = useState(() => {
+    const saved = loadSavedLocation();
+    if (saved) {
+      const cache = loadWeatherCache(saved.lat, saved.lon);
+      return cache?.weatherData ?? null;
+    }
+    return null;
+  });
+  const [airQuality, setAirQuality] = useState(() => {
+    const saved = loadSavedLocation();
+    if (saved) {
+      const cache = loadWeatherCache(saved.lat, saved.lon);
+      return cache?.airQuality ?? null;
+    }
+    return null;
+  });
   const [cityNotFound, setCityNotFound] = useState(false);
   const [apiError, setApiError] = useState("");
   const [isUpdatingLocation] = useState(false);
+  const [lastUpdatedAt, setLastUpdatedAt] = useState(() => {
+    const saved = loadSavedLocation();
+    if (saved) {
+      const cache = loadWeatherCache(saved.lat, saved.lon);
+      return cache?.savedAt ?? null;
+    }
+    return null;
+  });
+  const [usingCachedData, setUsingCachedData] = useState(false);
 
   // Saved locations state & data cache
   const [savedLocations, setSavedLocations] = useState(() => {
@@ -101,7 +171,25 @@ const Home = () => {
       return [];
     }
   });
-  const [savedWeatherData, setSavedWeatherData] = useState({});
+  const [savedWeatherData, setSavedWeatherData] = useState(() => {
+    try {
+      const saved = localStorage.getItem("weatherme:savedLocations");
+      const locations = saved ? JSON.parse(saved) : [];
+      const initialData = {};
+      locations.forEach((loc) => {
+        const cache = loadWeatherCache(loc.lat, loc.lon);
+        if (cache) {
+          initialData[`${loc.lat},${loc.lon}`] = {
+            weatherData: cache.weatherData,
+            airQuality: cache.airQuality,
+          };
+        }
+      });
+      return initialData;
+    } catch (_) {
+      return {};
+    }
+  });
   const [activeIndex, setActiveIndex] = useState(0);
 
   const lastFetchedCoordsRef = useRef(null);
@@ -209,6 +297,7 @@ const Home = () => {
           airQuality: airQualityResponse.data,
         },
       }));
+      saveWeatherCache(lat, lon, payload, airQualityResponse.data);
     } catch (err) {
       console.error(
         `Failed to fetch weather for location ${lat}, ${lon}:`,
@@ -269,10 +358,19 @@ const Home = () => {
       })
       .catch((err) => {
         console.error(err);
-        handleApiError(
-          err,
-          "error.reverseGeoFailed",
-        );
+        // If we already have a city from cache/saved location, don't show
+        // the error screen — the dashboard is still usable with stale data.
+        setCurrCity((prev) => {
+          if (!prev) {
+            // No city at all — try saved location as last resort
+            const saved = loadSavedLocation();
+            if (saved?.city && saved?.country) {
+              return { city: saved.city, country: saved.country };
+            }
+            handleApiError(err, "error.reverseGeoFailed");
+          }
+          return prev;
+        });
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps -- closes over only stable state setters and a module-level constant
   }, []);
@@ -387,7 +485,14 @@ const Home = () => {
         })
         .catch((err) => {
           console.error(err);
-          handleApiError(err, "error.cityNotFound");
+          // If we already have data on screen, don't blow it away with an error screen.
+          // Show the "city not found" toast instead — the user can retry when online.
+          if (weatherData) {
+            setCityNotFound(true);
+            setTimeout(() => setCityNotFound(false), 4000);
+          } else {
+            handleApiError(err, "error.cityNotFound");
+          }
         });
     };
     if (searchCity !== null) {
@@ -449,10 +554,24 @@ const Home = () => {
           setWeatherData(payload);
           lastFetchedCoordsRef.current = coords;
           setApiError("");
+          setUsingCachedData(false);
+          const now = Date.now();
+          setLastUpdatedAt(now);
+          saveWeatherCache(coords.lat, coords.lon, payload, airQuality);
         } catch (err) {
           if (!isMounted) return;
           console.error(err);
-          handleApiError(err, "error.weatherFailed");
+          // Try to serve stale cached data instead of showing a hard error
+          const cache = loadWeatherCache(coords.lat, coords.lon);
+          if (cache) {
+            setWeatherData(cache.weatherData);
+            setAirQuality(cache.airQuality);
+            setLastUpdatedAt(cache.savedAt);
+            setUsingCachedData(true);
+            setApiError("");
+          } else {
+            handleApiError(err, "error.weatherFailed");
+          }
         }
       };
 
@@ -491,10 +610,22 @@ const Home = () => {
           setAirQuality(response.data);
           lastFetchedCoordsRef.current = coords;
           setApiError("");
+          setUsingCachedData(false);
+          // Update cache with fresh air quality
+          saveWeatherCache(coords.lat, coords.lon, weatherData, response.data);
         } catch (err) {
           if (!isMounted) return;
           console.error(err);
-          handleApiError(err, "error.airPollutionFailed");
+          // Try to serve stale cached data for air quality
+          const cache = loadWeatherCache(coords.lat, coords.lon);
+          if (cache && !airQuality) {
+            setAirQuality(cache.airQuality);
+            setLastUpdatedAt(cache.savedAt);
+            setUsingCachedData(true);
+            setApiError("");
+          } else if (!cache) {
+            handleApiError(err, "error.airPollutionFailed");
+          }
         }
       };
 
@@ -576,6 +707,8 @@ const Home = () => {
           savedLocations={savedLocations}
           handleAddSavedLocation={addSavedLocation}
           handleRemoveLocation={removeSavedLocation}
+          usingCachedData={usingCachedData}
+          lastUpdatedAt={lastUpdatedAt}
         />
       )}
     </WeatherContext.Provider>
