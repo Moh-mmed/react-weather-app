@@ -8,7 +8,6 @@
     "saved": "Saved",
     "saveLocation": "Save location",
     "saveThisLocation": "Save this location",
-    "sourceOnGitHub": "View source on GitHub",
     "settings": "Settings",
     "language": "Language",
     "units": "Units",
@@ -27,19 +26,30 @@
   },
   "outlook": {
     "title": "48-Hour Outlook",
-    "fallbackMessage": "48-hour hourly forecast requires OpenWeather One Call 3.0 access."
+    "fallbackMessage": "48-hour hourly forecast is temporarily unavailable."
   },
   "forecast": {
     "title": "7-Day Forecast",
     "titleWithCount": "{{count}}-Day Forecast",
     "precip": "Precip",
     "humidity": "Humidity",
-    "wind": "Wind"
+    "humidityAvg": "Humidity (avg)",
+    "wind": "Wind",
+    "windMax": "Wind (max)"
   },
   "sun": {
     "title": "Sun Position",
+    "titleNight": "Moon Position",
     "sunrise": "Sunrise",
-    "sunset": "Sunset"
+    "sunset": "Sunset",
+    "moon": "Moon",
+    "moonrise": "Moonrise",
+    "moonset": "Moonset",
+    "illuminatedSuffix": "% Illuminated",
+    "tonightMoon": "Tonight's Moon",
+    "nextFullMoon": "Next Full Moon",
+    "nextFullMoonDays": "{{count}} days",
+    "tonight": "Tonight"
   },
   "night": {
     "moonPhase": "Moon Phase",
@@ -57,14 +67,6 @@
     "waningCrescent": "Waning Crescent"
   },
   "uvi": {
-    "level": {
-      "low": "Low",
-      "moderate": "Moderate",
-      "high": "High",
-      "very high": "Very high",
-      "extreme": "Extreme",
-      "unknown": "Unknown"
-    },
     "title": {
       "low": "Low UV",
       "moderate": "Moderate UV",
@@ -85,6 +87,12 @@
   "aqi": {
     "title": "Air Quality",
     "mainPollutant": "Main pollutant — {{pollutant}}",
+    "updatedUnknown": "Updated recently",
+    "updatedJustNow": "Updated just now",
+    "updatedMinutesAgo_one": "Updated {{count}} minute ago",
+    "updatedMinutesAgo_other": "Updated {{count}} minutes ago",
+    "updatedHoursAgo_one": "Updated {{count}} hour ago",
+    "updatedHoursAgo_other": "Updated {{count}} hours ago",
     "categories": {
       "good": "Good",
       "moderate": "Moderate",
@@ -111,8 +119,15 @@
     "visibility": "Visibility",
     "dewPoint": "Dew Point",
     "cloudCover": "Cloud Cover",
+    "uvIndex": "UV Index",
+    "gusts": "Gusts",
+    "rh": "RH",
+    "windDirectionAria": "Wind direction {{abbr}} at {{bearing}} degrees",
+    "pressureDialAria": "Pressure dial: {{value}} {{unit}}",
+    "humidityGaugeAria": "Humidity gauge: {{value}}",
+    "visibilityAria": "Visibility {{value}} {{unit}}, {{status}}",
     "unitKmH": "km/h",
-    "unitHpa": "hPa",
+    "unitMb": "mb",
     "unitKm": "km",
     "unitMph": "mph",
     "unitInHg": "inHg",
@@ -120,7 +135,7 @@
     "stable": "Stable",
     "rising": "Rising",
     "falling": "Falling",
-    "pressureTrendDesc": "{{change}} hPa in the last 24 hours",
+    "pressureTrendDesc": "{{change}} mb in the last 24 hours",
     "pressureTrendDescImperial": "{{change}} inHg in the last 24 hours",
     "humidityComfortable": "Comfortable indoor environment.",
     "humiditySticky": "Sticky and damp atmosphere.",
@@ -141,6 +156,79 @@
     "comfortDry": "Dry",
     "comfortComfortable": "Comfy",
     "comfortMuggy": "Muggy"
+  },
+  "weatherStatus": {
+    "na": "Not available",
+    "humidity": {
+      "headings": {
+        "veryDry": "Very Dry",
+        "comfortable": "Comfortable",
+        "humid": "Humid",
+        "saturated": "Saturated"
+      },
+      "pills": {
+        "dry": "Dry",
+        "comfortable": "Comfortable",
+        "humid": "Humid",
+        "sticky": "Sticky"
+      },
+      "descriptions": {
+        "na": "Humidity is not available",
+        "dry": "Low moisture in the air",
+        "comfortable": "Air feels comfortable",
+        "humid": "High moisture in the air",
+        "saturated": "Air is holding maximum moisture"
+      }
+    },
+    "dewPoint": {
+      "headings": {
+        "feelsDry": "Feels Dry",
+        "comfortable": "Comfortable",
+        "feelsMuggy": "Feels Muggy"
+      },
+      "descriptions": {
+        "na": "Dew point is not available",
+        "dry": "Low moisture in the air",
+        "comfortable": "Air feels comfortable",
+        "muggy": "High moisture in the air"
+      },
+      "scale": {
+        "dry": "Dry",
+        "comfortable": "Comfortable",
+        "muggy": "Muggy"
+      }
+    },
+    "visibility": {
+      "labels": {
+        "poor": "Poor",
+        "moderate": "Moderate",
+        "excellent": "Excellent"
+      }
+    },
+    "wind": {
+      "pills": {
+        "calm": "Calm",
+        "lightBreeze": "Light Breeze",
+        "moderateBreeze": "Moderate Breeze",
+        "strongWind": "Strong Wind"
+      }
+    },
+    "uv": {
+      "labels": {
+        "low": "Low",
+        "moderate": "Moderate",
+        "high": "High",
+        "veryHigh": "Very High",
+        "extreme": "Extreme"
+      }
+    }
+  },
+  "metrics": {
+    "lowExposure": "Low Exposure",
+    "moderateExposure": "Moderate Exposure",
+    "highExposure": "High Exposure",
+    "veryHighExposure": "Very High Exposure",
+    "extremeExposure": "Extreme Exposure"
   },
   "windDirections": {
     "N": "N",

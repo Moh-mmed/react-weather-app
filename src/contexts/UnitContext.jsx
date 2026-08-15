@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState } from "react";
 
 export const UnitContext = createContext({
   unitSystem: "metric", // "metric" | "imperial"
@@ -7,7 +7,7 @@ export const UnitContext = createContext({
   convertTemp: (c) => c,
   convertWind: (ms) => ({ value: 0, unitKey: "stats.unitKmH" }),
   convertVisibility: (meters) => ({ value: 0, unitKey: "stats.unitKm" }),
-  convertPressure: (hpa) => ({ value: 0, unitKey: "stats.unitHpa" }),
+  convertPressure: (hpa) => ({ value: 0, unitKey: "stats.unitMb" }),
 });
 
 const UNIT_KEY = "weatherme:unitSystem";
@@ -92,7 +92,7 @@ export const UnitProvider = ({ children }) => {
   };
 
   const convertPressure = (hpa) => {
-    if (!Number.isFinite(hpa)) return { value: "--", unitKey: unitSystem === "imperial" ? "stats.unitInHg" : "stats.unitHpa" };
+    if (!Number.isFinite(hpa)) return { value: "--", unitKey: unitSystem === "imperial" ? "stats.unitInHg" : "stats.unitMb" };
     if (unitSystem === "imperial") {
       const inHg = (hpa * 0.02953).toFixed(2);
       return {
@@ -102,7 +102,7 @@ export const UnitProvider = ({ children }) => {
     }
     return {
       value: Math.round(hpa),
-      unitKey: "stats.unitHpa",
+      unitKey: "stats.unitMb",
     };
   };
 

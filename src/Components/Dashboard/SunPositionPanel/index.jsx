@@ -1,15 +1,14 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import getTiming from "../../../helpers/getTiming";
-import { getUviDescription } from "../../../helpers/getUVI";
 import { getSunArcPoint, SUN_ARC_BASE } from "../../../helpers/sunArc";
 import { useTimeFormat } from "../../../contexts/TimeFormatContext";
 import {
   getSkyPhase,
-  getSkyGradient,
   getSunColor,
   getSunsetProgress,
-  calculateNightProgress,
+  localTimeStringToUnix,
+  getMoonVisibility,
   isNight as checkIsNight,
 } from "../../../helpers/sunArcUtils";
 
@@ -17,15 +16,20 @@ import SkyGradient from "./SkyGradient";
 import SunBody from "./SunBody";
 import MoonBody from "./MoonBody";
 import StarField from "./StarField";
-import HorizonGlow from "./HorizonGlow";
-import NightInfoCard from "./NightInfoCard";
+import MoonCard from "./MoonCard";
 
-// ─── Panel title icon ─────────────────────────────────────────────────────────
+// ─── Panel title icons ────────────────────────────────────────────────────────
 const SunIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3.5 h-3.5 opacity-85">
     <circle cx="12" cy="12" r="4" />
     <line x1="12" y1="2" x2="12" y2="4" />
     <line x1="12" y1="20" x2="12" y2="22" />
+  </svg>
+);
+
+const MoonIcon = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3.5 h-3.5 opacity-85">
+    <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z" />
   </svg>
 );
 
@@ -40,11 +44,11 @@ const ARC_STROKE = {
 };
 
 // ─── Main component ───────────────────────────────────────────────────────────
-const SunPositionPanel = ({ weatherData, currentTime }) => {
+const SunPositionPanel = ({ weatherData, currentTime, astronomy }) => {
   const { t } = useTranslation();
   const { hourFormat } = useTimeFormat();
   const { current, timezone_offset } = weatherData;
-  const { dt, uvi, sunrise, sunset } = current;
+  const { dt, sunrise, sunset } = current;
   const displayTime = Number.isFinite(currentTime) ? currentTime : dt;
 
   const { day, width, Sunrise, Sunset } = getTiming(
@@ -66,11 +70,6 @@ const SunPositionPanel = ({ weatherData, currentTime }) => {
     [displayTime, sunset]
   );
 
-  const skyGrad = useMemo(
-    () => getSkyGradient(phase, sunsetT),
-    [phase, sunsetT]
-  );
-
   const sunColor = useMemo(
     () => getSunColor(phase, sunsetT),
     [phase, sunsetT]
@@ -83,31 +82,53 @@ const SunPositionPanel = ({ weatherData, currentTime }) => {
 
   const starsVisible = phase === 'night' || phase === 'blue-hour';
 
+  const hemisphere =
+    (weatherData.coord?.lat ?? 0) < 0 ? "southern" : "northern";
+
+  const moonRaw = astronomy?.raw ?? null;
+
   // ── Arc position ────────────────────────────────────────────────────────────
   const daySunProgress = useMemo(
     () => day ? width / 100 : 0,
     [day, width]
   );
 
-  const nightProgress = useMemo(
-    () => calculateNightProgress(sunset, sunrise, displayTime),
-    [sunset, sunrise, displayTime]
-  );
-
-  // Sun moves 0→1 during the day; Moon moves 0→1 during the night
+  // Sun moves 0→1 during the day
   const sunArcPoint = useMemo(
     () => getSunArcPoint(daySunProgress),
     [daySunProgress]
   );
 
-  const moonArcPoint = useMemo(
-    () => getSunArcPoint(nightProgress),
-    [nightProgress]
+  // Moon position uses the moon's OWN rise/set times (not the sun's day/night
+  // window), so the dot only sits on the arc while the moon is actually above
+  // the horizon — and tracks moonrise→moonset rather than sunset→sunrise.
+  const moonRiseTs = useMemo(
+    () => localTimeStringToUnix(moonRaw?.moonriseDate, moonRaw?.moonrise, timezone_offset),
+    [moonRaw, timezone_offset],
   );
 
-  // ── UV card / Night card swap ───────────────────────────────────────────────
-  const UVI = Number.isFinite(uvi) ? Math.round(uvi) : "--";
-  const uviCopy = getUviDescription(Number.isFinite(uvi) ? uvi : null, t);
+  const moonSetTs = useMemo(
+    () => localTimeStringToUnix(moonRaw?.moonsetDate, moonRaw?.moonset, timezone_offset),
+    [moonRaw, timezone_offset],
+  );
+
+  const { isUp: moonIsUp, progress: moonProgress } = useMemo(
+    () => getMoonVisibility(moonRiseTs, moonSetTs, displayTime),
+    [moonRiseTs, moonSetTs, displayTime],
+  );
+
+  const moonArcPoint = useMemo(
+    () => getSunArcPoint(moonProgress),
+    [moonProgress]
+  );
+
+  // ── Moon data (permanent card, day or night) ───────────────────────────────
+  const moonPhase = astronomy?.moonPhase ?? null;
+  const moonPhaseName = astronomy?.phaseName ?? null;
+  const moonIllumination = astronomy?.illumination ?? null;
+  const moonrise = astronomy?.moonrise ?? null;
+  const moonset = astronomy?.moonset ?? null;
+  const nextFullMoon = astronomy?.nextFullMoon ?? null;
 
   const arcStroke = ARC_STROKE[phase] || '#4FA3D9';
 
@@ -118,8 +139,8 @@ const SunPositionPanel = ({ weatherData, currentTime }) => {
     >
       {/* Panel title */}
       <div className="text-[12px] uppercase tracking-[1.2px] text-muted font-semibold mb-1 flex items-center gap-2">
-        <SunIcon />
-        {t("sun.title")}
+        {night ? <MoonIcon /> : <SunIcon />}
+        {night ? t("sun.titleNight") : t("sun.title")}
       </div>
 
       {/* Arc and labels */}
@@ -132,36 +153,11 @@ const SunPositionPanel = ({ weatherData, currentTime }) => {
           role="img"
           aria-label={night ? "Moon position arc" : "Sun position arc"}
         >
-          {/* ── Gradient definitions ── */}
-          <SkyGradient top={skyGrad.top} mid={skyGrad.mid} bottom={skyGrad.bottom} />
-
-          {/* ── Sky fill — clipped to semicircle dome ── */}
-          <rect
-            x="25"
-            y="20"
-            width="300"
-            height="150"
-            fill="url(#skyGrad)"
-            clipPath="url(#domeClip)"
-            style={{ transition: 'fill 2.5s ease' }}
-          />
-
-          {/* ── Atmospheric shimmer overlay ── */}
-          <rect
-            x="25"
-            y="20"
-            width="300"
-            height="150"
-            fill="url(#atmosGrad)"
-            clipPath="url(#domeClip)"
-            className="motion-safe:animate-atmosphericDrift"
-          />
+          {/* ── Gradient/filter definitions used by the sun & moon bodies ── */}
+          <SkyGradient />
 
           {/* ── Stars ── */}
           <StarField visible={starsVisible} />
-
-          {/* ── Horizon glow ── */}
-          <HorizonGlow phase={phase} />
 
           {/* ── Dashed track arc (always visible) ── */}
           <path
@@ -192,11 +188,13 @@ const SunPositionPanel = ({ weatherData, currentTime }) => {
             visible={!night}
           />
 
-          {/* ── Moon ── */}
+          {/* ── Moon (only while it's dark AND the moon is above the horizon) ── */}
           <MoonBody
             cx={moonArcPoint.x}
             cy={moonArcPoint.y}
-            visible={night}
+            visible={night && moonIsUp}
+            phase={moonPhase ?? 0}
+            hemisphere={hemisphere}
           />
 
           {/* ── Horizon endpoint dots ── */}
@@ -216,32 +214,18 @@ const SunPositionPanel = ({ weatherData, currentTime }) => {
           </div>
         </div>
 
-        {/* ── Info card — UV during day, Night info during night ── */}
+        {/* ── Moon card — permanent, same data day or night ── */}
         <div className="mt-3.5 w-full relative" style={{ minHeight: 110 }}>
-          {/* UV card — fades out at night */}
-          <div
-            className="absolute inset-0 w-full flex items-start gap-3 bg-accent-coral/[0.12] border border-accent-coral/30 rounded-chip p-[14px_14px_18px] box-border"
-            style={{
-              opacity: night ? 0 : 1,
-              pointerEvents: night ? 'none' : 'auto',
-              transition: 'opacity 2.5s ease',
-            }}
-            aria-hidden={night}
-          >
-            <div className="font-display font-semibold text-[24px] text-accent-coral">{UVI}</div>
-            <div className="text-[12px] text-muted leading-[1.55] min-w-0">
-              <b className="text-primary capitalize">{uviCopy.title}.</b> {uviCopy.description}
-            </div>
-          </div>
-
-          {/* Night info card — fades in at night */}
-          <NightInfoCard
-            dt={dt}
-            sunrise={sunrise}
-            sunset={sunset}
-            timezone_offset={timezone_offset}
-            visible={night}
-            currentTime={displayTime}
+          <MoonCard
+            moonPhase={moonPhase}
+            moonPhaseName={moonPhaseName}
+            illumination={moonIllumination}
+            moonrise={moonrise}
+            moonset={moonset}
+            nextFullMoon={nextFullMoon}
+            moonRaw={moonRaw}
+            hemisphere={hemisphere}
+            timezoneOffset={timezone_offset}
           />
         </div>
       </div>

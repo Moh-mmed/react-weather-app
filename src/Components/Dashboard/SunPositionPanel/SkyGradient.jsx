@@ -1,27 +1,8 @@
 /**
- * SkyGradient — fills the semicircular dome area with a smooth gradient.
- * Renders a clipPath-constrained rect so the gradient stays inside the arc.
+ * SkyGradient — SVG gradient/filter definitions used by the sun and moon bodies.
  */
-const SkyGradient = ({ top, mid, bottom }) => (
+const SkyGradient = () => (
   <defs>
-    {/* Clip the sky fill to the dome semicircle */}
-    <clipPath id="domeClip">
-      <path d="M 25 170 A 150 150 0 0 1 325 170 Z" />
-    </clipPath>
-
-    {/* Vertical sky gradient: top → mid → bottom */}
-    <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%"   style={{ stopColor: top,    stopOpacity: 1, transition: 'stop-color 2.5s ease' }} />
-      <stop offset="52%"  style={{ stopColor: mid,    stopOpacity: 1, transition: 'stop-color 2.5s ease' }} />
-      <stop offset="100%" style={{ stopColor: bottom, stopOpacity: 1, transition: 'stop-color 2.5s ease' }} />
-    </linearGradient>
-
-    {/* Atmospheric shimmer gradient (very subtle) */}
-    <radialGradient id="atmosGrad" cx="50%" cy="30%" r="60%">
-      <stop offset="0%"   stopColor="rgba(255,255,255,0.06)" />
-      <stop offset="100%" stopColor="rgba(255,255,255,0)" />
-    </radialGradient>
-
     {/* Sun radial glow gradient */}
     <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
       <stop offset="0%"   stopColor="rgba(255,220,100,0.9)" />
@@ -36,6 +17,12 @@ const SkyGradient = ({ top, mid, bottom }) => (
       <stop offset="40%"  stopColor="rgba(160,200,245,0.18)" />
       <stop offset="100%" stopColor="rgba(140,185,235,0)" />
     </radialGradient>
+
+    {/* Clip the moon's sliding phase shadow back to the moon-disc silhouette.
+        Origin-centered so it works for every moon regardless of position. */}
+    <clipPath id="moonDiscClip">
+      <circle cx="0" cy="0" r="9" />
+    </clipPath>
 
     {/* Sun inner bloom */}
     <filter id="sunBloom" x="-60%" y="-60%" width="220%" height="220%">

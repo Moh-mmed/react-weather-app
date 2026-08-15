@@ -23,17 +23,33 @@ const starPositions = [
   [91, 39],
 ];
 
-const getHeroCondition = (current) => {
+// Day/night determination for the hero. Uses the same live-clock convention as
+// SunPositionPanel: pass a finite `displayTime` (live currentTime, falling back
+// to the observation `current.dt`) and the sunrise/sunset bounds. When the
+// clock or bounds are missing, falls back to the weather icon's day/night
+// suffix so the hero always renders a coherent condition.
+export const heroIsDay = (displayTime, sunrise, sunset, iconEndsWithNight) => {
+  if (
+    Number.isFinite(displayTime) &&
+    Number.isFinite(sunrise) &&
+    Number.isFinite(sunset)
+  ) {
+    return displayTime >= sunrise && displayTime < sunset;
+  }
+  return !iconEndsWithNight;
+};
+
+const getHeroCondition = (current, displayTime) => {
   const weather = current?.weather?.[0] || {};
   const code = weather.icon?.slice(0, 2);
   const main = weather.main?.toLowerCase() || "";
   const description = weather.description?.toLowerCase() || "";
-  const isDay =
-    Number.isFinite(current?.dt) &&
-    Number.isFinite(current?.sunrise) &&
-    Number.isFinite(current?.sunset)
-      ? current.dt >= current.sunrise && current.dt < current.sunset
-      : !weather.icon?.endsWith("n");
+  const isDay = heroIsDay(
+    displayTime,
+    current?.sunrise,
+    current?.sunset,
+    weather.icon?.endsWith("n"),
+  );
 
   if (code === "01" || main === "clear")
     return isDay ? "clear-day" : "clear-night";
@@ -80,8 +96,8 @@ const CloudShape = ({ className }) => (
   </svg>
 );
 
-const HeroWeatherBackground = ({ current }) => {
-  const condition = getHeroCondition(current);
+const HeroWeatherBackground = ({ current, displayTime }) => {
+  const condition = getHeroCondition(current, displayTime);
 
   return (
     <div
@@ -174,16 +190,18 @@ const HeroWeatherBackground = ({ current }) => {
 /**
  * HeroPanel — current conditions card.
  */
-const HeroPanel = ({ weatherData, isPinned = true, onRemove }) => {
+const HeroPanel = ({ weatherData, isPinned = true, onRemove, currentTime }) => {
   const { t } = useTranslation();
   const { convertTemp } = useUnit();
   const { current, daily } = weatherData;
   const { temp, feels_like, weather } = current;
-  const { icon } = weather[0];
   const translatedDesc = translateConditionDescription(weather[0], t);
   const today = daily[0];
   const high = today?.temp?.max;
   const low = today?.temp?.min;
+  // Live clock owned by Dashboard; fall back to the observation timestamp when
+  // no live clock is available so the hero is never left without day/night info.
+  const displayTime = Number.isFinite(currentTime) ? currentTime : current?.dt;
   const displayTemp = Number.isFinite(temp) ? convertTemp(temp) : "--";
   const displayFeels = Number.isFinite(feels_like)
     ? convertTemp(feels_like)
@@ -205,7 +223,7 @@ const HeroPanel = ({ weatherData, isPinned = true, onRemove }) => {
       className="relative overflow-hidden rounded-panel border border-panel-line bg-navy-panel bg-panel-pattern p-[22px_24px] flex items-center justify-between gap-5 min-h-[190px] motion-safe:animate-rise"
       style={{ animationDelay: "0s" }}
     >
-      <HeroWeatherBackground current={current} />
+      <HeroWeatherBackground current={current} displayTime={displayTime} />
       <div
         aria-hidden="true"
         className="absolute inset-0 pointer-events-none"

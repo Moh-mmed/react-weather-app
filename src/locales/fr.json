@@ -8,7 +8,6 @@
     "saved": "Enregistré",
     "saveLocation": "Enregistrer la ville",
     "saveThisLocation": "Enregistrer cette ville",
-    "sourceOnGitHub": "Voir la source sur GitHub",
     "settings": "Réglages",
     "language": "Langue",
     "units": "Unités",
@@ -27,19 +26,30 @@
   },
   "outlook": {
     "title": "Aperçu 48h",
-    "fallbackMessage": "Les prévisions horaire sur 48h nécessitent un accès à OpenWeather One Call 3.0."
+    "fallbackMessage": "Les prévisions horaires sur 48h sont temporairement indisponibles."
   },
   "forecast": {
     "title": "Prévisions sur 7 jours",
     "titleWithCount": "Prévisions sur {{count}} jours",
     "precip": "Précip.",
     "humidity": "Humidité",
-    "wind": "Vent"
+    "humidityAvg": "Humidité (moy.)",
+    "wind": "Vent",
+    "windMax": "Vent (max)"
   },
   "sun": {
     "title": "Position du soleil",
+    "titleNight": "Position de la lune",
     "sunrise": "Lever du soleil",
-    "sunset": "Coucher du soleil"
+    "sunset": "Coucher du soleil",
+    "moon": "Lune",
+    "moonrise": "Lever de lune",
+    "moonset": "Coucher de lune",
+    "illuminatedSuffix": "% illuminée",
+    "tonightMoon": "La lune de ce soir",
+    "nextFullMoon": "Prochaine pleine lune",
+    "nextFullMoonDays": "{{count}} jours",
+    "tonight": "Ce soir"
   },
   "night": {
     "moonPhase": "Phase lunaire",
@@ -57,14 +67,6 @@
     "waningCrescent": "Dernier croissant"
   },
   "uvi": {
-    "level": {
-      "low": "Faible",
-      "moderate": "Modéré",
-      "high": "Élevé",
-      "very high": "Très élevé",
-      "extreme": "Extrême",
-      "unknown": "Inconnu"
-    },
     "title": {
       "low": "UV faible",
       "moderate": "UV modéré",
@@ -85,6 +87,12 @@
   "aqi": {
     "title": "Qualité de l'air",
     "mainPollutant": "Polluant principal — {{pollutant}}",
+    "updatedUnknown": "Mise à jour récente",
+    "updatedJustNow": "Mise à jour à l'instant",
+    "updatedMinutesAgo_one": "Mise à jour il y a {{count}} minute",
+    "updatedMinutesAgo_other": "Mise à jour il y a {{count}} minutes",
+    "updatedHoursAgo_one": "Mise à jour il y a {{count}} heure",
+    "updatedHoursAgo_other": "Mise à jour il y a {{count}} heures",
     "categories": {
       "good": "Bonne",
       "moderate": "Modérée",
@@ -111,8 +119,15 @@
     "visibility": "Visibilité",
     "dewPoint": "Point de rosée",
     "cloudCover": "Couverture nuageuse",
+    "uvIndex": "Indice UV",
+    "gusts": "Rafales",
+    "rh": "HR",
+    "windDirectionAria": "Direction du vent : {{abbr}} à {{bearing}} degrés",
+    "pressureDialAria": "Cadran de pression : {{value}} {{unit}}",
+    "humidityGaugeAria": "Jauge d'humidité : {{value}}",
+    "visibilityAria": "Visibilité : {{value}} {{unit}}, {{status}}",
     "unitKmH": "km/h",
-    "unitHpa": "hPa",
+    "unitMb": "mb",
     "unitKm": "km",
     "unitMph": "mph",
     "unitInHg": "inHg",
@@ -120,7 +135,7 @@
     "stable": "Stable",
     "rising": "En hausse",
     "falling": "En baisse",
-    "pressureTrendDesc": "{{change}} hPa ces dernières 24 heures",
+    "pressureTrendDesc": "{{change}} mb ces dernières 24 heures",
     "pressureTrendDescImperial": "{{change}} inHg ces dernières 24 heures",
     "humidityComfortable": "Ambiance intérieure confortable.",
     "humiditySticky": "Atmosphère lourde et humide.",
@@ -141,6 +156,79 @@
     "comfortDry": "Sec",
     "comfortComfortable": "Confortable",
     "comfortMuggy": "Lourd"
+  },
+  "weatherStatus": {
+    "na": "Indisponible",
+    "humidity": {
+      "headings": {
+        "veryDry": "Très sec",
+        "comfortable": "Confortable",
+        "humid": "Humide",
+        "saturated": "Saturé"
+      },
+      "pills": {
+        "dry": "Sec",
+        "comfortable": "Confortable",
+        "humid": "Humide",
+        "sticky": "Moite"
+      },
+      "descriptions": {
+        "na": "Humidité indisponible",
+        "dry": "Faible humidité dans l'air",
+        "comfortable": "L'air est agréable",
+        "humid": "Humidité élevée dans l'air",
+        "saturated": "L'air retient un maximum d'humidité"
+      }
+    },
+    "dewPoint": {
+      "headings": {
+        "feelsDry": "Sec",
+        "comfortable": "Confortable",
+        "feelsMuggy": "Moite"
+      },
+      "descriptions": {
+        "na": "Point de rosée indisponible",
+        "dry": "Faible humidité dans l'air",
+        "comfortable": "L'air est agréable",
+        "muggy": "Humidité élevée dans l'air"
+      },
+      "scale": {
+        "dry": "Sec",
+        "comfortable": "Confortable",
+        "muggy": "Moite"
+      }
+    },
+    "visibility": {
+      "labels": {
+        "poor": "Faible",
+        "moderate": "Moyenne",
+        "excellent": "Excellente"
+      }
+    },
+    "wind": {
+      "pills": {
+        "calm": "Calme",
+        "lightBreeze": "Brise légère",
+        "moderateBreeze": "Brise modérée",
+        "strongWind": "Vent fort"
+      }
+    },
+    "uv": {
+      "labels": {
+        "low": "Faible",
+        "moderate": "Modéré",
+        "high": "Élevé",
+        "veryHigh": "Très élevé",
+        "extreme": "Extrême"
+      }
+    }
+  },
+  "metrics": {
+    "lowExposure": "Exposition faible",
+    "moderateExposure": "Exposition modérée",
+    "highExposure": "Exposition élevée",
+    "veryHighExposure": "Exposition très élevée",
+    "extremeExposure": "Exposition extrême"
   },
   "windDirections": {
     "N": "N",

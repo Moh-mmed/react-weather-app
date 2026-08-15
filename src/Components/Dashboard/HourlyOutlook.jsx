@@ -215,18 +215,27 @@ const HourlyOutlook = ({ weatherData }) => {
   const PADDING_Y = 45;
   const INNER_HEIGHT = SVG_HEIGHT - PADDING_Y * 2;
 
-  const temps = outlook48h?.map((d) => convertTemp(d.temp)) || [];
-  const minTemp = Math.min(...temps);
-  const maxTemp = Math.max(...temps);
-  const range = maxTemp - minTemp || 1;
+  // Chart math runs entirely in Celsius so a missing sample can never turn into
+  // a "--" display string that corrupts Math.min/max with NaN. The range uses
+  // only finite sample temps; converted display values are used ONLY for the
+  // text layer below.
+  const cTemps =
+    outlook48h?.map((d) => d.temp).filter((t) => Number.isFinite(t)) || [];
+  const minTemp = cTemps.length > 0 ? Math.min(...cTemps) : null;
+  const maxTemp = cTemps.length > 0 ? Math.max(...cTemps) : null;
+  const range =
+    minTemp !== null && maxTemp !== null ? maxTemp - minTemp || 1 : null;
 
+  // Points are index-anchored (x = i * COLUMN_WIDTH) for even spacing, but a
+  // missing temperature contributes no point — it is omitted from the line and
+  // dots rather than fabricated at some arbitrary Y.
   const points =
-    outlook48h?.map((d, i) => {
-      const displayVal = convertTemp(d.temp);
+    outlook48h?.flatMap((d, i) => {
+      if (!Number.isFinite(d.temp) || range === null) return [];
       const x = i * COLUMN_WIDTH + COLUMN_WIDTH / 2;
-      const normalized = (displayVal - minTemp) / range;
+      const normalized = (d.temp - minTemp) / range;
       const y = PADDING_Y + (1 - normalized) * INNER_HEIGHT;
-      return { x, y };
+      return [{ x, y }];
     }) || [];
 
   const pathStr = points

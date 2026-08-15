@@ -23,36 +23,75 @@ export const calculateSunProgress = (sunrise, sunset, dt) => {
 };
 
 /**
- * Returns the fraction of the night that has elapsed (0–1).
- * Night goes from sunset → next sunrise.
- * Uses the actual sunrise from weather data + 24h when today's sunrise has passed.
+ * Returns the timestamp of the next sunrise relative to `dt`.
+ *
+ * Before today's sunrise has happened, returns today's sunrise. Once it has
+ * passed, the caller should supply the ACTUAL next-day sunrise (`nextSunrise`),
+ * e.g. from a multi-day astronomy response, so DST transitions and changing
+ * day length are respected. A fixed `+24h` fallback exists only for legacy
+ * callers that have no next-day value available; it is explicitly an
+ * approximation (incorrect across DST / day-length changes) and should not be
+ * relied on.
+ *
+ * @param {number} sunrise today's sunrise (Unix seconds)
+ * @param {number} dt current Unix seconds
+ * @param {number} [nextSunrise] the actual following sunrise (Unix seconds).
+ *        Used verbatim when finite and strictly after `sunrise`.
+ * @returns {number} next sunrise Unix seconds (or `sunrise` when inputs are invalid).
  */
-export const calculateNightProgress = (sunset, sunrise, dt) => {
-  if (!Number.isFinite(sunset) || !Number.isFinite(sunrise) || !Number.isFinite(dt)) return 0;
-  const nextSunrise = getNextSunrise(sunrise, dt);
-  if (dt <= sunset) return 0;
-  if (dt >= nextSunrise) return 1;
-  return (dt - sunset) / (nextSunrise - sunset);
-};
-
-/**
- * Returns the next sunrise timestamp.
- * If today's sunrise has already passed, returns tomorrow's sunrise.
- * Otherwise returns today's sunrise.
- */
-export const getNextSunrise = (sunrise, dt) => {
+export const getNextSunrise = (sunrise, dt, nextSunrise) => {
   if (!Number.isFinite(sunrise) || !Number.isFinite(dt)) return sunrise;
   if (dt < sunrise) return sunrise;
+  if (Number.isFinite(nextSunrise) && nextSunrise > sunrise) return nextSunrise;
   return sunrise + 24 * 60 * 60;
 };
 
 /**
  * Returns the seconds until the next sunrise.
+ * Accepts the same optional actual next-day sunrise as getNextSunrise.
  */
-export const getTimeUntilSunrise = (sunrise, dt) => {
+export const getTimeUntilSunrise = (sunrise, dt, nextSunrise) => {
   if (!Number.isFinite(sunrise) || !Number.isFinite(dt)) return null;
-  const next = getNextSunrise(sunrise, dt);
+  const next = getNextSunrise(sunrise, dt, nextSunrise);
   return Math.max(0, next - dt);
+};
+
+/**
+ * Converts a "YYYY-MM-DD" + "HH:MM:SS" pair (in the location's local time)
+ * into a Unix timestamp, using the same timezone_offset convention as
+ * OpenWeather (seconds east of UTC).
+ */
+export const localTimeStringToUnix = (dateStr, timeStr, timezoneOffsetSeconds) => {
+  if (!dateStr || !timeStr || !Number.isFinite(timezoneOffsetSeconds)) return null;
+  const [year, month, day] = dateStr.split("-").map(Number);
+  const [hh, mm, ss = 0] = timeStr.split(":").map(Number);
+  if (![year, month, day, hh, mm].every(Number.isFinite)) return null;
+  const utcMillis = Date.UTC(year, month - 1, day, hh, mm, ss) - timezoneOffsetSeconds * 1000;
+  return Math.floor(utcMillis / 1000);
+};
+
+/**
+ * Given the moon's actual rise/set timestamps, returns whether it's
+ * currently above the horizon and how far through its pass it is (0→1),
+ * for positioning on the arc.
+ */
+export const getMoonVisibility = (moonriseTs, moonsetTs, dt) => {
+  if (!Number.isFinite(moonriseTs) || !Number.isFinite(moonsetTs) || !Number.isFinite(dt)) {
+    return { isUp: false, progress: 0 };
+  }
+  if (moonriseTs <= moonsetTs) {
+    // Normal case: this rise happens before this set.
+    if (dt < moonriseTs || dt > moonsetTs) return { isUp: false, progress: 0 };
+    return { isUp: true, progress: (dt - moonriseTs) / (moonsetTs - moonriseTs) };
+  }
+  // TODO: This moonset belongs to an earlier rise we don't have on hand — the
+  // moon is up from some prior rise until this set, then down again until this
+  // rise. progress is approximated as 1 here; widening the Visual Crossing
+  // fetch window one extra day backward (astronomyService.js fetchAstronomyData)
+  // would resolve it exactly.
+  if (dt <= moonsetTs) return { isUp: true, progress: 1 };
+  if (dt >= moonriseTs) return { isUp: true, progress: 0 };
+  return { isUp: false, progress: 0 };
 };
 
 /**
@@ -137,45 +176,6 @@ export const getSunColor = (phase, t = 0) => {
     case 'blue-hour': return '#c83010';
     default:        return '#f4c12a'; // night → sun is hidden anyway
   }
-};
-
-// ─── Moon phase ──────────────────────────────────────────────────────────────
-
-const MOON_PHASES = [
-  { key: 'newMoon',        emoji: '🌑', fraction: 0    },
-  { key: 'waxingCrescent', emoji: '🌒', fraction: 0.125 },
-  { key: 'firstQuarter',   emoji: '🌓', fraction: 0.25  },
-  { key: 'waxingGibbous',  emoji: '🌔', fraction: 0.375 },
-  { key: 'fullMoon',       emoji: '🌕', fraction: 0.5   },
-  { key: 'waningGibbous',  emoji: '🌖', fraction: 0.625 },
-  { key: 'lastQuarter',    emoji: '🌗', fraction: 0.75  },
-  { key: 'waningCrescent', emoji: '🌘', fraction: 0.875 },
-];
-
-/**
- * Returns the approximate moon phase based on a known new-moon reference date.
- * Reference: Jan 6 2000 18:14 UTC (known new moon).
- */
-export const getMoonPhase = (dt) => {
-  const LUNAR_CYCLE = 29.53058867 * 24 * 3600; // seconds
-  const REF_NEW_MOON = 947182440;               // Unix timestamp of reference new moon
-  const elapsed = ((dt - REF_NEW_MOON) % LUNAR_CYCLE + LUNAR_CYCLE) % LUNAR_CYCLE;
-  const fraction = elapsed / LUNAR_CYCLE;
-
-  // Find the closest named phase
-  const idx = Math.round(fraction * 8) % 8;
-  return { ...MOON_PHASES[idx], exactFraction: fraction };
-};
-
-/**
- * Formats a duration in seconds as "Xh Ym".
- */
-export const formatDuration = (seconds) => {
-  if (!Number.isFinite(seconds) || seconds < 0) return '--';
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  if (h === 0) return `${m}m`;
-  return `${h}h ${m}m`;
 };
 
 // ─── Color interpolation helper ───────────────────────────────────────────────

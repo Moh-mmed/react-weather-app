@@ -8,7 +8,6 @@
     "saved": "محفوظة",
     "saveLocation": "حفظ الموقع",
     "saveThisLocation": "حفظ هذا الموقع",
-    "sourceOnGitHub": "عرض المصدر على GitHub",
     "settings": "الإعدادات",
     "language": "اللغة",
     "units": "الوحدات",
@@ -27,19 +26,30 @@
   },
   "outlook": {
     "title": "توقعات 48 ساعة",
-    "fallbackMessage": "تتطلب التوقعات الساعية لـ 48 ساعة اشتراك OpenWeather One Call 3.0."
+    "fallbackMessage": "التوقعات الساعية لـ 48 ساعة غير متاحة مؤقتًا."
   },
   "forecast": {
     "title": "توقعات 7 أيام",
     "titleWithCount": "توقعات {{count}} أيام",
     "precip": "الهطول",
     "humidity": "الرطوبة",
-    "wind": "الرياح"
+    "humidityAvg": "الرطوبة (متوسط)",
+    "wind": "الرياح",
+    "windMax": "الرياح (القصوى)"
   },
   "sun": {
     "title": "موقع الشمس",
+    "titleNight": "موقع القمر",
     "sunrise": "الشروق",
-    "sunset": "الغروب"
+    "sunset": "الغروب",
+    "moon": "القمر",
+    "moonrise": "طلوع القمر",
+    "moonset": "غروب القمر",
+    "illuminatedSuffix": "% مضيء",
+    "tonightMoon": "قمر الليلة",
+    "nextFullMoon": "البدر القادم",
+    "nextFullMoonDays": "{{count}} أيام",
+    "tonight": "الليلة"
   },
   "night": {
     "moonPhase": "طور القمر",
@@ -57,14 +67,6 @@
     "waningCrescent": "هلال متناقص"
   },
   "uvi": {
-    "level": {
-      "low": "منخفض",
-      "moderate": "معتدل",
-      "high": "مرتفع",
-      "very high": "مرتفع جداً",
-      "extreme": "أقصى",
-      "unknown": "غير معروف"
-    },
     "title": {
       "low": "أشعة فوق بنفسجية منخفضة",
       "moderate": "أشعة فوق بنفسجية معتدلة",
@@ -85,6 +87,18 @@
   "aqi": {
     "title": "جودة الهواء",
     "mainPollutant": "الملوث الرئيسي — {{pollutant}}",
+    "updatedUnknown": "تم التحديث مؤخراً",
+    "updatedJustNow": "تم التحديث الآن",
+    "updatedMinutesAgo_one": "تم التحديث منذ {{count}} دقيقة",
+    "updatedMinutesAgo_two": "تم التحديث منذ {{count}} دقيقتين",
+    "updatedMinutesAgo_few": "تم التحديث منذ {{count}} دقائق",
+    "updatedMinutesAgo_many": "تم التحديث منذ {{count}} دقيقة",
+    "updatedMinutesAgo_other": "تم التحديث منذ {{count}} دقيقة",
+    "updatedHoursAgo_one": "تم التحديث منذ {{count}} ساعة",
+    "updatedHoursAgo_two": "تم التحديث منذ {{count}} ساعتين",
+    "updatedHoursAgo_few": "تم التحديث منذ {{count}} ساعات",
+    "updatedHoursAgo_many": "تم التحديث منذ {{count}} ساعة",
+    "updatedHoursAgo_other": "تم التحديث منذ {{count}} ساعة",
     "categories": {
       "good": "ممتاز",
       "moderate": "مقبول",
@@ -111,8 +125,15 @@
     "visibility": "مدى الرؤية",
     "dewPoint": "نقطة الندى",
     "cloudCover": "الغطاء السحابي",
+    "uvIndex": "مؤشر الأشعة فوق البنفسجية",
+    "gusts": "هبات",
+    "rh": "الرطوبة النسبية",
+    "windDirectionAria": "اتجاه الرياح {{abbr}} عند {{bearing}} درجة",
+    "pressureDialAria": "مؤشر الضغط: {{value}} {{unit}}",
+    "humidityGaugeAria": "مقياس الرطوبة: {{value}}",
+    "visibilityAria": "مدى الرؤية: {{value}} {{unit}}, {{status}}",
     "unitKmH": "كم/س",
-    "unitHpa": "هكتوباسكال",
+    "unitMb": "مليبار",
     "unitKm": "كم",
     "unitMph": "ميل/س",
     "unitInHg": "إنش زئبقي",
@@ -120,7 +141,7 @@
     "stable": "مستقر",
     "rising": "مرتفع",
     "falling": "منخفض",
-    "pressureTrendDesc": "{{change}} هكتوباسكال في الـ 24 ساعة الماضية",
+    "pressureTrendDesc": "{{change}} مليبار في الـ 24 ساعة الماضية",
     "pressureTrendDescImperial": "{{change}} إنش زئبقي في الـ 24 ساعة الماضية",
     "humidityComfortable": "بيئة داخلية مريحة.",
     "humiditySticky": "أجواء رطبة وكاتمة.",
@@ -141,6 +162,79 @@
     "comfortDry": "جاف",
     "comfortComfortable": "مريح",
     "comfortMuggy": "رطب"
+  },
+  "weatherStatus": {
+    "na": "غير متوفر",
+    "humidity": {
+      "headings": {
+        "veryDry": "جاف جداً",
+        "comfortable": "مريح",
+        "humid": "رطب",
+        "saturated": "مشبع"
+      },
+      "pills": {
+        "dry": "جاف",
+        "comfortable": "مريح",
+        "humid": "رطب",
+        "sticky": "لزج"
+      },
+      "descriptions": {
+        "na": "الرطوبة غير متوفرة",
+        "dry": "رطوبة منخفضة في الهواء",
+        "comfortable": "الهواء مريح",
+        "humid": "رطوبة عالية في الهواء",
+        "saturated": "الهواء يحمل أقصى رطوبة"
+      }
+    },
+    "dewPoint": {
+      "headings": {
+        "feelsDry": "جاف",
+        "comfortable": "مريح",
+        "feelsMuggy": "خانق"
+      },
+      "descriptions": {
+        "na": "نقطة الندى غير متوفرة",
+        "dry": "رطوبة منخفضة في الهواء",
+        "comfortable": "الهواء مريح",
+        "muggy": "رطوبة عالية في الهواء"
+      },
+      "scale": {
+        "dry": "جاف",
+        "comfortable": "مريح",
+        "muggy": "خانق"
+      }
+    },
+    "visibility": {
+      "labels": {
+        "poor": "ضعيفة",
+        "moderate": "متوسطة",
+        "excellent": "ممتازة"
+      }
+    },
+    "wind": {
+      "pills": {
+        "calm": "هادئة",
+        "lightBreeze": "نسيم خفيف",
+        "moderateBreeze": "نسيم معتدل",
+        "strongWind": "رياح قوية"
+      }
+    },
+    "uv": {
+      "labels": {
+        "low": "منخفض",
+        "moderate": "معتدل",
+        "high": "مرتفع",
+        "veryHigh": "مرتفع جداً",
+        "extreme": "أقصى"
+      }
+    }
+  },
+  "metrics": {
+    "lowExposure": "تعرض منخفض",
+    "moderateExposure": "تعرض معتدل",
+    "highExposure": "تعرض مرتفع",
+    "veryHighExposure": "تعرض مرتفع جداً",
+    "extremeExposure": "تعرض أقصى"
   },
   "windDirections": {
     "N": "شمال",
