@@ -120,6 +120,7 @@
     "dewPoint": "Point de rosée",
     "cloudCover": "Couverture nuageuse",
     "uvIndex": "Indice UV",
+    "uvPeakToday": "Pic du jour : {{value}}",
     "gusts": "Rafales",
     "rh": "HR",
     "windDirectionAria": "Direction du vent : {{abbr}} à {{bearing}} degrés",

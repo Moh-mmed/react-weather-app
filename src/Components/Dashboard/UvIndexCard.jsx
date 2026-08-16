@@ -12,7 +12,7 @@ const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 const SCALE_MAX = 11;
 
 // Computes marker horizontal position to match standard category divisions
-const getUvPercentage = (uvi) => {
+export const getUvPercentage = (uvi) => {
   const val = clamp(uvi, 0, SCALE_MAX);
   if (val <= 3) {
     return (val / 3) * 25;
@@ -29,7 +29,7 @@ const getUvPercentage = (uvi) => {
   return 90 + ((val - 10) / 1) * 10;
 };
 
-const getUvBand = (uvi) => {
+export const getUvBand = (uvi) => {
   if (uvi >= 11) {
     return {
       labelKey: "weatherStatus.uv.labels.extreme",
@@ -84,13 +84,35 @@ const getUvBand = (uvi) => {
   };
 };
 
-const UvIndexCard = ({ uvi, animationDelay }) => {
+const UvIndexCard = ({
+  uvi,
+  sunrise,
+  sunset,
+  currentTime,
+  dt,
+  animationDelay,
+}) => {
   const { t } = useTranslation();
+
+  const displayTime = Number.isFinite(currentTime) ? currentTime : dt;
+  const isNight =
+    Number.isFinite(displayTime) &&
+    Number.isFinite(sunrise) &&
+    Number.isFinite(sunset)
+      ? displayTime < sunrise || displayTime >= sunset
+      : false;
+
   // A genuine 0 (UV = 0) is a valid reading; only non-finite input is missing.
   const hasUvi = Number.isFinite(uvi);
-  const displayValue = hasUvi ? Math.round(uvi) : "--";
-  const band = hasUvi
-    ? getUvBand(uvi)
+
+  // At nighttime, primary current UV is 0 / Low Exposure.
+  // The API daily peak `uvi` is preserved and rendered as secondary context.
+  const effectiveUvi = isNight ? 0 : uvi;
+  const hasEffectiveUvi = isNight ? true : hasUvi;
+
+  const displayValue = hasEffectiveUvi ? Math.round(effectiveUvi) : "--";
+  const band = hasEffectiveUvi
+    ? getUvBand(effectiveUvi)
     : {
         labelKey: "weatherStatus.na",
         exposureKey: null,
@@ -99,7 +121,7 @@ const UvIndexCard = ({ uvi, animationDelay }) => {
         pillClassName:
           "bg-[#E7EDF4] text-[#8795A5] dark:bg-white/10 dark:text-[#A9B8C7]",
       };
-  const uvPercentage = hasUvi ? getUvPercentage(uvi) : 0;
+  const uvPercentage = hasEffectiveUvi ? getUvPercentage(effectiveUvi) : 0;
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -133,19 +155,24 @@ const UvIndexCard = ({ uvi, animationDelay }) => {
 
       {/* Content */}
       <div className="flex min-h-0 flex-1 flex-col">
-        <div className="mt-[clamp(0.8rem,1.8vh,1.25rem)]">
+        <div className="mt-3">
           <div className="flex items-baseline gap-1.5">
             <span className={VALUE_CLASS}>{displayValue}</span>
           </div>
           <div
-            className={`mt-2 text-[clamp(0.82rem,1vw,0.95rem)] font-bold ${band.colorClassName}`}
+            className={`mt-1.5 text-[clamp(0.82rem,1vw,0.95rem)] font-bold ${band.colorClassName}`}
           >
             {t(band.labelKey)}
           </div>
+          {isNight && hasUvi && (
+            <div className="mt-1 text-[clamp(0.72rem,0.9vw,0.82rem)] font-semibold text-[#8795A5] dark:text-[#A9B8C7]">
+              {t("stats.uvPeakToday", { value: Math.round(uvi) })}
+            </div>
+          )}
         </div>
 
         {/* Continuous UV scale */}
-        <div className="mt-[clamp(0.7rem,1.6vh,1.1rem)] flex min-h-0 flex-1 flex-col justify-center">
+        <div className="mt-3 flex min-h-0 flex-1 flex-col justify-center">
           <div className="px-1.5">
             <div className="relative h-[6px] w-full rounded-full bg-[#E8F4FB] dark:bg-white/[0.07]">
               <div
@@ -157,7 +184,7 @@ const UvIndexCard = ({ uvi, animationDelay }) => {
                     "width 600ms cubic-bezier(0.16,1,0.3,1), opacity 600ms ease",
                 }}
               />
-              {hasUvi && (
+              {hasEffectiveUvi && (
                 <div
                   className="absolute top-1/2 h-[15px] w-[15px] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-[#8B5CF6] bg-white shadow-[0_2px_8px_rgba(15,35,56,0.18)] dark:bg-[#13273D]"
                   style={{

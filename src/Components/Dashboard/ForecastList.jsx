@@ -257,37 +257,39 @@ const ForecastList = ({ weatherData }) => {
           let trendIcon = null;
           if (index > 0) {
             const prevHigh = forecastDays[index - 1].temp.max;
-            const diff = temp.max - prevHigh;
-            if (diff > 1) {
-              trendIcon = (
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#E2694A"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="w-3.5 h-3.5 inline-block ml-0.5 relative -top-[1px]"
-                >
-                  <line x1="12" y1="19" x2="12" y2="5" />
-                  <polyline points="5 12 12 5 19 12" />
-                </svg>
-              );
-            } else if (diff < -1) {
-              trendIcon = (
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#4FA3D9"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="w-3.5 h-3.5 inline-block ml-0.5 relative -top-[1px]"
-                >
-                  <line x1="12" y1="5" x2="12" y2="19" />
-                  <polyline points="19 12 12 19 5 12" />
-                </svg>
-              );
+            if (Number.isFinite(temp.max) && Number.isFinite(prevHigh)) {
+              const diff = temp.max - prevHigh;
+              if (diff > 1) {
+                trendIcon = (
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#E2694A"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="w-3.5 h-3.5 inline-block ml-0.5 relative -top-[1px]"
+                  >
+                    <line x1="12" y1="19" x2="12" y2="5" />
+                    <polyline points="5 12 12 5 19 12" />
+                  </svg>
+                );
+              } else if (diff < -1) {
+                trendIcon = (
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4FA3D9"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="w-3.5 h-3.5 inline-block ml-0.5 relative -top-[1px]"
+                  >
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <polyline points="19 12 12 19 5 12" />
+                  </svg>
+                );
+              }
             }
           }
 

@@ -107,7 +107,6 @@ describe("buildGroupedDailySummary — daily values", () => {
 
   test("representative condition uses the midday (11–15h) sample, not the first", () => {
     // Night sample first at 00:00 local, clear daytime sample at 14:00 local.
-    const dtNight = unixts(2026, 8, 13, 21); // UTC 21:00 → Beijing 05:00
     const dtNoon = unixts(2026, 8, 13, 6); // UTC 06:00 → Beijing 14:00
     const samples = [
       fentry(dtNoon - 28800, { icon: "01d", id: 800, main: "Clear" }), // 05:00 Aug 13 local (night icon)
@@ -124,13 +123,27 @@ describe("buildGroupedDailySummary — daily values", () => {
     expect(day.weather[0].icon).toBe("01d");
   });
 
-  test("high is never below low", () => {
+  test("high is never below low when finite", () => {
     const dt0 = unixts(2026, 8, 13, 0);
     const samples = [12, 9, 15, 8, 14].map((t, i) => fentry(dt0 + i * 10800, { temp: t }));
     const daily = buildGroupedDailySummary(samples, currentOf(unixts(2026, 8, 12, 12)), 3600);
-    for (const d of daily) {
-      expect(d.temp.max).toBeGreaterThanOrEqual(d.temp.min);
-    }
+    const validMaxes = daily.filter((d) => d.temp.max !== null);
+    expect(validMaxes.every((d) => d.temp.max >= d.temp.min)).toBe(true);
+  });
+
+  test("late-night case (ISSUE #2): missing midday samples → temp.max is null, isHighIncomplete is true", () => {
+    // Current observation at 22:25 local (UTC+1 = 21:25 UTC) with temp 28°C
+    const currentNight = currentOf(unixts(2026, 8, 13, 21, 25), { temp: 28 });
+    // Forecast list has only surviving late-night sample at 23:00 local (22:00 UTC)
+    const lateNightSample = fentry(unixts(2026, 8, 13, 22), { temp: 27 });
+
+    const daily = buildGroupedDailySummary([lateNightSample], currentNight, 3600);
+    const today = daily.find((d) => d.date === "2026-08-13");
+
+    expect(today.isHighIncomplete).toBe(true);
+    expect(today.temp.max).toBeNull();
+    // Low temperature (min of surviving late-night samples) is still preserved
+    expect(today.temp.min).toBe(27);
   });
 });
 
@@ -260,13 +273,19 @@ describe("buildOpenWeatherPayload — integration", () => {
     const dates = payload.daily.map((d) => d.date);
     expect(new Set(dates).size).toBe(dates.length); // unique, no clones
 
-    for (const day of payload.daily) {
-      expect(Number.isNaN(day.temp.max)).toBe(false);
-      expect(Number.isNaN(day.temp.min)).toBe(false);
-      expect(day.temp.max).toBeGreaterThanOrEqual(day.temp.min);
-      if (day.pop !== null) expect(day.pop).toBeGreaterThanOrEqual(0);
-      if (day.pop !== null) expect(day.pop).toBeLessThanOrEqual(100);
-    }
+    expect(
+      payload.daily.every(
+        (d) =>
+          d.temp.max === null ||
+          (!Number.isNaN(d.temp.max) && d.temp.max >= d.temp.min)
+      )
+    ).toBe(true);
+    expect(payload.daily.every((d) => !Number.isNaN(d.temp.min))).toBe(true);
+    expect(
+      payload.daily.every(
+        (d) => d.pop === null || (d.pop >= 0 && d.pop <= 100)
+      )
+    ).toBe(true);
 
     for (const point of payload.outlook48h) {
       expect(point.dt).toBeGreaterThanOrEqual(now);

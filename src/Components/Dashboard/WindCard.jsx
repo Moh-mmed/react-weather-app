@@ -19,7 +19,7 @@ const polarPoint = (cx, cy, radius, angleDeg) => {
 const WIND_PILL =
   "bg-[#EAF6FE] text-[#2E7FB5] dark:bg-[#4FA3D9]/12 dark:text-[#8CCCF2]";
 
-const getWindBand = (speedMs) => {
+export const getWindBand = (speedMs) => {
   if (!Number.isFinite(speedMs) || speedMs < 0) return null;
   if (speedMs < 1) return "weatherStatus.wind.pills.calm";
   if (speedMs < 5) return "weatherStatus.wind.pills.lightBreeze";
@@ -89,12 +89,12 @@ const WindCard = ({
 
       {/* Content */}
       <div className="flex min-h-0 flex-1 flex-col">
-        <div className="mt-[clamp(0.8rem,1.8vh,1.25rem)] grid min-h-0 flex-1 grid-cols-[1fr_1fr] gap-[clamp(0.7rem,1.4vw,1.15rem)]">
+        <div className="mt-3 grid min-h-0 flex-1 grid-cols-[1fr_1fr] items-center gap-3">
           {/* Compass rose */}
           <div className="grid min-h-0 place-items-center">
             <svg
               viewBox="0 0 160 160"
-              className="metric-soft-appear aspect-square max-h-full w-[clamp(6.5rem,12vw,9.5rem)] overflow-visible"
+              className="metric-soft-appear aspect-square max-h-full w-[clamp(6rem,10vw,7.5rem)] overflow-visible"
               role="img"
               aria-label={t("stats.windDirectionAria", { abbr: dirAbbr, bearing })}
             >

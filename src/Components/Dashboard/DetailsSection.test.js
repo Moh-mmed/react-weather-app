@@ -133,6 +133,24 @@ describe("DetailsSection — pressure gauge missing state (FIX #4D M1)", () => {
     const { container } = renderDetails(mkCurrent({ pressure: 1013 }));
     expect(container.querySelector('[class*="3B82F6"]')).not.toBeNull();
   });
+
+  test("falls back to outlook48h when hourly has fewer than 2 samples", () => {
+    const current = mkCurrent({ dt: 1000, pressure: 1012 });
+    const singleHourly = [{ dt: 1000, pressure: 1012 }];
+    const outlook48h = [
+      { dt: 2000, pressure: 1012 },
+      { dt: 3000, pressure: 1012 },
+    ];
+    setupI18n("en");
+    render(
+      <DetailsSection
+        page={{
+          weatherData: { current, hourly: singleHourly, outlook48h },
+        }}
+      />
+    );
+    expect(screen.queryAllByText("Stable").length).toBeGreaterThan(0);
+  });
 });
 
 describe("DetailsSection — gust comparison (FIX #4D L3)", () => {

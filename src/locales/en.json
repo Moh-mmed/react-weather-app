@@ -120,6 +120,7 @@
     "dewPoint": "Dew Point",
     "cloudCover": "Cloud Cover",
     "uvIndex": "UV Index",
+    "uvPeakToday": "Today's peak: {{value}}",
     "gusts": "Gusts",
     "rh": "RH",
     "windDirectionAria": "Wind direction {{abbr}} at {{bearing}} degrees",

@@ -1,6 +1,6 @@
 export const CARD_BASE =
   "metric-card relative flex h-full min-h-0 flex-col overflow-hidden rounded-[24px] border border-[#E7EDF4] bg-white " +
-  "p-[clamp(1.05rem,1.65vw,1.65rem)] " +
+  "p-[clamp(1rem,1.5vw,1.5rem)] " +
   "transition-all duration-[250ms] ease-out hover:-translate-y-[3px] " +
   "dark:border-white/10 dark:bg-[#13273D] motion-safe:animate-rise";
 

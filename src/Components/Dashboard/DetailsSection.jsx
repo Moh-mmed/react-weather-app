@@ -117,21 +117,21 @@ const PressureCard = ({
 
       <div className="flex min-h-0 flex-1 flex-col">
         {/* Zone B & C: Value & Trend Text */}
-        <div className="mt-[clamp(0.8rem,1.8vh,1.25rem)]">
+        <div className="mt-3">
           <div className="flex items-baseline gap-1.5">
             <span className={VALUE_CLASS}>{value}</span>
             <span className={UNIT_CLASS}>{unit}</span>
           </div>
-          <div className="mt-2 text-[clamp(0.82rem,1vw,0.95rem)] font-bold text-[#0F2338] dark:text-[#F5F8FB]">
+          <div className="mt-1.5 text-[clamp(0.82rem,1vw,0.95rem)] font-bold text-[#0F2338] dark:text-[#F5F8FB]">
             {trendText}
           </div>
         </div>
 
         {/* Zone D: Dial Gauge Visualization */}
-        <div className="relative mt-[clamp(0.7rem,1.6vh,1.1rem)] flex min-h-[6.5rem] flex-1 items-center justify-center pb-[clamp(0.4rem,0.8vh,0.7rem)]">
+        <div className="relative mt-2.5 flex min-h-0 flex-1 items-center justify-center pb-2">
           <svg
             viewBox={`0 0 ${VB_W} ${VB_H}`}
-            className="w-full max-w-[190px] h-auto overflow-visible"
+            className="w-full max-w-[185px] h-auto overflow-visible"
             role="img"
             aria-label={t("stats.pressureDialAria", { value, unit })}
           >
@@ -202,7 +202,7 @@ const PressureCard = ({
   );
 };
 
-const getHumidityBand = (humidity) => {
+export const getHumidityBand = (humidity) => {
   if (!Number.isFinite(humidity)) {
     return {
       headingKey: "weatherStatus.na",
@@ -270,9 +270,9 @@ const HumidityCard = ({ humidity, band, animationDelay }) => {
   const hasHumidity = Number.isFinite(humidity);
   const fill = hasHumidity ? clamp(humidity, 0, 100) : null;
 
-  // Radial progress ring geometry — significantly larger gauge
-  const GAUGE_SIZE = 124;
-  const GAUGE_R = 47;
+  // Radial progress ring geometry
+  const GAUGE_SIZE = 112;
+  const GAUGE_R = 43;
   const GAUGE_SW = 6;
   const CIRC = 2 * Math.PI * GAUGE_R;
   const dashOffset = hasHumidity ? CIRC * (1 - fill / 100) : CIRC;
@@ -306,7 +306,7 @@ const HumidityCard = ({ humidity, band, animationDelay }) => {
 
       <div className="flex min-h-0 flex-1 flex-col">
         {/* ── 1. Value — same typography as Pressure ── */}
-        <div className="mt-[clamp(0.8rem,1.8vh,1.25rem)]">
+        <div className="mt-3">
           <div className="flex items-baseline gap-1.5">
             <span className={VALUE_CLASS}>
               {hasHumidity ? Math.round(fill) : "--"}
@@ -316,7 +316,7 @@ const HumidityCard = ({ humidity, band, animationDelay }) => {
         </div>
 
         {/* ── 2. Gauge + heading/description ── */}
-        <div className="mt-[clamp(0.9rem,1.8vh,1.25rem)] flex flex-1 items-center gap-[clamp(0.85rem,1.7vw,1.4rem)]">
+        <div className="mt-3 flex flex-1 items-center gap-4">
           <div className="flex flex-shrink-0 flex-col items-center">
             <div
               className="relative"
@@ -363,7 +363,7 @@ const HumidityCard = ({ humidity, band, animationDelay }) => {
                 {/* Centre: % reading + RH label */}
                 <text
                   x={GAUGE_SIZE / 2}
-                  y={GAUGE_SIZE / 2 - 6}
+                  y={GAUGE_SIZE / 2 - 5}
                   textAnchor="middle"
                   dominantBaseline="middle"
                   style={{
@@ -509,14 +509,14 @@ const DewPointCard = ({ value, unit, dewPointC, band, animationDelay }) => {
       />
 
       <div className="flex min-h-0 flex-1 flex-col">
-        <div className="mt-[clamp(0.8rem,1.8vh,1.25rem)]">
+        <div className="mt-3">
           <div className="flex items-baseline gap-1.5">
             <span className={VALUE_CLASS}>{value}</span>
             <span className={UNIT_CLASS}>{unit}</span>
           </div>
         </div>
 
-        <div className="mt-[clamp(0.9rem,1.8vh,1.25rem)] grid min-h-0 flex-1 grid-cols-[0.9fr_1.1fr] items-center gap-[clamp(0.85rem,1.8vw,1.35rem)]">
+        <div className="mt-3 grid min-h-0 flex-1 grid-cols-[0.9fr_1.1fr] items-center gap-3">
           <div className="min-w-0">
             <div
               className={`text-[clamp(0.98rem,1.25vw,1.15rem)] font-bold leading-tight ${band.headingClassName}`}
@@ -528,8 +528,8 @@ const DewPointCard = ({ value, unit, dewPointC, band, animationDelay }) => {
             </div>
           </div>
 
-          <div className="grid min-h-[5.4rem] grid-cols-[1.15rem_1fr] items-center gap-2.5">
-            <div className="relative mx-auto h-[min(7.6rem,100%)] min-h-[5.4rem] w-[1.15rem] rounded-full bg-gradient-to-b from-[#E2694A] via-[#B9D95A] to-[#28BFD0] shadow-[inset_0_0_0_1px_rgba(15,35,56,0.08)] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.14)]">
+          <div className="grid min-h-0 h-[84px] grid-cols-[1.15rem_1fr] items-center gap-2.5">
+            <div className="relative mx-auto h-full w-[1.15rem] rounded-full bg-gradient-to-b from-[#E2694A] via-[#B9D95A] to-[#28BFD0] shadow-[inset_0_0_0_1px_rgba(15,35,56,0.08)] dark:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.14)]">
               {markerTop !== null && (
                 <span
                   className="absolute left-1/2 h-[0.9rem] w-[0.9rem] -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] border-white bg-white shadow-[0_4px_13px_rgba(15,35,56,0.20)] dark:border-[#DCEEFF] dark:bg-[#13273D]"
@@ -538,7 +538,7 @@ const DewPointCard = ({ value, unit, dewPointC, band, animationDelay }) => {
               )}
             </div>
 
-            <div className="relative h-[min(7.6rem,100%)] min-h-[5.4rem]">
+            <div className="relative h-full">
               {scaleLabels.map((item) => {
                 const active = item.label === band.key;
                 return (
@@ -573,7 +573,7 @@ const DewPointCard = ({ value, unit, dewPointC, band, animationDelay }) => {
   );
 };
 
-const DetailsSection = ({ page }) => {
+const DetailsSection = ({ page, currentTime }) => {
   const { t } = useTranslation();
   const {
     convertTemp,
@@ -584,7 +584,7 @@ const DetailsSection = ({ page }) => {
   } = useUnit();
 
   const { weatherData } = page;
-  const { current, hourly } = weatherData;
+  const { current, hourly, outlook48h } = weatherData;
 
   const { pressure, humidity, wind_speed, wind_deg, visibility, temp, uvi } =
     current;
@@ -592,12 +592,16 @@ const DetailsSection = ({ page }) => {
   // ── 1. PRESSURE TREND ──
   // Current pressure: convertPressure yields "--" when the value is missing
   // (no fabricated replacement). The trend derives exclusively from REAL
-  // chronological pressure samples — the current observation plus today's
-  // real forecast samples, in the order returned by the adapter — never from
-  // synthetic values. With fewer than 2 valid samples the trend is simply
-  // unavailable (pill hidden, text "--").
+  // chronological pressure samples — today's forecast samples or upcoming
+  // forecast samples (outlook48h) when fewer than 2 samples exist for today —
+  // never from synthetic values. With fewer than 2 valid samples total, the trend
+  // is simply unavailable (pill hidden, text "--").
   const presObj = convertPressure(pressure);
-  const { direction: pressureDirection } = calculatePressureTrend(hourly);
+  const pressureSamples =
+    Array.isArray(hourly) && hourly.length >= 2
+      ? hourly
+      : [current, ...(outlook48h || [])];
+  const { direction: pressureDirection } = calculatePressureTrend(pressureSamples);
   const pressureStatus = pressureDirection
     ? pressureDirection.charAt(0).toUpperCase() + pressureDirection.slice(1)
     : null;
@@ -636,9 +640,9 @@ const DetailsSection = ({ page }) => {
       : null; // suppress gust display when API reports it below sustained wind speed (known OpenWeather data quirk)
 
   return (
-    <div className="relative w-full animate-fadeIn select-none">
-      {/* 6 Metric Cards in 3×2 grid */}
-      <div className="grid grid-cols-1 gap-[clamp(0.55rem,1vw,1rem)] md:grid-cols-3 auto-rows-[360px]">
+    <div className="relative flex h-full w-full flex-col animate-fadeIn select-none">
+      {/* 6 Metric Cards in 3×2 grid — rows flex to fill remaining height */}
+      <div className="grid min-h-0 flex-1 grid-cols-1 gap-[clamp(0.55rem,1vw,1rem)] md:grid-cols-3 md:auto-rows-[minmax(0,1fr)]">
         {/* Card 1: Pressure */}
         <PressureCard
           value={presObj.value}
@@ -666,7 +670,14 @@ const DetailsSection = ({ page }) => {
         />
 
         {/* Card 4: UV Index */}
-        <UvIndexCard uvi={uvi} animationDelay="0.15s" />
+        <UvIndexCard
+          uvi={uvi}
+          sunrise={current?.sunrise}
+          sunset={current?.sunset}
+          currentTime={currentTime}
+          dt={current?.dt}
+          animationDelay="0.15s"
+        />
 
         {/* Card 5: Visibility */}
         <VisibilityCard

@@ -168,7 +168,6 @@ export const buildGroupedDailySummary = (forecastList, current, timezoneOffset) 
       }
 
       const min = Math.round(Math.min(...temps));
-      const max = Math.round(Math.max(...temps));
       const maxPop = popValues.length ? Math.round(Math.max(...popValues) * 100) : null;
       const averageHumidity = humidityValues.length
         ? Math.round(
@@ -187,11 +186,23 @@ export const buildGroupedDailySummary = (forecastList, current, timezoneOffset) 
           return hour !== null && hour >= 11 && hour <= 15;
         }) || items[0];
 
+      // A day's true high temperature requires daytime samples (07h–19h).
+      // When daytime samples are missing because daytime has already passed
+      // (e.g. late-night initial load), the max of surviving samples is NOT the
+      // actual daily high. In that case, maxTemp is set to null (isHighIncomplete = true).
+      const hasDaytimeSamples = items.some((item) => {
+        const hour = getLocationHour(item.dt, timezoneOffset);
+        return hour !== null && hour >= 7 && hour <= 19;
+      });
+      const maxTemp = hasDaytimeSamples ? Math.round(Math.max(...temps)) : null;
+
       return {
         date,
         dt: middayEntry.dt,
         sampleCount: items.length,
-        temp: { day: max, min, max },
+        hasMiddaySample: hasDaytimeSamples,
+        isHighIncomplete: !hasDaytimeSamples,
+        temp: { day: maxTemp, min, max: maxTemp },
         feels_like: {
           day:
             middayEntry.main?.feels_like != null

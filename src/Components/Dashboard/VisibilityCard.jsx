@@ -11,7 +11,7 @@ const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 
 const VIS_MAX_KM = 16.093;
 
-const getVisibilityBand = (visKm) => {
+export const getVisibilityBand = (visKm) => {
   if (visKm < 2) {
     return {
       statusKey: "weatherStatus.visibility.labels.poor",
@@ -82,20 +82,20 @@ const VisibilityCard = ({ value, unit, visKm, animationDelay }) => {
 
       {/* Content */}
       <div className="flex min-h-0 flex-1 flex-col">
-        <div className="mt-[clamp(0.8rem,1.8vh,1.25rem)]">
+        <div className="mt-3">
           <div className="flex items-baseline gap-1.5">
             <span className={VALUE_CLASS}>{value}</span>
             <span className={UNIT_CLASS}>{unit}</span>
           </div>
           <div
-            className={`mt-2 text-[clamp(0.82rem,1vw,0.95rem)] font-bold ${band.labelClassName}`}
+            className={`mt-1.5 text-[clamp(0.82rem,1vw,0.95rem)] font-bold ${band.labelClassName}`}
           >
             {statusLabel}
           </div>
         </div>
 
         {/* Visibility scale */}
-        <div className="mt-[clamp(0.7rem,1.6vh,1.1rem)] flex min-h-0 flex-1 flex-col justify-center">
+        <div className="mt-3 flex min-h-0 flex-1 flex-col justify-center">
           <div className="px-1.5">
             <div
               className="relative h-[6px] w-full rounded-full bg-[#E8F4FB] dark:bg-white/[0.07]"

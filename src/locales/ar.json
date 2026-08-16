@@ -126,6 +126,7 @@
     "dewPoint": "نقطة الندى",
     "cloudCover": "الغطاء السحابي",
     "uvIndex": "مؤشر الأشعة فوق البنفسجية",
+    "uvPeakToday": "أعلى مستوى اليوم: {{value}}",
     "gusts": "هبات",
     "rh": "الرطوبة النسبية",
     "windDirectionAria": "اتجاه الرياح {{abbr}} عند {{bearing}} درجة",
