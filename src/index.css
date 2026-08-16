@@ -33,7 +33,6 @@ body {
   --text-primary: #0F2338;
   --text-primary-dark: #0F2338;
   --text-muted: #5A6E85;
-  --shadow-panel: 0 10px 30px -4px rgba(15, 35, 56, 0.06), 0 4px 12px -2px rgba(15, 35, 56, 0.03);
   --hero-overlay: linear-gradient(to right, #FFFFFF 0%, rgba(255,255,255,0.92) 45%, rgba(255,255,255,0.75) 72%, rgba(255,255,255,0.35) 100%);
   --input-bg: rgba(15, 35, 56, 0.04);
   --input-border: rgba(15, 35, 56, 0.12);
@@ -47,6 +46,10 @@ body {
   --hero-snow-color: rgba(148, 163, 184, 0.8);
   --hero-fog-color: rgba(148, 163, 184, 0.3);
   --timeline-dash: rgba(15, 35, 56, 0.12);
+  --compass-ring: rgba(15, 35, 56, 0.2);
+  /* Wind compass donut */
+  --compass-ring-fill: #dde2e8;
+  --compass-tick: rgba(255, 255, 255, 0.85);
 }
 
 html.dark {
@@ -59,7 +62,6 @@ html.dark {
   --text-primary: #EEF3F7;
   --text-primary-dark: #0A1826;
   --text-muted: #8CA1B4;
-  --shadow-panel: 0 8px 32px rgba(0, 0, 0, 0.25);
   --hero-overlay: linear-gradient(to right, #13273D 0%, #13273De6 45%, #13273Daa 72%, rgba(19,39,61,0.42) 100%);
   --input-bg: rgba(255, 255, 255, 0.05);
   --input-border: rgba(255, 255, 255, 0.1);
@@ -73,6 +75,10 @@ html.dark {
   --hero-snow-color: rgba(238, 243, 247, 0.72);
   --hero-fog-color: rgba(238, 243, 247, 0.13);
   --timeline-dash: rgba(255, 255, 255, 0.12);
+  --compass-ring: rgba(255, 255, 255, 0.18);
+  /* Wind compass donut */
+  --compass-ring-fill: rgba(255, 255, 255, 0.1);
+  --compass-tick: rgba(255, 255, 255, 0.5);
 }
 
 [dir="rtl"], [lang="ar"] {
@@ -112,7 +118,6 @@ body {
 /* Custom Radial/Linear Gradients */
 .bg-panel-pattern {
   background-image: var(--bg-panel-pattern);
-  box-shadow: var(--shadow-panel);
 }
 
 .bg-dashboard-radial {
@@ -411,8 +416,159 @@ body {
   }
 }
 
+@keyframes metricCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes metricLineDraw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes metricSoftAppear {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes metricDotPop {
+  from {
+    opacity: 0;
+    transform: scale(0.72);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes metricWaterFill {
+  from {
+    width: 0%;
+  }
+  to {
+    width: var(--metric-fill);
+  }
+}
+
+@keyframes metricScaleSlide {
+  from {
+    left: 0%;
+  }
+  to {
+    left: var(--metric-left);
+  }
+}
+
+@keyframes metricNeedleRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(var(--uv-angle));
+  }
+}
+
+@keyframes metricWindRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(var(--wind-angle));
+  }
+}
+
+@keyframes metricVisibilityAppear {
+  from {
+    opacity: 0.25;
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
 .animate-fadeIn {
   animation: fadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.metric-card {
+  animation: metricCardIn 350ms ease-out both;
+}
+
+.metric-card--pressure .metric-card-icon,
+.metric-card--visibility .metric-card-icon {
+  color: #4FA3D9;
+}
+
+.metric-card--humidity .metric-card-icon,
+.metric-card--dew .metric-card-icon {
+  color: #2fb7c8;
+}
+
+.metric-card--uv .metric-card-icon {
+  color: #F4A93B;
+}
+
+.metric-card--wind .metric-card-icon {
+  color: #4A78D9;
+}
+
+.metric-line-draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: metricLineDraw 460ms ease-out 80ms forwards;
+}
+
+.metric-soft-appear,
+.metric-visibility {
+  animation: metricVisibilityAppear 420ms ease-out 90ms both;
+}
+
+.metric-dot-pop {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: metricDotPop 360ms ease-out 280ms both;
+}
+
+.metric-water-fill {
+  width: 0%;
+  animation: metricWaterFill 480ms ease-out 90ms forwards;
+}
+
+.metric-scale-dot {
+  left: 0%;
+  animation: metricScaleSlide 460ms ease-out 90ms forwards;
+}
+
+.metric-uv-needle {
+  transform-box: view-box;
+  transform-origin: 60px 58px;
+  transform: rotate(var(--uv-angle));
+  animation: metricNeedleRotate 480ms ease-out 120ms both;
+}
+
+.metric-wind-arrow {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: rotate(var(--wind-angle));
+  animation: metricWindRotate 460ms ease-out 100ms both;
+  filter: drop-shadow(0 5px 10px rgba(79, 163, 217, 0.22));
 }
 
 /* ── Reduced motion ──────────────────────────────────────────────────────────

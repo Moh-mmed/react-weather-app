@@ -8,14 +8,14 @@ import Spinner from "./Spinner";
 import Error from "./Error";
 import { OPEN_WEATHER_API_KEY } from "../helpers/openWeather";
 import { buildOpenWeatherPayload } from "../helpers/openWeatherAdapter";
-
-// Session-level flag to avoid duplicate warnings for One Call 3.0 fallback
-let hasLoggedOneCallFallback = false;
+import { fetchAstronomyData } from "../services/astronomyService";
+import { useTimeFormat } from "../contexts/TimeFormatContext";
 
 // ─── Location persistence ──────────────────────────────────────────────────
 const LOCATION_KEY = "weatherme:lastLocation";
 const WEATHER_CACHE_MAP_KEY = "weatherme:weatherCacheMap";
-
+const STALE_AFTER_MS = 60 * 60 * 1000; // city snapshots are served from cache for up to 1 hour
+const POLL_INTERVAL_MS = 60 * 60 * 1000; // pinned location refresh cadence — matches the cache window
 /**
  * Persist the user's most recent location so the next visit loads instantly
  * without waiting on a geolocation permission prompt.
@@ -37,7 +37,14 @@ const getCacheKey = (lat, lon) => {
 };
 
 /** Persist weather + air quality data with a timestamp for offline/error fallback. */
-const saveWeatherCache = (lat, lon, weatherData, airQuality) => {
+const saveWeatherCache = (
+  lat,
+  lon,
+  weatherData,
+  airQuality,
+  astronomy,
+  use12h,
+) => {
   const key = getCacheKey(lat, lon);
   if (!key) return;
   try {
@@ -45,8 +52,11 @@ const saveWeatherCache = (lat, lon, weatherData, airQuality) => {
     const cacheMap = raw ? JSON.parse(raw) : {};
     const existing = cacheMap[key] || {};
     cacheMap[key] = {
-      weatherData: weatherData !== undefined ? weatherData : existing.weatherData,
+      weatherData:
+        weatherData !== undefined ? weatherData : existing.weatherData,
       airQuality: airQuality !== undefined ? airQuality : existing.airQuality,
+      astronomy: astronomy !== undefined ? astronomy : existing.astronomy,
+      use12h: use12h !== undefined ? use12h : existing.use12h,
       savedAt: Date.now(),
     };
     localStorage.setItem(WEATHER_CACHE_MAP_KEY, JSON.stringify(cacheMap));
@@ -69,6 +79,24 @@ const loadWeatherCache = (lat, lon) => {
   } catch {
     return null;
   }
+};
+
+/**
+ * True when the cached snapshot's sunrise belongs to the same local calendar
+ * day as `nowSec`. Sunrise/sunset go stale after midnight, which makes the sun
+ * panel compute night against a sky that no longer matches today's.
+ */
+const isWeatherDayCurrent = (weatherData, nowSec) => {
+  const timezone = weatherData?.timezone_offset ?? 0;
+  const sunrise = weatherData?.current?.sunrise;
+  if (!Number.isFinite(sunrise) || !Number.isFinite(timezone)) return false;
+  const localNow = new Date((nowSec + timezone) * 1000);
+  const localSunrise = new Date((sunrise + timezone) * 1000);
+  return (
+    localNow.getUTCFullYear() === localSunrise.getUTCFullYear() &&
+    localNow.getUTCMonth() === localSunrise.getUTCMonth() &&
+    localNow.getUTCDate() === localSunrise.getUTCDate()
+  );
 };
 
 /**
@@ -124,6 +152,8 @@ const loadSavedLocation = () => {
 
 const Home = () => {
   const { t } = useTranslation();
+  const { hourFormat } = useTimeFormat();
+  const use12h = hourFormat === "12h";
   const [searchCity, setSearchCity] = useState(null);
   const [currCity, setCurrCity] = useState(() => {
     const saved = loadSavedLocation();
@@ -146,6 +176,14 @@ const Home = () => {
     if (saved) {
       const cache = loadWeatherCache(saved.lat, saved.lon);
       return cache?.airQuality ?? null;
+    }
+    return null;
+  });
+  const [astronomy, setAstronomy] = useState(() => {
+    const saved = loadSavedLocation();
+    if (saved) {
+      const cache = loadWeatherCache(saved.lat, saved.lon);
+      return cache?.astronomy ?? null;
     }
     return null;
   });
@@ -182,6 +220,9 @@ const Home = () => {
           initialData[`${loc.lat},${loc.lon}`] = {
             weatherData: cache.weatherData,
             airQuality: cache.airQuality,
+            astronomy: cache.astronomy ?? null,
+            use12h: cache.use12h ?? null,
+            fetchedAt: cache.savedAt ?? null,
           };
         }
       });
@@ -193,6 +234,12 @@ const Home = () => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const lastFetchedCoordsRef = useRef(null);
+  const lastFetchedFormatRef = useRef(null);
+  const currCityRef = useRef(currCity);
+
+  useEffect(() => {
+    currCityRef.current = currCity;
+  }, [currCity]);
 
   const handleApiError = (err, fallbackKey) => {
     const status = err?.response?.status;
@@ -251,84 +298,112 @@ const Home = () => {
     });
   }, []);
 
-  const fetchWeatherDataForLocation = useCallback(async (lat, lon) => {
-    const key = `${lat},${lon}`;
-    const currentWeatherURL = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${OPEN_WEATHER_API_KEY}`;
-    const forecastURL = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${OPEN_WEATHER_API_KEY}`;
-    const uviURL = `https://api.openweathermap.org/data/2.5/uvi?lat=${lat}&lon=${lon}&appid=${OPEN_WEATHER_API_KEY}`;
-    const oneCallURL = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=minutely,alerts&units=metric&appid=${OPEN_WEATHER_API_KEY}`;
-    const airQualityURL = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${OPEN_WEATHER_API_KEY}`;
+  const fetchWeatherDataForLocation = useCallback(
+    async (lat, lon, cityName) => {
+      const key = `${lat},${lon}`;
+      const currentWeatherURL = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${OPEN_WEATHER_API_KEY}`;
+      const forecastURL = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${OPEN_WEATHER_API_KEY}`;
+      const uviURL = `https://api.openweathermap.org/data/2.5/uvi?lat=${lat}&lon=${lon}&appid=${OPEN_WEATHER_API_KEY}`;
+      const airQualityURL = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${OPEN_WEATHER_API_KEY}`;
 
-    try {
-      const [
-        currentResponse,
-        forecastResponse,
-        uviResponse,
-        airQualityResponse,
-      ] = await Promise.all([
-        axios.get(currentWeatherURL, {
-          headers: { Accept: "application/json" },
-        }),
-        axios.get(forecastURL, { headers: { Accept: "application/json" } }),
-        axios.get(uviURL, { headers: { Accept: "application/json" } }),
-        axios.get(airQualityURL, { headers: { Accept: "application/json" } }),
-      ]);
-
-      let oneCallResponse = null;
       try {
-        oneCallResponse = await axios.get(oneCallURL, {
-          headers: { Accept: "application/json" },
-        });
-      } catch (oneCallErr) {
-        // ignore or fallback
+        const [
+          currentResponse,
+          forecastResponse,
+          uviResponse,
+          airQualityResponse,
+          astroResponse,
+        ] = await Promise.allSettled([
+          axios.get(currentWeatherURL, {
+            headers: { Accept: "application/json" },
+          }),
+          axios.get(forecastURL, { headers: { Accept: "application/json" } }),
+          axios.get(uviURL, { headers: { Accept: "application/json" } }),
+          axios.get(airQualityURL, { headers: { Accept: "application/json" } }),
+          fetchAstronomyData(lat, lon, use12h, cityName),
+        ]);
+
+        if (
+          currentResponse.status === "rejected" ||
+          forecastResponse.status === "rejected" ||
+          uviResponse.status === "rejected" ||
+          airQualityResponse.status === "rejected"
+        ) {
+          throw new Error("One or more weather requests failed");
+        }
+
+        const astronomy =
+          astroResponse.status === "fulfilled" ? astroResponse.value : null;
+
+        const payload = buildOpenWeatherPayload(
+          currentResponse.value,
+          forecastResponse.value,
+          uviResponse.value,
+        );
+
+        setSavedWeatherData((prev) => ({
+          ...prev,
+          [key]: {
+            weatherData: payload,
+            airQuality: airQualityResponse.value.data,
+            astronomy,
+            use12h,
+            fetchedAt: Date.now(),
+          },
+        }));
+        saveWeatherCache(
+          lat,
+          lon,
+          payload,
+          airQualityResponse.value.data,
+          astronomy,
+          use12h,
+        );
+      } catch (err) {
+        console.error(
+          `Failed to fetch weather for location ${lat}, ${lon}:`,
+          err,
+        );
       }
+    },
+    [use12h],
+  );
 
-      const payload = buildOpenWeatherPayload(
-        currentResponse,
-        forecastResponse,
-        uviResponse,
-        oneCallResponse,
-      );
-
-      setSavedWeatherData((prev) => ({
-        ...prev,
-        [key]: {
-          weatherData: payload,
-          airQuality: airQualityResponse.data,
-        },
-      }));
-      saveWeatherCache(lat, lon, payload, airQualityResponse.data);
-    } catch (err) {
-      console.error(
-        `Failed to fetch weather for location ${lat}, ${lon}:`,
-        err,
-      );
-    }
-  }, []);
-
-  // Lazy pre-fetching effect
+  // Lazy per-city loading: fetch a saved city's data only when the user
+  // actually swipes to it (activeIndex changes). Cached snapshots are served
+  // as-is for up to 1 hour (STALE_AFTER_MS); anything older, written in a
+  // different hour format, or from a previous calendar day is refetched.
+  // This freshness gate is the ONLY one that matters — a failed Visual
+  // Crossing call (null moonrise/moonset) is retried on the next visit or
+  // after the hour, instead of being refetched in a tight loop.
   useEffect(() => {
     if (!OPEN_WEATHER_API_KEY) return;
+    if (activeIndex <= 0 || activeIndex > savedLocations.length) return;
 
-    // Fetch active index and neighbors (e.g. index-1, index+1) if they are saved locations
-    const indicesToFetch = [
-      activeIndex,
-      activeIndex - 1,
-      activeIndex + 1,
-    ].filter((idx) => idx > 0 && idx <= savedLocations.length);
+    const loc = savedLocations[activeIndex - 1];
+    const key = `${loc.lat},${loc.lon}`;
+    const cached = savedWeatherData[key];
 
-    indicesToFetch.forEach((idx) => {
-      const loc = savedLocations[idx - 1];
-      const key = `${loc.lat},${loc.lon}`;
-      if (savedWeatherData[key]) return; // already cached!
+    const formatMatches = cached?.use12h === use12h;
+    const weatherIsCurrent =
+      !!cached?.weatherData &&
+      isWeatherDayCurrent(cached.weatherData, Math.floor(Date.now() / 1000));
+    const isRecentlyFetched =
+      !!cached?.fetchedAt && Date.now() - cached.fetchedAt < STALE_AFTER_MS;
 
-      fetchWeatherDataForLocation(loc.lat, loc.lon);
-    });
+    if (cached && isRecentlyFetched && formatMatches && weatherIsCurrent) return;
+
+    const timer = setTimeout(
+      () => fetchWeatherDataForLocation(loc.lat, loc.lon, loc.city),
+      0,
+    );
+    return () => clearTimeout(timer);
   }, [
     activeIndex,
     savedLocations,
     savedWeatherData,
     fetchWeatherDataForLocation,
+    use12h,
   ]);
 
   // Lifted to component level so it's callable from both the init useEffect
@@ -498,6 +573,7 @@ const Home = () => {
     if (searchCity !== null) {
       findCoordinates();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- re-running on weatherData changes would retrigger geocoding
   }, [searchCity]);
 
   useEffect(() => {
@@ -512,52 +588,65 @@ const Home = () => {
       const currentWeatherURL = `https://api.openweathermap.org/data/2.5/weather?lat=${coords.lat}&lon=${coords.lon}&units=metric&appid=${OPEN_WEATHER_API_KEY}`;
       const forecastURL = `https://api.openweathermap.org/data/2.5/forecast?lat=${coords.lat}&lon=${coords.lon}&units=metric&appid=${OPEN_WEATHER_API_KEY}`;
       const uviURL = `https://api.openweathermap.org/data/2.5/uvi?lat=${coords.lat}&lon=${coords.lon}&appid=${OPEN_WEATHER_API_KEY}`;
-      const oneCallURL = `https://api.openweathermap.org/data/3.0/onecall?lat=${coords.lat}&lon=${coords.lon}&exclude=minutely,alerts&units=metric&appid=${OPEN_WEATHER_API_KEY}`;
 
       const findWeather = async () => {
         try {
-          const [currentResponse, forecastResponse, uviResponse] =
-            await Promise.all([
-              axios.get(currentWeatherURL, {
-                headers: { Accept: "application/json" },
-              }),
-              axios.get(forecastURL, {
-                headers: { Accept: "application/json" },
-              }),
-              axios.get(uviURL, { headers: { Accept: "application/json" } }),
-            ]);
-
-          let oneCallResponse = null;
-
-          try {
-            oneCallResponse = await axios.get(oneCallURL, {
+          const [
+            currentResponse,
+            forecastResponse,
+            uviResponse,
+            astroResponse,
+          ] = await Promise.allSettled([
+            axios.get(currentWeatherURL, {
               headers: { Accept: "application/json" },
-            });
-          } catch (oneCallErr) {
-            if (!hasLoggedOneCallFallback) {
-              console.info(
-                "[weather] One Call 3.0 not available on this API plan — using fallback",
-              );
-              hasLoggedOneCallFallback = true;
-            }
+            }),
+            axios.get(forecastURL, {
+              headers: { Accept: "application/json" },
+            }),
+            axios.get(uviURL, { headers: { Accept: "application/json" } }),
+            fetchAstronomyData(
+              coords.lat,
+              coords.lon,
+              use12h,
+              currCityRef.current?.city,
+            ),
+          ]);
+
+          if (
+            currentResponse.status === "rejected" ||
+            forecastResponse.status === "rejected" ||
+            uviResponse.status === "rejected"
+          ) {
+            throw new Error("One or more weather requests failed");
           }
 
           if (!isMounted) return;
 
+          const astronomy =
+            astroResponse.status === "fulfilled" ? astroResponse.value : null;
+
           const payload = buildOpenWeatherPayload(
-            currentResponse,
-            forecastResponse,
-            uviResponse,
-            oneCallResponse,
+            currentResponse.value,
+            forecastResponse.value,
+            uviResponse.value,
           );
 
           setWeatherData(payload);
+          setAstronomy(astronomy);
           lastFetchedCoordsRef.current = coords;
+          lastFetchedFormatRef.current = use12h;
           setApiError("");
           setUsingCachedData(false);
           const now = Date.now();
           setLastUpdatedAt(now);
-          saveWeatherCache(coords.lat, coords.lon, payload, airQuality);
+          saveWeatherCache(
+            coords.lat,
+            coords.lon,
+            payload,
+            airQuality,
+            astronomy,
+            use12h,
+          );
         } catch (err) {
           if (!isMounted) return;
           console.error(err);
@@ -575,21 +664,26 @@ const Home = () => {
         }
       };
 
-      if (!isAlreadyLoaded) {
+      // Refetch when the coords are new or the hour format changed since the
+      // last successful fetch — astronomy times are stored pre-formatted.
+      const formatChanged = lastFetchedFormatRef.current !== use12h;
+
+      if (!isAlreadyLoaded || formatChanged) {
         findWeather();
       } else {
         lastFetchedCoordsRef.current = coords;
       }
 
-      // Poll every 10 minutes (600,000 ms)
-      const intervalId = setInterval(findWeather, 10 * 60 * 1000);
+      // Poll every hour (1 hour = the cache freshness window)
+      const intervalId = setInterval(findWeather, POLL_INTERVAL_MS);
 
       return () => {
         isMounted = false;
         clearInterval(intervalId);
       };
     }
-  }, [coords]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- cache writes intentionally use the latest snapshot without resetting the poll interval
+  }, [coords, hourFormat]);
 
   useEffect(() => {
     let isMounted = true;
@@ -606,7 +700,9 @@ const Home = () => {
           const response = await axios.get(airQualityURL, {
             headers: { Accept: "application/json" },
           });
+
           if (!isMounted) return;
+
           setAirQuality(response.data);
           lastFetchedCoordsRef.current = coords;
           setApiError("");
@@ -633,14 +729,15 @@ const Home = () => {
         findAirQuality();
       }
 
-      // Poll every 10 minutes (600,000 ms)
-      const intervalId = setInterval(findAirQuality, 10 * 60 * 1000);
+      // Poll every hour (1 hour = the cache freshness window)
+      const intervalId = setInterval(findAirQuality, POLL_INTERVAL_MS);
 
       return () => {
         isMounted = false;
         clearInterval(intervalId);
       };
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- cache writes intentionally use the latest snapshot without resetting the poll interval
   }, [coords]);
 
   const allPages = [
@@ -653,6 +750,7 @@ const Home = () => {
       lon: coords?.lon,
       weatherData,
       airQuality,
+      astronomy,
     },
     ...savedLocations.map((loc) => {
       const key = `${loc.lat},${loc.lon}`;
@@ -666,13 +764,14 @@ const Home = () => {
         lon: loc.lon,
         weatherData: cached.weatherData || null,
         airQuality: cached.airQuality || null,
+        astronomy: cached.astronomy || null,
       };
     }),
   ];
 
   const activePage = allPages[activeIndex] || {};
-  const activeWeatherData = activePage.weatherData || weatherData;
-  const activeAirQuality = activePage.airQuality || airQuality;
+  const activeWeatherData = activePage.weatherData;
+  const activeAirQuality = activePage.airQuality;
   const activeCurrCity = activePage.city
     ? { city: activePage.city, country: activePage.country }
     : currCity;

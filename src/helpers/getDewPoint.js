@@ -1,4 +1,13 @@
+const isMissing = (v) =>
+  v === null ||
+  v === undefined ||
+  (typeof v === "string" && v.trim() === "");
+
 export const getDewPoint = (tempC, humidity) => {
+  if (isMissing(tempC) || isMissing(humidity)) {
+    return null;
+  }
+
   const temp = Number(tempC);
   const rh = Number(humidity);
 

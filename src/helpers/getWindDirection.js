@@ -1,3 +1,22 @@
+const CARDINAL_OF = {
+  N: "N",
+  NNE: "N",
+  NE: "E",
+  ENE: "E",
+  E: "E",
+  ESE: "E",
+  SE: "S",
+  SSE: "S",
+  S: "S",
+  SSW: "S",
+  SW: "W",
+  WSW: "W",
+  W: "W",
+  WNW: "W",
+  NW: "N",
+  NNW: "N",
+};
+
 const DIRECTIONS = [
   { max: 11, abbr: "N", full: "North" },
   { max: 33, abbr: "NNE", full: "North Northeast" },
@@ -18,17 +37,21 @@ const DIRECTIONS = [
 ];
 
 const getDirection = (deg) => {
+  if (
+    deg === null ||
+    deg === undefined ||
+    (typeof deg === "string" && deg.trim() === "")
+  ) {
+    return { abbr: "--", full: "Unknown wind" };
+  }
   const normalized = Number(deg);
   if (!Number.isFinite(normalized)) {
     return { abbr: "--", full: "Unknown wind" };
   }
 
   const value = ((normalized % 360) + 360) % 360;
-  const match =
-    DIRECTIONS.find((dir) => value < dir.max) ||
-    DIRECTIONS[DIRECTIONS.length - 1];
-
-  return { abbr: match.abbr, full: match.full };
+  const index = Math.round(value / 22.5) % 16;
+  return DIRECTIONS[index];
 };
 
 export const getWindDirectionAbbr = (deg, t) => {
@@ -39,3 +62,8 @@ export const getWindDirectionAbbr = (deg, t) => {
   return abbr;
 };
 export const getWindDirectionFull = (deg) => getDirection(deg).full;
+
+export const getWindDirectionCardinal = (deg) => {
+  const abbr = getDirection(deg).abbr;
+  return CARDINAL_OF[abbr] || abbr;
+};

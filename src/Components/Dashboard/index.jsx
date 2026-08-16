@@ -2,12 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import clsx from "clsx";
 import NavBarForm from "../Main/NavBar/NavBarForm";
-import HeroPanel from "./HeroPanel";
-import HourlyOutlook from "./HourlyOutlook";
-import StatsGrid from "./StatsGrid";
-import SunPositionPanel from "./SunPositionPanel";
-import AirQualityPanel from "./AirQualityPanel";
-import ForecastList from "./ForecastList";
+import OverviewSection from "./OverviewSection";
 import { formatTime } from "../../helpers/timeFormat";
 import { useUnit } from "../../contexts/UnitContext";
 import { useTimeFormat } from "../../contexts/TimeFormatContext";
@@ -270,63 +265,41 @@ const SettingsMenu = () => {
 };
 
 // ─── Ko-fi donation button ────────────────────────────────────────────────────
-const KofiButton = () => (
-  <a
-    href="https://ko-fi.com/mohammedbenomr"
-    target="_blank"
-    rel="noopener noreferrer"
-    aria-label="Support on Ko-fi"
-    className={clsx(
-      SECONDARY_ACTION_CLASS,
-      "gap-1.5 px-2.5 text-[11px] font-mono",
-    )}
-  >
-    {/* Thin-stroke coffee-cup icon — matches the line-art style used across the app */}
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      width="14"
-      height="14"
-      aria-hidden="true"
-    >
-      {/* Cup body */}
-      <path d="M5 7h11a1 1 0 0 1 1 1v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8a1 1 0 0 1 1-1z" />
-      {/* Handle */}
-      <path d="M17 9h1.5a2.5 2.5 0 0 1 0 5H17" />
-      {/* Steam wisps */}
-      <path d="M9 4c0-1 .6-1.5 1-2" />
-      <path d="M13 4c0-1 .6-1.5 1-2" />
-    </svg>
-    {/* Label hidden on mobile, visible on tablet+ */}
-    <span className="hidden tablet:inline">Support</span>
-  </a>
-);
-
-// ─── GitHub source link ──────────────────────────────────────────────────────
-const GitHubButton = () => {
+const KofiButton = () => {
   const { t } = useTranslation();
-
   return (
     <a
-      href="https://github.com/Moh-mmed/react-weather-app"
+      href="https://ko-fi.com/mohammedbenomr"
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={t("header.sourceOnGitHub")}
-      className={clsx(SECONDARY_ACTION_CLASS, "justify-center px-3")}
+      aria-label={t("dashboard.supportAria", { defaultValue: "Support on Ko-fi" })}
+      className={clsx(
+        SECONDARY_ACTION_CLASS,
+        "gap-1.5 px-2.5 text-[11px] font-mono",
+      )}
     >
+      {/* Thin-stroke coffee-cup icon — matches the line-art style used across the app */}
       <svg
         viewBox="0 0 24 24"
-        fill="currentColor"
-        width="15"
-        height="15"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        width="14"
+        height="14"
         aria-hidden="true"
       >
-        <path d="M12 .5C5.65.5.5 5.72.5 12.18c0 5.17 3.29 9.56 7.86 11.12.58.11.79-.26.79-.58 0-.29-.01-1.07-.01-2.09-3.2.71-3.88-1.58-3.88-1.58-.52-1.36-1.29-1.72-1.29-1.72-1.05-.74.08-.72.08-.72 1.16.08 1.77 1.22 1.77 1.22 1.03 1.8 2.71 1.28 3.37.98.1-.76.4-1.28.72-1.57-2.56-.3-5.25-1.31-5.25-5.82 0-1.29.44-2.34 1.16-3.17-.12-.3-.5-1.5.11-3.13 0 0 .95-.31 3.12 1.21a10.67 10.67 0 0 1 2.84-.39c.96 0 1.92.13 2.84.39 2.16-1.52 3.11-1.21 3.11-1.21.61 1.63.23 2.83.11 3.13.72.83 1.16 1.88 1.16 3.17 0 4.52-2.7 5.52-5.27 5.81.41.36.77 1.06.77 2.14 0 1.55-.01 2.8-.01 3.18 0 .31.2.69.8.57 4.56-1.57 7.85-5.95 7.85-11.11C23.5 5.72 18.35.5 12 .5z" />
+        {/* Cup body */}
+        <path d="M5 7h11a1 1 0 0 1 1 1v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8a1 1 0 0 1 1-1z" />
+        {/* Handle */}
+        <path d="M17 9h1.5a2.5 2.5 0 0 1 0 5H17" />
+        {/* Steam wisps */}
+        <path d="M9 4c0-1 .6-1.5 1-2" />
+        <path d="M13 4c0-1 .6-1.5 1-2" />
       </svg>
+      {/* Label hidden on mobile, visible on tablet+ */}
+      <span className="hidden tablet:inline">{t("dashboard.support", { defaultValue: "Support" })}</span>
     </a>
   );
 };
@@ -366,94 +339,60 @@ const LiveClock = ({ timezoneOffset, currentTime }) => {
 };
 
 // ─── Inline page-level spinner ────────────────────────────────────────────────
-const PageSpinner = () => (
-  <div className="flex-1 flex items-center justify-center min-h-[300px]">
-    <svg
-      className="motion-safe:animate-spin h-10 w-10 text-accent-sky opacity-60"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      aria-label="Loading weather data"
-    >
-      <circle
-        className="opacity-20"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="3"
-      />
-      <path
-        className="opacity-75"
-        fill="currentColor"
-        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-      />
-    </svg>
-  </div>
-);
-
-// ─── Dashboard grid for one location ─────────────────────────────────────────
 const LocationPage = ({ page, onRemove, currentTime }) => {
-  const { weatherData, airQuality, isPinned, city } = page;
+  const { weatherData, airQuality, city } = page;
+  const { t } = useTranslation();
 
   if (!weatherData || !airQuality) {
+    // City data is loaded lazily on swipe — missing data means "fetching",
+    // not "failed", so show a lightweight loading state.
     return (
       <div className="flex-1 flex flex-col items-center justify-center min-h-[300px] gap-4 text-center">
         <svg
+          className="motion-safe:animate-spin h-9 w-9 text-accent-sky"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="currentColor"
-          strokeWidth="1.6"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          width="36"
-          height="36"
-          className="text-muted opacity-40"
+          aria-hidden="true"
         >
-          <line x1="1" y1="1" x2="23" y2="23" />
-          <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55" />
-          <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39" />
-          <path d="M10.71 5.05A16 16 0 0 1 22.56 9" />
-          <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88" />
-          <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
-          <line x1="12" y1="20" x2="12.01" y2="20" />
+          <circle
+            className="opacity-20"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="3.5"
+          />
+          <path
+            className="opacity-80"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+          />
         </svg>
         <p className="text-muted text-sm opacity-60 max-w-[220px] leading-relaxed">
           {city
-            ? `Unable to load weather for ${city}`
-            : "Unable to load weather data"}
+            ? t("dashboard.loadingFor", {
+                city,
+                defaultValue: `Loading weather for ${city}…`,
+              })
+            : t("dashboard.loadingData", {
+                defaultValue: "Loading weather data…",
+              })}
         </p>
       </div>
     );
   }
 
   return (
-    <main
-      key={`${weatherData.coord?.lat}-${weatherData.coord?.lon}-${weatherData.dt}`}
-      className="dashboard-main flex-1 grid gap-5 min-h-0 animate-fadeIn"
-      style={{
-        gridTemplateColumns: "2.05fr 1fr",
-        gridTemplateRows: "auto minmax(0, 1fr)",
-      }}
-    >
-      <div className="dashboard-stack grid gap-5 min-h-0" style={{ gridTemplateRows: "auto minmax(0, 1fr)" }}>
-        <HeroPanel
-          weatherData={weatherData}
-          isPinned={isPinned}
+    <div className="flex-1 w-full overflow-y-auto scroll-smooth no-scrollbar">
+      {/* Section 1: Overview */}
+      <div className="w-full">
+        <OverviewSection
+          page={page}
+          currentTime={currentTime}
           onRemove={onRemove}
         />
-        <HourlyOutlook weatherData={weatherData} />
       </div>
-
-      <SunPositionPanel weatherData={weatherData} currentTime={currentTime} />
-
-      <ForecastList weatherData={weatherData} />
-
-      <div className="dashboard-stack grid gap-5 min-h-0" style={{ gridTemplateRows: "auto minmax(0, 1fr)" }}>
-        <AirQualityPanel airQuality={airQuality} />
-        <StatsGrid weatherData={weatherData} />
-      </div>
-    </main>
+    </div>
   );
 };
 
@@ -512,7 +451,7 @@ const Dashboard = ({
 
   // ── Derived header values from the active page ───────────────────────────────
   const activePage = allPages[activeIndex];
-  const activeWeatherData = activePage?.weatherData || weatherData;
+  const activeWeatherData = activePage?.weatherData;
   const activeCurrCity = activePage
     ? { city: activePage.city, country: activePage.country }
     : currCity;
@@ -523,7 +462,7 @@ const Dashboard = ({
   const safeTemp = Number.isFinite(activeTemp) ? convertTemp(activeTemp) : "--";
   const { city, country } = activeCurrCity || {};
 
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   // Is the current page already in savedLocations?
   const isCurrentPageSaved =
@@ -605,8 +544,11 @@ const Dashboard = ({
     activeIndex === 0 && !isCurrentPageSaved && handleAddSavedLocation;
 
   // ── Format the last-updated timestamp for the stale-data banner ─────────────
+  const rawLang = i18n.language?.slice(0, 2).toLowerCase();
+  const activeLocale =
+    rawLang === "fr" ? "fr-FR" : rawLang === "ar" ? "ar-EG" : "en-US";
   const lastUpdatedLabel = lastUpdatedAt
-    ? new Date(lastUpdatedAt).toLocaleString(undefined, {
+    ? new Date(lastUpdatedAt).toLocaleString(activeLocale, {
         month: "short",
         day: "numeric",
         hour: "2-digit",
@@ -619,8 +561,8 @@ const Dashboard = ({
     /* Root: full-height flex column, strictly contained — no vertical overflow anywhere.
        On small screens each page scrolls vertically inside the pager via overflow-y-auto. */
     <div
-      className="flex flex-col text-primary bg-dashboard-radial pt-7 pb-5 gap-5"
-      style={{ height: "100dvh", overflow: "hidden" }}
+      className="flex min-h-screen flex-col text-primary bg-dashboard-radial pt-7 pb-5 gap-5"
+      style={{ overflowX: "hidden" }}
     >
       {/* ── Stale data banner ────────────────────────────────────────────────── */}
       {lastUpdatedLabel && (
@@ -631,9 +573,12 @@ const Dashboard = ({
             position: "fixed",
             top: "14px",
             left: "50%",
-            transform: showBanner ? "translateX(-50%) translateY(0)" : "translateX(-50%) translateY(-10px)",
+            transform: showBanner
+              ? "translateX(-50%) translateY(0)"
+              : "translateX(-50%) translateY(-10px)",
             opacity: showBanner ? 1 : 0,
-            transition: "opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+            transition:
+              "opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
             pointerEvents: "none",
             zIndex: 9999,
             display: "flex",
@@ -677,7 +622,10 @@ const Dashboard = ({
               letterSpacing: "0.2px",
             }}
           >
-            Last updated {lastUpdatedLabel}
+            {t("dashboard.lastUpdated", {
+              time: lastUpdatedLabel,
+              defaultValue: `Last updated ${lastUpdatedLabel}`,
+            })}
           </span>
         </div>
       )}
@@ -693,7 +641,6 @@ const Dashboard = ({
           </div>
           {/* Secondary header actions */}
           <div className="flex items-center gap-2 shrink-0">
-            <GitHubButton />
             <KofiButton />
             <SettingsMenu />
           </div>
@@ -761,7 +708,7 @@ const Dashboard = ({
       <div
         ref={pagerRef}
         onScroll={handleScroll}
-        aria-label="Weather locations"
+        aria-label={t("dashboard.locations", { defaultValue: "Weather locations" })}
         style={{
           overscrollBehaviorX: "contain",
           WebkitOverflowScrolling: "touch",
@@ -771,7 +718,7 @@ const Dashboard = ({
         {allPages.map((page, idx) => (
           <div
             key={`${page.lat ?? "pinned"}-${page.lon ?? "pinned"}-${idx}`}
-            className="flex-none w-full min-w-full snap-start snap-always flex flex-col px-[clamp(20px,4vw,48px)] overflow-y-auto"
+            className="flex-none w-full min-w-full snap-start snap-always flex flex-col px-[clamp(20px,4vw,48px)] overflow-hidden min-h-0"
           >
             <LocationPage
               page={page}
@@ -795,7 +742,7 @@ const Dashboard = ({
       {allPages.length > 1 && (
         <div
           className="fixed bottom-5 left-0 right-0 flex items-center justify-center pointer-events-none z-30"
-          aria-label="Location pages"
+          aria-label={t("dashboard.locationPages", { defaultValue: "Location pages" })}
         >
           <div className="flex items-center gap-[7px] pointer-events-auto bg-black/25 backdrop-blur-sm rounded-full px-3 py-2">
             {allPages.map((page, idx) => (
@@ -803,12 +750,17 @@ const Dashboard = ({
                 key={`dot-${idx}`}
                 type="button"
                 title={
-                  idx === 0 ? "Current location" : page.city || "Saved location"
+                  idx === 0
+                    ? t("dashboard.currentLocation", { defaultValue: "Current location" })
+                    : page.city || t("dashboard.savedLocation", { defaultValue: "Saved location" })
                 }
                 aria-label={
                   idx === 0
-                    ? "Go to current location"
-                    : `Go to ${page.city || "saved location"}`
+                    ? t("dashboard.goToCurrent", { defaultValue: "Go to current location" })
+                    : t("dashboard.goToSaved", {
+                        city: page.city || t("dashboard.savedLocation", { defaultValue: "Saved location" }),
+                        defaultValue: `Go to ${page.city || "saved location"}`,
+                      })
                 }
                 aria-pressed={activeIndex === idx}
                 onClick={() => scrollToPage(idx)}

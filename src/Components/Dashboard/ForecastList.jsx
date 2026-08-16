@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { translateConditionMain, translateConditionDescription } from "../../helpers/weatherConditionTranslator";
 import { useUnit } from "../../contexts/UnitContext";
+import { getLocationDateKey } from "../../helpers/weatherTime";
 
 const CalendarIcon = () => (
   <svg
@@ -208,7 +209,6 @@ const ForecastList = ({ weatherData }) => {
   const { daily, timezone_offset } = weatherData;
   const forecastDays = daily.slice(0, 7);
   const forecastTitle = t("forecast.titleWithCount", { count: forecastDays.length });
-
   const rawLang = i18n.language?.slice(0, 2).toLowerCase();
   const activeLocale = rawLang === "fr" ? "fr-FR" : rawLang === "ar" ? "ar-EG" : "en-US";
 
@@ -225,9 +225,9 @@ const ForecastList = ({ weatherData }) => {
 
       {/* Forecast grid */}
       <div
-        className="mt-3 flex-1 min-h-0 grid gap-2.5 w-full items-stretch justify-stretch overflow-x-auto overflow-y-hidden pb-4
+        className="mt-3 flex-1 grid auto-rows-fr min-h-[260px] gap-2.5 w-full items-stretch justify-stretch overflow-x-auto overflow-y-hidden pb-4
                    [&::-webkit-scrollbar]:h-[6px] [&::-webkit-scrollbar-thumb]:bg-white/15 [&::-webkit-scrollbar-thumb]:rounded-full
-                   max-desktop:flex max-desktop:flex-col max-desktop:overflow-x-visible max-desktop:overflow-y-visible max-desktop:pb-0"
+                   max-desktop:flex max-desktop:flex-col max-desktop:overflow-x-visible max-desktop:overflow-y-visible max-desktop:pb-0 max-desktop:min-h-0"
         style={{
           gridTemplateColumns: `repeat(${Math.max(1, forecastDays.length)}, minmax(110px, 1fr))`,
         }}
@@ -238,7 +238,12 @@ const ForecastList = ({ weatherData }) => {
           const translatedMain = translateConditionMain(weather[0], t);
           const translatedDesc = translateConditionDescription(weather[0], t);
 
-          const localDate = new Date((dt + (timezone_offset || 0)) * 1000);
+          // Calendar day for the weather location. The date key comes from the
+          // normalized model (computed with the location's UTC offset); format
+          // it as UTC so the browser timezone can never shift the day label.
+          const dateKey =
+            day.date ?? getLocationDateKey(dt, timezone_offset);
+          const localDate = new Date(`${dateKey}T00:00:00Z`);
           const dayName = new Intl.DateTimeFormat(activeLocale, { weekday: "short", timeZone: "UTC" }).format(localDate);
           const monthName = new Intl.DateTimeFormat(activeLocale, { month: "short", timeZone: "UTC" }).format(localDate);
           const dayNum = new Intl.DateTimeFormat(activeLocale, { day: "2-digit", timeZone: "UTC", numberingSystem: "latn" }).format(localDate);
@@ -252,37 +257,39 @@ const ForecastList = ({ weatherData }) => {
           let trendIcon = null;
           if (index > 0) {
             const prevHigh = forecastDays[index - 1].temp.max;
-            const diff = temp.max - prevHigh;
-            if (diff > 1) {
-              trendIcon = (
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#E2694A"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="w-3.5 h-3.5 inline-block ml-0.5 relative -top-[1px]"
-                >
-                  <line x1="12" y1="19" x2="12" y2="5" />
-                  <polyline points="5 12 12 5 19 12" />
-                </svg>
-              );
-            } else if (diff < -1) {
-              trendIcon = (
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#4FA3D9"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="w-3.5 h-3.5 inline-block ml-0.5 relative -top-[1px]"
-                >
-                  <line x1="12" y1="5" x2="12" y2="19" />
-                  <polyline points="19 12 12 19 5 12" />
-                </svg>
-              );
+            if (Number.isFinite(temp.max) && Number.isFinite(prevHigh)) {
+              const diff = temp.max - prevHigh;
+              if (diff > 1) {
+                trendIcon = (
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#E2694A"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="w-3.5 h-3.5 inline-block ml-0.5 relative -top-[1px]"
+                  >
+                    <line x1="12" y1="19" x2="12" y2="5" />
+                    <polyline points="5 12 12 5 19 12" />
+                  </svg>
+                );
+              } else if (diff < -1) {
+                trendIcon = (
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#4FA3D9"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="w-3.5 h-3.5 inline-block ml-0.5 relative -top-[1px]"
+                  >
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <polyline points="19 12 12 19 5 12" />
+                  </svg>
+                );
+              }
             }
           }
 
@@ -336,12 +343,12 @@ const ForecastList = ({ weatherData }) => {
                     {t("forecast.precip")}
                   </span>
                   <b className="text-primary font-mono font-medium">
-                    {pop ?? 0}%
+                    {pop == null ? "--" : `${pop}%`}
                   </b>
                 </div>
                 <div className="flex justify-between gap-1.5 text-[10px] text-muted whitespace-nowrap max-desktop:flex-col max-desktop:gap-0 max-desktop:items-end">
                   <span className="max-desktop:text-[9px] max-desktop:opacity-85">
-                    {t("forecast.humidity")}
+                    {t("forecast.humidityAvg")}
                   </span>
                   <b className="text-primary font-mono font-medium">
                     {Number.isFinite(humidity) ? `${humidity}%` : "--"}
@@ -349,7 +356,7 @@ const ForecastList = ({ weatherData }) => {
                 </div>
                 <div className="flex justify-between gap-1.5 text-[10px] text-muted whitespace-nowrap max-desktop:flex-col max-desktop:gap-0 max-desktop:items-end">
                   <span className="max-desktop:text-[9px] max-desktop:opacity-85">
-                    {t("forecast.wind")}
+                    {t("forecast.windMax")}
                   </span>
                   <b className="text-primary font-mono font-medium">
                     {Number.isFinite(wind_speed) ? `${windObj.value} ${t(windObj.unitKey)}` : "--"}
