@@ -151,7 +151,9 @@ const SunPositionPanel = ({ weatherData, currentTime, astronomy }) => {
           style={{ marginTop: 8, overflow: 'visible' }}
           dir="ltr"
           role="img"
-          aria-label={night ? "Moon position arc" : "Sun position arc"}
+          aria-label={night
+            ? t("sun.moonArcAria", { defaultValue: "Moon position arc" })
+            : t("sun.sunArcAria", { defaultValue: "Sun position arc" })}
         >
           {/* ── Gradient/filter definitions used by the sun & moon bodies ── */}
           <SkyGradient />

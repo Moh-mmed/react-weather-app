@@ -4,6 +4,7 @@ import MoonCard from "./MoonCard";
 jest.mock("react-i18next", () => ({
   useTranslation: () => ({
     t: (key, opts) => (opts && opts.defaultValue) || key,
+    i18n: { language: "en" },
   }),
 }));
 

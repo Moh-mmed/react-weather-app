@@ -94,12 +94,17 @@ const OutdoorConditionsCard = ({ page, animationDelay = "0.1s" }) => {
         : t("outdoorConditions.advice.lowUvTitle", { defaultValue: "Mild UV Exposure" }),
       desc: isHighUv
         ? t("outdoorConditions.advice.highUvDesc", {
+            value: Math.round(current.uvi || 0),
             defaultValue: `UV index is high (${Math.round(current.uvi || 0)}) — wear sunscreen and sunglasses.`,
           })
         : t("outdoorConditions.advice.lowUvDesc", {
             defaultValue: "Low UV levels — comfortable for extended daylight outdoor activity.",
           }),
-      tag: isExtremeUv ? "High UV" : isHighUv ? "Moderate UV" : "Low Risk",
+      tag: isExtremeUv
+        ? t("outdoorConditions.advice.tags.highUv", { defaultValue: "High UV" })
+        : isHighUv
+          ? t("outdoorConditions.advice.tags.moderateUv", { defaultValue: "Moderate UV" })
+          : t("outdoorConditions.advice.tags.lowRisk", { defaultValue: "Low Risk" }),
       tagColor: isExtremeUv
         ? "bg-amber-50 text-amber-700 dark:bg-amber-400/10 dark:text-amber-300"
         : "bg-emerald-50 text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-300",
@@ -119,12 +124,16 @@ const OutdoorConditionsCard = ({ page, animationDelay = "0.1s" }) => {
         : t("outdoorConditions.advice.comfortableHumidityTitle", { defaultValue: "Comfortable Air" }),
       desc: isDry
         ? t("outdoorConditions.advice.dryAirDesc", {
+            value: Math.round(current.humidity || 0),
             defaultValue: `Very dry air (${Math.round(current.humidity || 0)}% RH) — drink water regularly during walks.`,
           })
         : t("outdoorConditions.advice.comfortableHumidityDesc", {
+            value: Math.round(current.humidity || 0),
             defaultValue: `Balanced moisture (${Math.round(current.humidity || 0)}% RH) makes breathing effortless.`,
           }),
-      tag: isDry ? "Dry Air" : "Balanced",
+      tag: isDry
+        ? t("outdoorConditions.advice.tags.dryAir", { defaultValue: "Dry Air" })
+        : t("outdoorConditions.advice.tags.balanced", { defaultValue: "Balanced" }),
       tagColor: isDry
         ? "bg-sky-50 text-sky-700 dark:bg-sky-400/10 dark:text-sky-300"
         : "bg-cyan-50 text-cyan-700 dark:bg-cyan-400/10 dark:text-cyan-300",
@@ -149,7 +158,9 @@ const OutdoorConditionsCard = ({ page, animationDelay = "0.1s" }) => {
         : t("outdoorConditions.advice.lightWindDesc", {
             defaultValue: "Light airflow keeps conditions feeling fresh and pleasant.",
           }),
-      tag: isWindy ? "Breezy" : "Gentle",
+      tag: isWindy
+        ? t("outdoorConditions.advice.tags.breezy", { defaultValue: "Breezy" })
+        : t("outdoorConditions.advice.tags.gentle", { defaultValue: "Gentle" }),
       tagColor: isWindy
         ? "bg-blue-50 text-blue-700 dark:bg-blue-400/10 dark:text-blue-300"
         : "bg-teal-50 text-teal-700 dark:bg-teal-400/10 dark:text-teal-300",

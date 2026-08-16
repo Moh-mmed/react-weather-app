@@ -21,9 +21,9 @@ const capitalize = (str) =>
     : "";
 
 export const getOutdoorConditions = (data = {}, t) => {
-  const tr = (key, fallback) => {
+  const tr = (key, fallback, extra = {}) => {
     if (typeof t === "function") {
-      return t(key, { defaultValue: fallback });
+      return t(key, { ...extra, defaultValue: fallback });
     }
     return fallback;
   };
@@ -297,6 +297,9 @@ export const getOutdoorConditions = (data = {}, t) => {
 
   let description = "";
 
+  const and = tr("outdoorConditions.connectors.and", " and ");
+  const but = tr("outdoorConditions.connectors.but", ", but ");
+
   if (cautions.length === 0) {
     if (positives.length === 0) {
       description = tr("outdoorConditions.descriptions.normal", "Outdoor conditions are pleasant.");
@@ -305,25 +308,31 @@ export const getOutdoorConditions = (data = {}, t) => {
     } else {
       const p1 = positives[0].posClause;
       const p2 = positives[1].posClause;
-      description = `${capitalize(p1)} and ${p2}.`;
+      description = `${capitalize(p1)}${and}${p2}.`;
     }
   } else if (positives.length > 0) {
     // Both positives and cautions exist
     const posPart =
       positives.length >= 2
-        ? `${capitalize(positives[0].posClause)} and ${positives[1].posClause}`
+        ? `${capitalize(positives[0].posClause)}${and}${positives[1].posClause}`
         : `${capitalize(positives[0].posClause)}`;
-    const mainCaution = cautions[0].cautionClause;
-    description = `${posPart}, but ${mainCaution}.`;
+    description = `${posPart}${but}${cautions[0].cautionClause}.`;
   } else {
     // Cautions only
+    const c1 = capitalize(cautions[0].cautionClause);
     if (cautions.length === 1) {
-      const c1 = capitalize(cautions[0].cautionClause);
-      description = `${c1} makes outdoor activity less comfortable.`;
+      description = tr(
+        "outdoorConditions.descriptions.lessComfortableSingle",
+        `${c1} makes outdoor activity less comfortable.`,
+        { clause: c1 }
+      );
     } else {
-      const c1 = capitalize(cautions[0].cautionClause);
       const c2 = cautions[1].cautionClause;
-      description = `${c1} and ${c2} make outdoor activity less comfortable.`;
+      description = tr(
+        "outdoorConditions.descriptions.lessComfortablePlural",
+        `${c1} and ${c2} make outdoor activity less comfortable.`,
+        { clause1: c1, clause2: c2 }
+      );
     }
   }
 

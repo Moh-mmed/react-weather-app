@@ -73,6 +73,19 @@ const CalendarIcon = () => (
 // label is identical regardless of the browser timezone. The date strings come
 // from Visual Crossing already in the location's local calendar.
 
+// ─── Moon phase key (mirrors astronomyService.getMoonPhaseName) ───────────────
+const getMoonPhaseKey = (phase) => {
+  if (!Number.isFinite(phase)) return null;
+  if (phase < 0.03 || phase > 0.97) return "newMoon";
+  if (phase < 0.22) return "waxingCrescent";
+  if (phase < 0.28) return "firstQuarter";
+  if (phase < 0.47) return "waxingGibbous";
+  if (phase < 0.53) return "fullMoon";
+  if (phase < 0.72) return "waningGibbous";
+  if (phase < 0.78) return "lastQuarter";
+  return "waningCrescent";
+};
+
 // ─── Single info cell (icon + label + value + optional day sub-label) ────────
 const InfoCell = ({ icon, label, value, dayLabel }) => (
   <div className="flex flex-col items-center text-center gap-1 min-w-0">
@@ -103,10 +116,13 @@ const MoonCard = ({
   hemisphere = "northern",
   timezoneOffset,
 }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const reduced = usePrefersReducedMotion();
 
-  const phaseName = moonPhaseName || "--";
+  const phaseKey = getMoonPhaseKey(moonPhase);
+  const phaseName = phaseKey
+    ? t(`moonPhases.${phaseKey}`, { defaultValue: moonPhaseName })
+    : moonPhaseName || "--";
   const hasIllumination = Number.isFinite(illumination);
   const illuminated = useCountUp(hasIllumination ? illumination : null, reduced);
 
@@ -114,14 +130,38 @@ const MoonCard = ({
   // "today" boundary via the location's timezone offset). Null moonrise/moonset
   // stay null and render "--".
   const nowUnix = Math.floor(Date.now() / 1000);
-  const moonriseDay = getDayLabel(moonRaw?.moonriseDate ?? null, nowUnix, timezoneOffset);
-  const moonsetDay  = getDayLabel(moonRaw?.moonsetDate  ?? null, nowUnix, timezoneOffset);
+  const rawLang = i18n.language?.slice(0, 2).toLowerCase();
+  const activeLocale =
+    rawLang === "fr" ? "fr-FR" : rawLang === "ar" ? "ar-EG" : "en-US";
+
+  const translateDay = (label) => {
+    if (label === "Today") return t("sun.today", { defaultValue: "Today" });
+    if (label === "Tomorrow") return t("sun.tomorrow", { defaultValue: "Tomorrow" });
+    if (label === "Yesterday") return t("sun.yesterday", { defaultValue: "Yesterday" });
+    return label;
+  };
+
+  const moonriseDay = translateDay(
+    getDayLabel(moonRaw?.moonriseDate ?? null, nowUnix, timezoneOffset, activeLocale)
+  );
+  const moonsetDay = translateDay(
+    getDayLabel(moonRaw?.moonsetDate ?? null, nowUnix, timezoneOffset, activeLocale)
+  );
 
   // Normalise the nextFullMoon value: the service returns "0 days" when the
-  // full moon is tonight, but we display "Tonight" in that case.
+  // full moon is tonight, but we display "Tonight" in that case. Otherwise the
+  // "N days" string is pluralized in the active language.
   const fullMoonValue = (() => {
     if (!nextFullMoon) return "--";
-    if (nextFullMoon === "0 days" || nextFullMoon === "Tonight") return t("sun.tonight", { defaultValue: "Tonight" });
+    if (nextFullMoon === "0 days" || nextFullMoon === "Tonight")
+      return t("sun.tonight", { defaultValue: "Tonight" });
+    const days = Number(String(nextFullMoon).replace(/\D/g, ""));
+    if (Number.isFinite(days)) {
+      return t("sun.nextFullMoonDays", {
+        count: days,
+        defaultValue: `${days} days`,
+      });
+    }
     return nextFullMoon;
   })();
 

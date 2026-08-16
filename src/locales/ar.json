@@ -48,8 +48,17 @@
     "illuminatedSuffix": "% مضيء",
     "tonightMoon": "قمر الليلة",
     "nextFullMoon": "البدر القادم",
-    "nextFullMoonDays": "{{count}} أيام",
-    "tonight": "الليلة"
+    "nextFullMoonDays_one": "يوم واحد",
+    "nextFullMoonDays_two": "يومان",
+    "nextFullMoonDays_few": "{{count}} أيام",
+    "nextFullMoonDays_many": "{{count}} يومًا",
+    "nextFullMoonDays_other": "{{count}} يوم",
+    "tonight": "الليلة",
+    "today": "اليوم",
+    "tomorrow": "غدًا",
+    "yesterday": "أمس",
+    "sunArcAria": "قوس مسار الشمس",
+    "moonArcAria": "قوس مسار القمر"
   },
   "night": {
     "moonPhase": "طور القمر",
@@ -86,6 +95,18 @@
   },
   "aqi": {
     "title": "جودة الهواء",
+    "unavailable": "بيانات مؤشر جودة الهواء غير متوفرة",
+    "usScaleLabel": "مقياس مؤشر جودة الهواء الأمريكي",
+    "recommendationTitle": "التوصية الصحية",
+    "recommendations": {
+      "unavailable": "بيانات جودة الهواء غير متوفرة حاليًا.",
+      "good": "يوم ممتاز للأنشطة الخارجية وتهوية المنزل.",
+      "moderate": "يُفضَّل أن يقلل الفئات الحساسة من المجهود الخارجي المطول.",
+      "unhealthySensitive": "يجب على الفئات الحساسة تجنب الأنشطة الخارجية المطولة، وعلى الآخرين الحد من المجهود.",
+      "unhealthy": "يجب على الأطفال النشطين والبالغين ومن يعانون من أمراض الجهاز التنفسي تجنب الأنشطة الخارجية.",
+      "veryUnhealthy": "يجب على الجميع تجنب أي مجهود خارجي. أبقِ النوافذ مغلقة وشغّل أجهزة تنقية الهواء.",
+      "hazardous": "يجب على الجميع تجنب أي مجهود خارجي. أبقِ النوافذ مغلقة وشغّل أجهزة تنقية الهواء."
+    },
     "mainPollutant": "الملوث الرئيسي — {{pollutant}}",
     "updatedUnknown": "تم التحديث مؤخراً",
     "updatedJustNow": "تم التحديث الآن",
@@ -304,6 +325,128 @@
     "light thunderstorm": "عاصفة رعدية خفيفة",
     "heavy thunderstorm": "عاصفة رعدية شديدة",
     "ragged thunderstorm": "عاصفة رعدية متفرقة"
+  },
+  "outdoorConditions": {
+    "eyebrow": "الظروف الخارجية",
+    "statusGood": "ظروف جيدة",
+    "statusGoodPrecaution": "جيد مع بعض الاحتياطات",
+    "statusFair": "ظروف متوسطة",
+    "statusPoor": "ظروف سيئة",
+    "headlines": {
+      "good": "وقت مناسب للخروج ☀️",
+      "poor": "أقل ملاءمة للخروج",
+      "fairPrecaution": "جميل في الخارج، مع بعض الاحتياطات"
+    },
+    "titles": {
+      "good": "ظروف جيدة",
+      "goodOverall": "جيد بشكل عام",
+      "fair": "ظروف متوسطة",
+      "poor": "ظروف سيئة"
+    },
+    "descriptions": {
+      "normal": "الظروف الخارجية لطيفة.",
+      "noData": "بيانات الظروف الخارجية محدودة.",
+      "lessComfortableSingle": "{{clause}}؛ الأنشطة الخارجية أقل راحة.",
+      "lessComfortablePlural": "{{clause1}} و{{clause2}}؛ الأنشطة الخارجية أقل راحة.",
+      "defaultDescription": "رؤية ممتازة ونسيم مريح يجعلان الجو لطيفًا في الخارج، لكن ارتفاع الأشعة وجفاف الهواء يستدعيان بعض الاحتياطات."
+    },
+    "connectors": {
+      "and": " و",
+      "but": "، لكن "
+    },
+    "clauses": {
+      "lowUv": "أشعة فوق بنفسجية منخفضة",
+      "moderateUv": "أشعة فوق بنفسجية معتدلة",
+      "elevatedUv": "أشعة فوق بنفسجية مرتفعة",
+      "veryHighUv": "مؤشر الأشعة فوق البنفسجية مرتفع جدًا",
+      "extremeUv": "أشعة فوق بنفسجية قصوى",
+      "clearVisibility": "رؤية واضحة",
+      "reducedVisibility": "رؤية منخفضة",
+      "poorVisibility": "رؤية ضعيفة",
+      "calmAir": "هواء ساكن",
+      "lightWind": "نسيم خفيف",
+      "moderateBreeze": "رياح معتدلة",
+      "strongWind": "رياح قوية",
+      "veryDryAir": "الهواء جاف جدًا",
+      "comfortableHumidity": "رطوبة مريحة",
+      "humidAir": "هواء رطب",
+      "veryHumidAir": "هواء رطب جدًا",
+      "goodAirQuality": "جودة هواء جيدة",
+      "elevatedPollution": "تلوث هواء مرتفع",
+      "poorAirQuality": "جودة هواء رديئة",
+      "veryPoorAirQuality": "جودة هواء رديئة جدًا",
+      "hazardousAirQuality": "هواء خطر"
+    },
+    "highlights": {
+      "lowUv": "أشعة فوق بنفسجية منخفضة",
+      "moderateUv": "أشعة فوق بنفسجية معتدلة",
+      "highUv": "أشعة فوق بنفسجية مرتفعة",
+      "veryHighUv": "أشعة فوق بنفسجية مرتفعة جدًا",
+      "extremeUv": "أشعة فوق بنفسجية قصوى",
+      "goodVisibility": "رؤية جيدة",
+      "reducedVisibility": "رؤية منخفضة",
+      "poorVisibility": "رؤية ضعيفة",
+      "calmAir": "هواء ساكن",
+      "lightWind": "نسيم خفيف",
+      "moderateBreeze": "رياح معتدلة",
+      "strongWind": "رياح قوية",
+      "veryDryAir": "هواء جاف جدًا",
+      "comfortableHumidity": "رطوبة مريحة",
+      "humidAir": "هواء رطب",
+      "veryHumidAir": "رطوبة عالية",
+      "goodAirQuality": "جودة هواء جيدة",
+      "moderateAqi": "مؤشر جودة هواء معتدل",
+      "elevatedPollution": "تلوث مرتفع",
+      "poorAirQuality": "جودة هواء رديئة",
+      "veryPoorAirQuality": "جودة هواء رديئة جدًا",
+      "hazardousAirQuality": "هواء خطر"
+    },
+    "advice": {
+      "protectSkinTitle": "احمِ بشرتك",
+      "highUvDesc": "مؤشر الأشعة فوق البنفسجية مرتفع ({{value}}) — استخدم واقي الشمس والنظارات الشمسية.",
+      "lowUvTitle": "تعرض معتدل للأشعة",
+      "lowUvDesc": "مستويات منخفضة من الأشعة فوق البنفسجية — مريحة للأنشطة الخارجية المطولة أثناء النهار.",
+      "hydrateTitle": "حافظ على ترطيب جسمك",
+      "dryAirDesc": "هواء جاف جدًا ({{value}}% رطوبة نسبية) — اشرب الماء بانتظام أثناء المشي.",
+      "comfortableHumidityTitle": "هواء مريح",
+      "comfortableHumidityDesc": "رطوبة متوازنة ({{value}}%) تجعل التنفس مريحًا.",
+      "breezyWindTitle": "ظروف عاصفة",
+      "strongWindDesc": "رياح معتدلة تسبب مقاومة ملحوظة في الأماكن المفتوحة.",
+      "comfortableBreezeTitle": "نسيم مريح",
+      "lightWindDesc": "تيار هواء خفيف يجعل الأجواء منعشة وممتعة.",
+      "tags": {
+        "highUv": "أشعة مرتفعة",
+        "moderateUv": "أشعة معتدلة",
+        "lowRisk": "خطر منخفض",
+        "dryAir": "هواء جاف",
+        "balanced": "متوازن",
+        "breezy": "عاصف",
+        "gentle": "لطيف"
+      }
+    },
+    "bestForLabel": "الأفضل لـ",
+    "activities": {
+      "walking": "المشي",
+      "photography": "التصوير",
+      "cafe": "مقهى خارجي"
+    },
+    "cautions": {
+      "sunExposure": "تعرض طويل للشمس"
+    },
+    "timestamp": "نصائح لحظية"
+  },
+  "dashboard": {
+    "lastUpdated": "آخر تحديث {{time}}",
+    "loadingFor": "جارٍ تحميل طقس {{city}}…",
+    "loadingData": "جارٍ تحميل بيانات الطقس…",
+    "locations": "مواقع الطقس",
+    "locationPages": "صفحات المواقع",
+    "currentLocation": "الموقع الحالي",
+    "savedLocation": "موقع محفوظ",
+    "goToCurrent": "الانتقال إلى الموقع الحالي",
+    "goToSaved": "الانتقال إلى {{city}}",
+    "support": "ادعمنا",
+    "supportAria": "ادعمنا على كو-في"
   },
   "error": {
     "rejectedKey": "رفض OpenWeather الطلب. يرجى إضافة مفتاح REACT_APP_OPENWEATHER_API_KEY صحيح إلى ملف .env الخاص بك.",

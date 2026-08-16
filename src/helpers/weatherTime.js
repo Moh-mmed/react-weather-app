@@ -61,8 +61,9 @@ export const formatLocationTime = (timestampSeconds, timezoneOffsetSeconds, form
 // "Yesterday", or a short weekday name for any other day. The comparison uses
 // the location calendar via getLocationDateKey — the browser timezone can never
 // change the result. Returns null when the date key or timezone offset is
-// invalid or the current instant cannot be resolved.
-export const getDayLabel = (dateKey, nowUnix, timezoneOffsetSeconds) => {
+// invalid or the current instant cannot be resolved. An optional `locale`
+// controls the weekday formatting language (defaults to the browser locale).
+export const getDayLabel = (dateKey, nowUnix, timezoneOffsetSeconds, locale) => {
   if (!dateKey) return null;
   const todayKey = getLocationDateKey(nowUnix, timezoneOffsetSeconds);
   if (!todayKey) return null;
@@ -78,7 +79,7 @@ export const getDayLabel = (dateKey, nowUnix, timezoneOffsetSeconds) => {
   if (diff === -1) return "Yesterday";
 
   const [y, m, d] = dateKey.split("-").map(Number);
-  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString(undefined, {
+  return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString(locale, {
     weekday: "short",
   });
 };

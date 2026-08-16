@@ -48,8 +48,14 @@
     "illuminatedSuffix": "% Illuminated",
     "tonightMoon": "Tonight's Moon",
     "nextFullMoon": "Next Full Moon",
-    "nextFullMoonDays": "{{count}} days",
-    "tonight": "Tonight"
+    "nextFullMoonDays_one": "{{count}} day",
+    "nextFullMoonDays_other": "{{count}} days",
+    "tonight": "Tonight",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "yesterday": "Yesterday",
+    "sunArcAria": "Sun position arc",
+    "moonArcAria": "Moon position arc"
   },
   "night": {
     "moonPhase": "Moon Phase",
@@ -86,6 +92,18 @@
   },
   "aqi": {
     "title": "Air Quality",
+    "unavailable": "AQI data unavailable",
+    "usScaleLabel": "US AQI SCALE",
+    "recommendationTitle": "Health Recommendation",
+    "recommendations": {
+      "unavailable": "Air quality data is currently unavailable.",
+      "good": "An excellent day for outdoor activities and fresh air ventilation.",
+      "moderate": "Sensitive groups should consider reducing prolonged outdoor exertion.",
+      "unhealthySensitive": "Sensitive groups should avoid prolonged outdoor activity. Everyone else limit exertion.",
+      "unhealthy": "Active children, adults, and people with respiratory disease should avoid outdoor activity.",
+      "veryUnhealthy": "Everyone should avoid all outdoor exertion. Keep windows closed and run air filters.",
+      "hazardous": "Everyone should avoid all outdoor exertion. Keep windows closed and run air filters."
+    },
     "mainPollutant": "Main pollutant — {{pollutant}}",
     "updatedUnknown": "Updated recently",
     "updatedJustNow": "Updated just now",
@@ -298,6 +316,128 @@
     "light thunderstorm": "Light Thunderstorm",
     "heavy thunderstorm": "Heavy Thunderstorm",
     "ragged thunderstorm": "Ragged Thunderstorm"
+  },
+  "outdoorConditions": {
+    "eyebrow": "OUTDOOR CONDITIONS",
+    "statusGood": "Good conditions",
+    "statusGoodPrecaution": "Good, with precautions",
+    "statusFair": "Fair conditions",
+    "statusPoor": "Poor conditions",
+    "headlines": {
+      "good": "Good time to go outside",
+      "poor": "Less favorable for outdoors",
+      "fairPrecaution": "Pleasant outside, take precautions"
+    },
+    "titles": {
+      "good": "Good conditions",
+      "goodOverall": "Good overall",
+      "fair": "Fair conditions",
+      "poor": "Poor conditions"
+    },
+    "descriptions": {
+      "normal": "Outdoor conditions are pleasant.",
+      "noData": "Outdoor conditions data is limited.",
+      "lessComfortableSingle": "{{clause}} makes outdoor activity less comfortable.",
+      "lessComfortablePlural": "{{clause1}} and {{clause2}} make outdoor activity less comfortable.",
+      "defaultDescription": "Excellent visibility and a comfortable breeze make it pleasant outdoors, but high UV and dry air call for simple precautions."
+    },
+    "connectors": {
+      "and": " and ",
+      "but": ", but "
+    },
+    "clauses": {
+      "lowUv": "low UV",
+      "moderateUv": "moderate UV",
+      "elevatedUv": "elevated UV",
+      "veryHighUv": "very high UV",
+      "extremeUv": "extreme UV",
+      "clearVisibility": "clear visibility",
+      "reducedVisibility": "reduced visibility",
+      "poorVisibility": "poor visibility",
+      "calmAir": "calm air",
+      "lightWind": "light wind",
+      "moderateBreeze": "moderate wind",
+      "strongWind": "strong wind",
+      "veryDryAir": "the air is very dry",
+      "comfortableHumidity": "comfortable humidity",
+      "humidAir": "humid air",
+      "veryHumidAir": "very humid air",
+      "goodAirQuality": "good air quality",
+      "elevatedPollution": "elevated air pollution",
+      "poorAirQuality": "poor air quality",
+      "veryPoorAirQuality": "very poor air quality",
+      "hazardousAirQuality": "hazardous air quality"
+    },
+    "highlights": {
+      "lowUv": "Low UV",
+      "moderateUv": "Moderate UV",
+      "highUv": "High UV",
+      "veryHighUv": "Very high UV",
+      "extremeUv": "Extreme UV",
+      "goodVisibility": "Good visibility",
+      "reducedVisibility": "Reduced visibility",
+      "poorVisibility": "Poor visibility",
+      "calmAir": "Calm air",
+      "lightWind": "Light breeze",
+      "moderateBreeze": "Moderate breeze",
+      "strongWind": "Strong wind",
+      "veryDryAir": "Very dry air",
+      "comfortableHumidity": "Comfortable humidity",
+      "humidAir": "Humid air",
+      "veryHumidAir": "High humidity",
+      "goodAirQuality": "Good air quality",
+      "moderateAqi": "Moderate AQI",
+      "elevatedPollution": "Elevated pollution",
+      "poorAirQuality": "Poor air quality",
+      "veryPoorAirQuality": "Very poor AQI",
+      "hazardousAirQuality": "Hazardous air"
+    },
+    "advice": {
+      "protectSkinTitle": "Protect Your Skin",
+      "highUvDesc": "UV index is high ({{value}}) — wear sunscreen and sunglasses.",
+      "lowUvTitle": "Mild UV Exposure",
+      "lowUvDesc": "Low UV levels — comfortable for extended daylight outdoor activity.",
+      "hydrateTitle": "Stay Hydrated",
+      "dryAirDesc": "Very dry air ({{value}}% RH) — drink water regularly during walks.",
+      "comfortableHumidityTitle": "Comfortable Air",
+      "comfortableHumidityDesc": "Balanced moisture ({{value}}% RH) makes breathing effortless.",
+      "breezyWindTitle": "Breezy Conditions",
+      "strongWindDesc": "Moderate breeze creates noticeable wind resistance in open spots.",
+      "comfortableBreezeTitle": "Comfortable Breeze",
+      "lightWindDesc": "Light airflow keeps conditions feeling fresh and pleasant.",
+      "tags": {
+        "highUv": "High UV",
+        "moderateUv": "Moderate UV",
+        "lowRisk": "Low Risk",
+        "dryAir": "Dry Air",
+        "balanced": "Balanced",
+        "breezy": "Breezy",
+        "gentle": "Gentle"
+      }
+    },
+    "bestForLabel": "BEST FOR",
+    "activities": {
+      "walking": "Walking",
+      "photography": "Photography",
+      "cafe": "Outdoor Café"
+    },
+    "cautions": {
+      "sunExposure": "Long sun exposure"
+    },
+    "timestamp": "Real-time advice"
+  },
+  "dashboard": {
+    "lastUpdated": "Last updated {{time}}",
+    "loadingFor": "Loading weather for {{city}}…",
+    "loadingData": "Loading weather data…",
+    "locations": "Weather locations",
+    "locationPages": "Location pages",
+    "currentLocation": "Current location",
+    "savedLocation": "Saved location",
+    "goToCurrent": "Go to current location",
+    "goToSaved": "Go to {{city}}",
+    "support": "Support",
+    "supportAria": "Support on Ko-fi"
   },
   "error": {
     "rejectedKey": "OpenWeather rejected the request. Add a valid REACT_APP_OPENWEATHER_API_KEY to your .env file.",

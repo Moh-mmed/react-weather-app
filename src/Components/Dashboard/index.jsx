@@ -265,41 +265,44 @@ const SettingsMenu = () => {
 };
 
 // ─── Ko-fi donation button ────────────────────────────────────────────────────
-const KofiButton = () => (
-  <a
-    href="https://ko-fi.com/mohammedbenomr"
-    target="_blank"
-    rel="noopener noreferrer"
-    aria-label="Support on Ko-fi"
-    className={clsx(
-      SECONDARY_ACTION_CLASS,
-      "gap-1.5 px-2.5 text-[11px] font-mono",
-    )}
-  >
-    {/* Thin-stroke coffee-cup icon — matches the line-art style used across the app */}
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      width="14"
-      height="14"
-      aria-hidden="true"
+const KofiButton = () => {
+  const { t } = useTranslation();
+  return (
+    <a
+      href="https://ko-fi.com/mohammedbenomr"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={t("dashboard.supportAria", { defaultValue: "Support on Ko-fi" })}
+      className={clsx(
+        SECONDARY_ACTION_CLASS,
+        "gap-1.5 px-2.5 text-[11px] font-mono",
+      )}
     >
-      {/* Cup body */}
-      <path d="M5 7h11a1 1 0 0 1 1 1v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8a1 1 0 0 1 1-1z" />
-      {/* Handle */}
-      <path d="M17 9h1.5a2.5 2.5 0 0 1 0 5H17" />
-      {/* Steam wisps */}
-      <path d="M9 4c0-1 .6-1.5 1-2" />
-      <path d="M13 4c0-1 .6-1.5 1-2" />
-    </svg>
-    {/* Label hidden on mobile, visible on tablet+ */}
-    <span className="hidden tablet:inline">Support</span>
-  </a>
-);
+      {/* Thin-stroke coffee-cup icon — matches the line-art style used across the app */}
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        width="14"
+        height="14"
+        aria-hidden="true"
+      >
+        {/* Cup body */}
+        <path d="M5 7h11a1 1 0 0 1 1 1v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8a1 1 0 0 1 1-1z" />
+        {/* Handle */}
+        <path d="M17 9h1.5a2.5 2.5 0 0 1 0 5H17" />
+        {/* Steam wisps */}
+        <path d="M9 4c0-1 .6-1.5 1-2" />
+        <path d="M13 4c0-1 .6-1.5 1-2" />
+      </svg>
+      {/* Label hidden on mobile, visible on tablet+ */}
+      <span className="hidden tablet:inline">{t("dashboard.support", { defaultValue: "Support" })}</span>
+    </a>
+  );
+};
 
 // ─── Live clock ───────────────────────────────────────────────────────────────
 const LiveClock = ({ timezoneOffset, currentTime }) => {
@@ -338,6 +341,7 @@ const LiveClock = ({ timezoneOffset, currentTime }) => {
 // ─── Inline page-level spinner ────────────────────────────────────────────────
 const LocationPage = ({ page, onRemove, currentTime }) => {
   const { weatherData, airQuality, city } = page;
+  const { t } = useTranslation();
 
   if (!weatherData || !airQuality) {
     // City data is loaded lazily on swipe — missing data means "fetching",
@@ -365,7 +369,14 @@ const LocationPage = ({ page, onRemove, currentTime }) => {
           />
         </svg>
         <p className="text-muted text-sm opacity-60 max-w-[220px] leading-relaxed">
-          {city ? `Loading weather for ${city}…` : "Loading weather data…"}
+          {city
+            ? t("dashboard.loadingFor", {
+                city,
+                defaultValue: `Loading weather for ${city}…`,
+              })
+            : t("dashboard.loadingData", {
+                defaultValue: "Loading weather data…",
+              })}
         </p>
       </div>
     );
@@ -451,7 +462,7 @@ const Dashboard = ({
   const safeTemp = Number.isFinite(activeTemp) ? convertTemp(activeTemp) : "--";
   const { city, country } = activeCurrCity || {};
 
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   // Is the current page already in savedLocations?
   const isCurrentPageSaved =
@@ -533,8 +544,11 @@ const Dashboard = ({
     activeIndex === 0 && !isCurrentPageSaved && handleAddSavedLocation;
 
   // ── Format the last-updated timestamp for the stale-data banner ─────────────
+  const rawLang = i18n.language?.slice(0, 2).toLowerCase();
+  const activeLocale =
+    rawLang === "fr" ? "fr-FR" : rawLang === "ar" ? "ar-EG" : "en-US";
   const lastUpdatedLabel = lastUpdatedAt
-    ? new Date(lastUpdatedAt).toLocaleString(undefined, {
+    ? new Date(lastUpdatedAt).toLocaleString(activeLocale, {
         month: "short",
         day: "numeric",
         hour: "2-digit",
@@ -608,7 +622,10 @@ const Dashboard = ({
               letterSpacing: "0.2px",
             }}
           >
-            Last updated {lastUpdatedLabel}
+            {t("dashboard.lastUpdated", {
+              time: lastUpdatedLabel,
+              defaultValue: `Last updated ${lastUpdatedLabel}`,
+            })}
           </span>
         </div>
       )}
@@ -691,7 +708,7 @@ const Dashboard = ({
       <div
         ref={pagerRef}
         onScroll={handleScroll}
-        aria-label="Weather locations"
+        aria-label={t("dashboard.locations", { defaultValue: "Weather locations" })}
         style={{
           overscrollBehaviorX: "contain",
           WebkitOverflowScrolling: "touch",
@@ -725,7 +742,7 @@ const Dashboard = ({
       {allPages.length > 1 && (
         <div
           className="fixed bottom-5 left-0 right-0 flex items-center justify-center pointer-events-none z-30"
-          aria-label="Location pages"
+          aria-label={t("dashboard.locationPages", { defaultValue: "Location pages" })}
         >
           <div className="flex items-center gap-[7px] pointer-events-auto bg-black/25 backdrop-blur-sm rounded-full px-3 py-2">
             {allPages.map((page, idx) => (
@@ -733,12 +750,17 @@ const Dashboard = ({
                 key={`dot-${idx}`}
                 type="button"
                 title={
-                  idx === 0 ? "Current location" : page.city || "Saved location"
+                  idx === 0
+                    ? t("dashboard.currentLocation", { defaultValue: "Current location" })
+                    : page.city || t("dashboard.savedLocation", { defaultValue: "Saved location" })
                 }
                 aria-label={
                   idx === 0
-                    ? "Go to current location"
-                    : `Go to ${page.city || "saved location"}`
+                    ? t("dashboard.goToCurrent", { defaultValue: "Go to current location" })
+                    : t("dashboard.goToSaved", {
+                        city: page.city || t("dashboard.savedLocation", { defaultValue: "Saved location" }),
+                        defaultValue: `Go to ${page.city || "saved location"}`,
+                      })
                 }
                 aria-pressed={activeIndex === idx}
                 onClick={() => scrollToPage(idx)}

@@ -37,7 +37,7 @@ const AirQualityExpanded = ({ airQuality }) => {
   if (!airQuality || !airQuality.list || !airQuality.list[0]) {
     return (
       <section className="relative overflow-hidden rounded-panel border border-panel-line bg-navy-panel bg-panel-pattern p-6 flex flex-col justify-center items-center h-full min-h-[300px]">
-        <span className="text-muted text-sm">AQI data unavailable</span>
+        <span className="text-muted text-sm">{t("aqi.unavailable", { defaultValue: "AQI data unavailable" })}</span>
       </section>
     );
   }
@@ -47,6 +47,7 @@ const AirQualityExpanded = ({ airQuality }) => {
     aqi,
     label,
     markerPercent,
+    category,
   } = getUsAqiFromComponents(components, t);
 
   // Define scale colors for categories
@@ -112,18 +113,30 @@ const AirQualityExpanded = ({ airQuality }) => {
   // Custom recommendations based on AQI value
   const getRecommendation = (aqiScore) => {
     if (aqiScore === null || !Number.isFinite(aqiScore)) {
-      return "Air quality data is currently unavailable.";
+      return t("aqi.recommendations.unavailable", {
+        defaultValue: "Air quality data is currently unavailable.",
+      });
     }
     if (aqiScore <= 50) {
-      return "An excellent day for outdoor activities and fresh air ventilation.";
+      return t("aqi.recommendations.good", {
+        defaultValue: "An excellent day for outdoor activities and fresh air ventilation.",
+      });
     } else if (aqiScore <= 100) {
-      return "Sensitive groups should consider reducing prolonged outdoor exertion.";
+      return t("aqi.recommendations.moderate", {
+        defaultValue: "Sensitive groups should consider reducing prolonged outdoor exertion.",
+      });
     } else if (aqiScore <= 150) {
-      return "Sensitive groups should avoid prolonged outdoor activity. Everyone else limit exertion.";
+      return t("aqi.recommendations.unhealthySensitive", {
+        defaultValue: "Sensitive groups should avoid prolonged outdoor activity. Everyone else limit exertion.",
+      });
     } else if (aqiScore <= 200) {
-      return "Active children, adults, and people with respiratory disease should avoid outdoor activity.";
+      return t("aqi.recommendations.unhealthy", {
+        defaultValue: "Active children, adults, and people with respiratory disease should avoid outdoor activity.",
+      });
     } else {
-      return "Everyone should avoid all outdoor exertion. Keep windows closed and run air filters.";
+      return t("aqi.recommendations.veryUnhealthy", {
+        defaultValue: "Everyone should avoid all outdoor exertion. Keep windows closed and run air filters.",
+      });
     }
   };
 
@@ -158,7 +171,7 @@ const AirQualityExpanded = ({ airQuality }) => {
             {label}
           </div>
           <div className="text-[11px] text-muted font-mono uppercase tracking-wider">
-            US AQI SCALE
+            {t("aqi.usScaleLabel", { defaultValue: "US AQI SCALE" })}
           </div>
         </div>
       </div>
@@ -189,7 +202,7 @@ const AirQualityExpanded = ({ airQuality }) => {
             key={c.key}
             className={clsx(
               "text-[10px] font-semibold tracking-wide transition-colors",
-              aqi > 0 && label.toLowerCase().includes(c.key)
+              aqi > 0 && category.toLowerCase().includes(c.key)
                 ? "text-primary font-bold scale-[1.05]"
                 : "text-muted opacity-60"
             )}
@@ -238,7 +251,7 @@ const AirQualityExpanded = ({ airQuality }) => {
       {/* Health Recommendation */}
       <div className="flex flex-col gap-1.5">
         <span className="text-[11px] font-bold uppercase tracking-wider text-muted font-sans">
-          Health Recommendation
+          {t("aqi.recommendationTitle", { defaultValue: "Health Recommendation" })}
         </span>
         <p className={clsx("text-[12px] leading-relaxed", getRecommendationColor(aqi))}>
           {getRecommendation(aqi)}
