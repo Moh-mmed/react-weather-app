@@ -214,11 +214,11 @@ const ForecastList = ({ weatherData }) => {
 
   return (
     <section
-      className="relative overflow-hidden desktop:overflow-hidden rounded-panel border border-panel-line bg-navy-panel bg-panel-pattern p-[22px_24px] min-h-0 flex flex-col motion-safe:animate-rise"
+      className="relative overflow-hidden desktop:overflow-hidden rounded-panel border border-panel-line bg-navy-panel bg-panel-pattern p-[22px_24px] min-h-0 flex flex-col motion-safe:animate-rise max-mobile:p-[14px_14px]"
       style={{ animationDelay: "0.1s" }}
     >
       {/* Panel title */}
-      <div className="text-[12px] uppercase tracking-[1.2px] text-muted font-semibold mb-1 flex items-center gap-2">
+      <div className="text-[12px] uppercase tracking-[1.2px] text-muted font-semibold mb-1 flex items-center gap-2 max-mobile:text-[10px]">
         <CalendarIcon />
         {forecastTitle}
       </div>
@@ -227,7 +227,7 @@ const ForecastList = ({ weatherData }) => {
       <div
         className="mt-3 flex-1 grid auto-rows-fr min-h-[260px] gap-2.5 w-full items-stretch justify-stretch overflow-x-auto overflow-y-hidden pb-4
                    [&::-webkit-scrollbar]:h-[6px] [&::-webkit-scrollbar-thumb]:bg-white/15 [&::-webkit-scrollbar-thumb]:rounded-full
-                   max-desktop:flex max-desktop:flex-col max-desktop:overflow-x-visible max-desktop:overflow-y-visible max-desktop:pb-0 max-desktop:min-h-0"
+                   max-desktop:flex max-desktop:flex-col max-desktop:overflow-x-visible max-desktop:overflow-y-visible max-desktop:pb-0 max-desktop:min-h-0 max-mobile:gap-2"
         style={{
           gridTemplateColumns: `repeat(${Math.max(1, forecastDays.length)}, minmax(110px, 1fr))`,
         }}
@@ -297,7 +297,7 @@ const ForecastList = ({ weatherData }) => {
             <div
               key={dt}
               className="relative overflow-hidden bg-white/[0.035] border border-panel-line rounded-card p-[10px_10px_8px] flex flex-col gap-1 min-w-0 w-full max-w-none flex-1 box-border self-stretch
-                         max-desktop:flex-row max-desktop:items-center max-desktop:justify-between max-desktop:p-[8px_16px] max-desktop:gap-4"
+                         max-desktop:flex-row max-desktop:items-center max-desktop:justify-between max-desktop:p-[8px_16px] max-desktop:gap-4 max-mobile:p-[6px_10px_5px] max-mobile:gap-2"
             >
               <div
                 aria-hidden="true"
@@ -312,7 +312,7 @@ const ForecastList = ({ weatherData }) => {
               {/* Card top: Day text + Icon */}
               <div className="flex items-start justify-between gap-2 w-full max-desktop:w-auto max-desktop:items-center max-desktop:gap-3">
                 <div>
-                  <div className="text-[12.5px] font-semibold leading-[1.2] capitalize">
+                  <div className="text-[12.5px] font-semibold leading-[1.2] capitalize max-mobile:text-[11px]">
                     {dayLabel}
                   </div>
                   <div className="text-[11px] text-muted capitalize leading-[1.2] max-desktop:hidden">
@@ -322,12 +322,12 @@ const ForecastList = ({ weatherData }) => {
                 <img
                   src={`https://openweathermap.org/img/wn/${icon}@2x.png`}
                   alt={translatedDesc}
-                  className="w-8 h-8 shrink-0"
+                  className="w-8 h-8 shrink-0 max-mobile:w-6 max-mobile:h-6"
                 />
               </div>
 
               {/* Temp high / low */}
-              <div className="font-mono text-[14px] font-semibold leading-[1.2] max-desktop:flex-1 max-desktop:text-center flex items-center max-desktop:justify-center">
+              <div className="font-mono text-[14px] font-semibold leading-[1.2] max-desktop:flex-1 max-desktop:text-center flex items-center max-desktop:justify-center max-mobile:text-[12px]">
                 <span className="flex items-center">
                   {maxTemp}°{trendIcon}
                 </span>
@@ -337,28 +337,28 @@ const ForecastList = ({ weatherData }) => {
               </div>
 
               {/* Meta rows */}
-              <div className="grid gap-[2px] mt-auto max-desktop:mt-0 max-desktop:flex max-desktop:items-center max-desktop:gap-5 max-desktop:flex-none">
-                <div className="flex justify-between gap-1.5 text-[10px] text-muted whitespace-nowrap max-desktop:flex-col max-desktop:gap-0 max-desktop:items-end">
+              <div className="grid gap-[2px] mt-auto max-desktop:mt-0 max-desktop:flex max-desktop:items-center max-desktop:gap-5 max-desktop:flex-none max-mobile:gap-3">
+                <div className="flex justify-between gap-1.5 text-[10px] text-muted whitespace-nowrap max-desktop:flex-col max-desktop:gap-0 max-desktop:items-end max-mobile:text-[9px] max-mobile:gap-1">
                   <span className="max-desktop:text-[9px] max-desktop:opacity-85">
                     {t("forecast.precip")}
                   </span>
-                  <b className="text-primary font-mono font-medium">
+                  <b className="text-primary font-mono font-medium max-mobile:text-[9px]">
                     {pop == null ? "--" : `${pop}%`}
                   </b>
                 </div>
-                <div className="flex justify-between gap-1.5 text-[10px] text-muted whitespace-nowrap max-desktop:flex-col max-desktop:gap-0 max-desktop:items-end">
+                <div className="flex justify-between gap-1.5 text-[10px] text-muted whitespace-nowrap max-desktop:flex-col max-desktop:gap-0 max-desktop:items-end max-mobile:text-[9px] max-mobile:gap-1">
                   <span className="max-desktop:text-[9px] max-desktop:opacity-85">
                     {t("forecast.humidityAvg")}
                   </span>
-                  <b className="text-primary font-mono font-medium">
+                  <b className="text-primary font-mono font-medium max-mobile:text-[9px]">
                     {Number.isFinite(humidity) ? `${humidity}%` : "--"}
                   </b>
                 </div>
-                <div className="flex justify-between gap-1.5 text-[10px] text-muted whitespace-nowrap max-desktop:flex-col max-desktop:gap-0 max-desktop:items-end">
+                <div className="flex justify-between gap-1.5 text-[10px] text-muted whitespace-nowrap max-desktop:flex-col max-desktop:gap-0 max-desktop:items-end max-mobile:text-[9px] max-mobile:gap-1">
                   <span className="max-desktop:text-[9px] max-desktop:opacity-85">
                     {t("forecast.windMax")}
                   </span>
-                  <b className="text-primary font-mono font-medium">
+                  <b className="text-primary font-mono font-medium max-mobile:text-[9px]">
                     {Number.isFinite(wind_speed) ? `${windObj.value} ${t(windObj.unitKey)}` : "--"}
                   </b>
                 </div>

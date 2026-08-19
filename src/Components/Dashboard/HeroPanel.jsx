@@ -244,7 +244,7 @@ const HeroPanel = ({ weatherData, isPinned = true, onRemove, currentTime }) => {
 
       {/* ── Remove Button for Saved Locations ────────────────────────────── */}
       {!isPinned && (
-        <div className="absolute top-4 right-4 z-20 flex items-center gap-1.5">
+        <div className="absolute top-4 end-4 z-20 flex items-center gap-1.5">
           <button
             type="button"
             onClick={(e) => {

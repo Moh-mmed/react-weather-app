@@ -154,7 +154,7 @@ const UvIndexCard = ({
       />
 
       {/* Content */}
-      <div className="flex min-h-0 flex-1 flex-col">
+      <div className="flex min-h-0 flex-1 flex-col mb-2">
         <div className="mt-3">
           <div className="flex items-baseline gap-1.5">
             <span className={VALUE_CLASS}>{displayValue}</span>

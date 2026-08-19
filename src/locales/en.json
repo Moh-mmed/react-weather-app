@@ -437,7 +437,9 @@
     "goToCurrent": "Go to current location",
     "goToSaved": "Go to {{city}}",
     "support": "Support",
-    "supportAria": "Support on Ko-fi"
+    "supportAria": "Support on Ko-fi",
+    "portfolio": "Mohammed Benaoumeur",
+    "portfolioAria": "Mohammed Benaoumeur — Portfolio"
   },
   "error": {
     "rejectedKey": "OpenWeather rejected the request. Add a valid REACT_APP_OPENWEATHER_API_KEY to your .env file.",
