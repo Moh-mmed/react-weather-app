@@ -272,7 +272,9 @@ const KofiButton = () => {
       href="https://ko-fi.com/mohammedbenomr"
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={t("dashboard.supportAria", { defaultValue: "Support on Ko-fi" })}
+      aria-label={t("dashboard.supportAria", {
+        defaultValue: "Support on Ko-fi",
+      })}
       className={clsx(
         SECONDARY_ACTION_CLASS,
         "gap-1.5 px-2.5 text-[11px] font-mono",
@@ -299,7 +301,9 @@ const KofiButton = () => {
         <path d="M13 4c0-1 .6-1.5 1-2" />
       </svg>
       {/* Label hidden on mobile, visible on tablet+ */}
-      <span className="hidden tablet:inline">{t("dashboard.support", { defaultValue: "Support" })}</span>
+      <span className="hidden tablet:inline">
+        {t("dashboard.support", { defaultValue: "Support" })}
+      </span>
     </a>
   );
 };
@@ -339,7 +343,7 @@ const LiveClock = ({ timezoneOffset, currentTime }) => {
 };
 
 // ─── Inline page-level spinner ────────────────────────────────────────────────
-const LocationPage = ({ page, onRemove, currentTime }) => {
+const LocationPage = ({ page, onRemove, currentTime, hasMultiplePages }) => {
   const { weatherData, airQuality, city } = page;
   const { t } = useTranslation();
 
@@ -383,7 +387,12 @@ const LocationPage = ({ page, onRemove, currentTime }) => {
   }
 
   return (
-    <div className="flex-1 w-full overflow-y-auto scroll-smooth no-scrollbar">
+    <div
+      className={clsx(
+        "flex-1 w-full overflow-y-auto scroll-smooth no-scrollbar",
+        hasMultiplePages ? "pb-16" : "pb-0",
+      )}
+    >
       {/* Section 1: Overview */}
       <div className="w-full">
         <OverviewSection
@@ -391,8 +400,51 @@ const LocationPage = ({ page, onRemove, currentTime }) => {
           currentTime={currentTime}
           onRemove={onRemove}
         />
+        <div className="flex justify-start pt-2">
+          <WebsiteBadge />
+        </div>
       </div>
     </div>
+  );
+};
+
+// ─── Portfolio badge ──────────────────────────────────────────────────────────
+const WebsiteBadge = () => {
+  const { t } = useTranslation();
+  return (
+    <a
+      href="https://benaoumeur-mohammed.vercel.app/"
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={t("dashboard.portfolioAria", {
+        defaultValue: "Mohammed Ben Aoumeur — Portfolio",
+      })}
+      className={clsx(
+        SECONDARY_ACTION_CLASS,
+        "gap-1.5 px-2.5 text-[11px] font-mono !bg-white/10",
+      )}
+    >
+      {/* Globe icon — thin-stroke line-art matching the app's icon style */}
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        width="14"
+        height="14"
+        aria-hidden="true"
+      >
+        <circle cx="12" cy="12" r="10" />
+        <ellipse cx="12" cy="12" rx="4" ry="10" />
+        <line x1="2" y1="12" x2="22" y2="12" />
+      </svg>
+      {/* Label always visible, smaller on mobile */}
+      <span className="inline max-mobile:text-[9px]">
+        Built by <span className="font-semibold">Mohammed Benaoumeur</span>
+      </span>
+    </a>
   );
 };
 
@@ -561,7 +613,7 @@ const Dashboard = ({
     /* Root: full-height flex column, strictly contained — no vertical overflow anywhere.
        On small screens each page scrolls vertically inside the pager via overflow-y-auto. */
     <div
-      className="flex min-h-screen flex-col text-primary bg-dashboard-radial pt-7 pb-5 gap-5"
+      className="flex min-h-screen flex-col text-primary bg-dashboard-radial pt-7 gap-5"
       style={{ overflowX: "hidden" }}
     >
       {/* ── Stale data banner ────────────────────────────────────────────────── */}
@@ -629,120 +681,128 @@ const Dashboard = ({
           </span>
         </div>
       )}
-      {/* ── Fixed header — horizontal padding lives here ───────────────────── */}
-      <header className="flex items-center justify-between gap-4 flex-wrap px-[clamp(20px,4vw,48px)] shrink-0">
-        {/* Brand + secondary header actions cluster */}
-        <div className="flex items-center gap-3.5">
-          <div className="flex items-center gap-2.5">
-            <BrandIcon />
-            <div className="font-display font-semibold text-[20px] tracking-[0.2px]">
-              Weather<em className="italic text-accent-sun">Me</em>
+      {/* ── Content container — max-width + centered ──────────────────────── */}
+      <div className="w-full max-w-[1600px] mx-auto flex flex-col flex-1 gap-5">
+        {/* ── Fixed header — horizontal padding lives here ───────────────────── */}
+        <header className="flex items-center justify-between gap-4 flex-wrap px-[clamp(20px,4vw,48px)] shrink-0">
+          {/* Brand + secondary header actions cluster */}
+          <div className="flex items-center gap-3.5">
+            <div className="flex items-center gap-2.5">
+              <BrandIcon />
+              <div className="font-display font-semibold text-[20px] tracking-[0.2px]">
+                Weather<em className="italic text-accent-sun">Me</em>
+              </div>
+            </div>
+            {/* Secondary header actions */}
+            <div className="flex items-center gap-2 shrink-0">
+              <KofiButton />
+              <SettingsMenu />
             </div>
           </div>
-          {/* Secondary header actions */}
-          <div className="flex items-center gap-2 shrink-0">
-            <KofiButton />
-            <SettingsMenu />
-          </div>
-        </div>
 
-        {/* Search form — grows to fill available space, min-w prevents it collapsing to icon-only */}
-        <NavBarForm
-          cityNotFound={cityNotFound}
-          handleSearchCity={handleSearchCity}
-          handleWeatherData={handleWeatherData}
-          handleAirQuality={handleAirQuality}
-          handleCurrCity={handleCurrCity}
-          handleGeoCoords={handleGeoCoords}
-          isUpdatingLocation={isUpdatingLocation}
-          handleAddSavedLocation={handleAddSavedLocation}
-          savedLocations={savedLocations}
-        />
+          {/* Search form — grows to fill available space, min-w prevents it collapsing to icon-only */}
+          <NavBarForm
+            cityNotFound={cityNotFound}
+            handleSearchCity={handleSearchCity}
+            handleWeatherData={handleWeatherData}
+            handleAirQuality={handleAirQuality}
+            handleCurrCity={handleCurrCity}
+            handleGeoCoords={handleGeoCoords}
+            isUpdatingLocation={isUpdatingLocation}
+            handleAddSavedLocation={handleAddSavedLocation}
+            savedLocations={savedLocations}
+          />
 
-        {/* Headline: date + city + temp */}
-        <div className="flex items-center gap-3.5 text-right max-desktop:text-left">
-          <div className="flex flex-col justify-center text-left">
-            <div className="text-[13px] leading-[1.25] text-muted font-mono tracking-[0.4px] uppercase">
-              {activeWeatherData ? (
-                <LiveClock
-                  timezoneOffset={timezone_offset}
-                  currentTime={currentTime}
-                />
-              ) : (
-                <span className="opacity-40">-- : --</span>
-              )}
-            </div>
-            <div className="text-[14px] leading-[1.25] font-semibold flex items-center gap-1.5">
-              {city}, {country}
-              {/* Add to saved locations button */}
-              {showAddBtn && (
-                <button
-                  type="button"
-                  title={t("header.saveThisLocation")}
-                  onClick={handleAddCurrentToSaved}
-                  className="w-5 h-5 rounded-full bg-white/10 hover:bg-accent-sky/20 border border-white/10 hover:border-accent-sky/40 flex items-center justify-center transition-all duration-150 cursor-pointer"
-                >
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    width="10"
-                    height="10"
-                    className="text-accent-sky"
+          {/* Headline: date + city + temp */}
+          <div className="flex items-center gap-3.5 text-right max-desktop:text-left">
+            <div className="flex flex-col justify-center text-left">
+              <div className="text-[13px] leading-[1.25] text-muted font-mono tracking-[0.4px] uppercase">
+                {activeWeatherData ? (
+                  <LiveClock
+                    timezoneOffset={timezone_offset}
+                    currentTime={currentTime}
+                  />
+                ) : (
+                  <span className="opacity-40">-- : --</span>
+                )}
+              </div>
+              <div className="text-[14px] leading-[1.25] font-semibold flex items-center gap-1.5">
+                {city}, {country}
+                {/* Add to saved locations button */}
+                {showAddBtn && (
+                  <button
+                    type="button"
+                    title={t("header.saveThisLocation")}
+                    onClick={handleAddCurrentToSaved}
+                    className="w-5 h-5 rounded-full bg-white/10 hover:bg-accent-sky/20 border border-white/10 hover:border-accent-sky/40 flex items-center justify-center transition-all duration-150 cursor-pointer"
                   >
-                    <line x1="12" y1="5" x2="12" y2="19" />
-                    <line x1="5" y1="12" x2="19" y2="12" />
-                  </svg>
-                </button>
-              )}
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      width="10"
+                      height="10"
+                      className="text-accent-sky"
+                    >
+                      <line x1="12" y1="5" x2="12" y2="19" />
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                    </svg>
+                  </button>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center font-display font-semibold text-[32px] leading-none text-accent-sky">
+              {safeTemp}°{unitSystem === "imperial" ? "F" : "C"}
             </div>
           </div>
-          <div className="flex items-center font-display font-semibold text-[32px] leading-none text-accent-sky">
-            {safeTemp}°{unitSystem === "imperial" ? "F" : "C"}
-          </div>
-        </div>
-      </header>
+        </header>
 
-      {/* ── Horizontal paging scroll container ────────────────────────────── */}
-      <div
-        ref={pagerRef}
-        onScroll={handleScroll}
-        aria-label={t("dashboard.locations", { defaultValue: "Weather locations" })}
-        style={{
-          overscrollBehaviorX: "contain",
-          WebkitOverflowScrolling: "touch",
-        }}
-        className="flex flex-1 min-h-0 overflow-x-auto no-scrollbar snap-x snap-mandatory touch-pan-x"
-      >
-        {allPages.map((page, idx) => (
-          <div
-            key={`${page.lat ?? "pinned"}-${page.lon ?? "pinned"}-${idx}`}
-            className="flex-none w-full min-w-full snap-start snap-always flex flex-col px-[clamp(20px,4vw,48px)] overflow-hidden min-h-0"
-          >
-            <LocationPage
-              page={page}
-              currentTime={currentTime}
-              onRemove={
-                !page.isPinned && handleRemoveLocation
-                  ? () => {
-                      handleRemoveLocation(page.lat, page.lon);
-                      // scroll back to the previous page
-                      const prevIdx = Math.max(0, activeIndex - 1);
-                      scrollToPage(prevIdx);
-                    }
-                  : undefined
-              }
-            />
-          </div>
-        ))}
+        {/* ── Horizontal paging scroll container ────────────────────────────── */}
+        <div
+          ref={pagerRef}
+          onScroll={handleScroll}
+          aria-label={t("dashboard.locations", {
+            defaultValue: "Weather locations",
+          })}
+          style={{
+            overscrollBehaviorX: "contain",
+            WebkitOverflowScrolling: "touch",
+          }}
+          className="flex flex-1 min-h-0 overflow-x-auto no-scrollbar snap-x snap-mandatory touch-pan-x"
+        >
+          {allPages.map((page, idx) => (
+            <div
+              key={`${page.lat ?? "pinned"}-${page.lon ?? "pinned"}-${idx}`}
+              className="flex-none w-full min-w-full snap-start snap-always flex flex-col px-[clamp(20px,4vw,48px)] overflow-hidden min-h-0"
+            >
+              <LocationPage
+                page={page}
+                currentTime={currentTime}
+                hasMultiplePages={allPages.length > 1}
+                onRemove={
+                  !page.isPinned && handleRemoveLocation
+                    ? () => {
+                        handleRemoveLocation(page.lat, page.lon);
+                        // scroll back to the previous page
+                        const prevIdx = Math.max(0, activeIndex - 1);
+                        scrollToPage(prevIdx);
+                      }
+                    : undefined
+                }
+              />
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* ── Page indicator dots ────────────────────────────────────────────── */}
       {allPages.length > 1 && (
         <div
-          className="fixed bottom-5 left-0 right-0 flex items-center justify-center pointer-events-none z-30"
-          aria-label={t("dashboard.locationPages", { defaultValue: "Location pages" })}
+          className="fixed left-0 right-0 flex items-center justify-center pointer-events-none z-30 location-dots"
+          aria-label={t("dashboard.locationPages", {
+            defaultValue: "Location pages",
+          })}
         >
           <div className="flex items-center gap-[7px] pointer-events-auto bg-black/25 backdrop-blur-sm rounded-full px-3 py-2">
             {allPages.map((page, idx) => (
@@ -751,14 +811,25 @@ const Dashboard = ({
                 type="button"
                 title={
                   idx === 0
-                    ? t("dashboard.currentLocation", { defaultValue: "Current location" })
-                    : page.city || t("dashboard.savedLocation", { defaultValue: "Saved location" })
+                    ? t("dashboard.currentLocation", {
+                        defaultValue: "Current location",
+                      })
+                    : page.city ||
+                      t("dashboard.savedLocation", {
+                        defaultValue: "Saved location",
+                      })
                 }
                 aria-label={
                   idx === 0
-                    ? t("dashboard.goToCurrent", { defaultValue: "Go to current location" })
+                    ? t("dashboard.goToCurrent", {
+                        defaultValue: "Go to current location",
+                      })
                     : t("dashboard.goToSaved", {
-                        city: page.city || t("dashboard.savedLocation", { defaultValue: "Saved location" }),
+                        city:
+                          page.city ||
+                          t("dashboard.savedLocation", {
+                            defaultValue: "Saved location",
+                          }),
                         defaultValue: `Go to ${page.city || "saved location"}`,
                       })
                 }

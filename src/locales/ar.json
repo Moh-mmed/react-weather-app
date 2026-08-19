@@ -446,7 +446,9 @@
     "goToCurrent": "الانتقال إلى الموقع الحالي",
     "goToSaved": "الانتقال إلى {{city}}",
     "support": "ادعمنا",
-    "supportAria": "ادعمنا على كو-في"
+    "supportAria": "ادعمنا على كو-في",
+    "portfolio": "محمد بنعمر",
+    "portfolioAria": "محمد بنعمر — معرض الأعمال"
   },
   "error": {
     "rejectedKey": "رفض OpenWeather الطلب. يرجى إضافة مفتاح REACT_APP_OPENWEATHER_API_KEY صحيح إلى ملف .env الخاص بك.",

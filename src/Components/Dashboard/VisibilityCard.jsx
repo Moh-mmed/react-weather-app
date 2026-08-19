@@ -51,7 +51,9 @@ const VisibilityCard = ({ value, unit, visKm, animationDelay }) => {
   const hasVisibility = Number.isFinite(visKm);
   const band = hasVisibility ? getVisibilityBand(visKm) : MISSING_BAND;
   const percent = hasVisibility ? clamp(visKm / VIS_MAX_KM, 0, 1) * 100 : 0;
-  const statusLabel = band.statusKey ? t(band.statusKey) : t("weatherStatus.na");
+  const statusLabel = band.statusKey
+    ? t(band.statusKey)
+    : t("weatherStatus.na");
 
   return (
     <div
@@ -81,7 +83,7 @@ const VisibilityCard = ({ value, unit, visKm, animationDelay }) => {
       />
 
       {/* Content */}
-      <div className="flex min-h-0 flex-1 flex-col">
+      <div className="flex min-h-0 flex-1 flex-col mb-2">
         <div className="mt-3">
           <div className="flex items-baseline gap-1.5">
             <span className={VALUE_CLASS}>{value}</span>

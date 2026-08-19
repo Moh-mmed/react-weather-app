@@ -642,7 +642,7 @@ const DetailsSection = ({ page, currentTime }) => {
   return (
     <div className="relative flex h-full w-full flex-col animate-fadeIn select-none">
       {/* 6 Metric Cards in 3×2 grid — rows flex to fill remaining height */}
-      <div className="grid min-h-0 flex-1 grid-cols-1 gap-[clamp(0.55rem,1vw,1rem)] md:grid-cols-3 md:auto-rows-[minmax(0,1fr)]">
+      <div className="grid min-h-0 flex-1 grid-cols-1 gap-[clamp(0.55rem,1vw,1rem)] min-[600px]:grid-cols-2 min-[1080px]:grid-cols-3 min-[1080px]:auto-rows-[minmax(0,1fr)]">
         {/* Card 1: Pressure */}
         <PressureCard
           value={presObj.value}

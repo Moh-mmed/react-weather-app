@@ -257,11 +257,11 @@ const HourlyOutlook = ({ weatherData }) => {
 
   return (
     <section
-      className="relative overflow-hidden rounded-panel border border-panel-line bg-navy-panel bg-panel-pattern p-[22px_24px] motion-safe:animate-rise"
+      className="relative overflow-hidden rounded-panel border border-panel-line bg-navy-panel bg-panel-pattern p-[22px_24px] motion-safe:animate-rise max-mobile:p-[14px_14px]"
       style={{ animationDelay: "0.05s" }}
     >
       {/* Panel title */}
-      <div className="text-[12px] uppercase tracking-[1.2px] text-muted font-semibold mb-4 flex items-center gap-2">
+      <div className="text-[12px] uppercase tracking-[1.2px] text-muted font-semibold mb-4 flex items-center gap-2 max-mobile:text-[10px] max-mobile:tracking-[1px] max-mobile:mb-3">
         <ClockIcon />
         {t("outlook.title")}
       </div>
@@ -276,12 +276,12 @@ const HourlyOutlook = ({ weatherData }) => {
       {/* Scrollable area — force LTR for chronological timeline progression */}
       <div
         dir="ltr"
-        className="overflow-x-auto overflow-y-hidden custom-scrollbar pb-2"
+        className="overflow-x-auto overflow-y-hidden custom-scrollbar pb-2 hourly-scroll max-mobile:pb-1"
         style={{ scrollbarWidth: "thin" }}
       >
         {outlook48h?.length ? (
           <div
-            className="relative min-w-max mt-2"
+            className="relative min-w-max mt-2 hourly-chart-inner max-mobile:mt-1"
             style={{ height: SVG_HEIGHT, width: totalWidth }}
           >
             {/* ── SVG Timeline Layer ── */}
@@ -355,10 +355,10 @@ const HourlyOutlook = ({ weatherData }) => {
                     className="flex-none flex flex-col justify-between items-center py-1"
                     style={{ width: COLUMN_WIDTH }}
                   >
-                    <div className="font-mono text-[11px] text-muted tracking-wide mt-1">
+                    <div className="font-mono text-[11px] text-muted tracking-wide mt-1 max-mobile:text-[9px]">
                       {label}
                     </div>
-                    <div className="font-mono text-[17px] font-medium tracking-tight mb-1">
+                    <div className="font-mono text-[17px] font-medium tracking-tight mb-1 max-mobile:text-[13px]">
                       {convertTemp(entry.temp)}°
                     </div>
                   </div>

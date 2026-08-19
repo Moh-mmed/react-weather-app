@@ -393,6 +393,23 @@ body {
   }
 }
 
+/* 48-hour outlook: scale chart on small screens */
+@media (max-width: 480px) {
+  .hourly-scroll {
+    height: 115px;
+  }
+
+  .hourly-chart-inner {
+    transform: scale(0.82);
+    transform-origin: left top;
+  }
+}
+
+/* Floating page-dots: safe-area on notched devices */
+.location-dots {
+  bottom: max(1.25rem, calc(0.75rem + env(safe-area-inset-bottom, 0px)));
+}
+
 /* Smooth Fade-In animation for dashboard panels transitions */
 @keyframes fadeIn {
   from {
